@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 ```
 
 # PMPLNFA
-Parsimonious Finite Mixtures of Multivariate Poisson-Log Normal Factor Analyzers (PMPLNFA) for Clustering Count Data
+Parsimonious Finite Mixtures of Multivariate Poisson-Log Normal Factor Analyzers for Clustering Count Data
 
 <!-- badges: start -->
  ![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/y/anjalisilva/MPLNClust/master)

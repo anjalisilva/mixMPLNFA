@@ -4,7 +4,7 @@
 # PMPLNFA
 
 Parsimonious Finite Mixtures of Multivariate Poisson-Log Normal Factor
-Analyzers (PMPLNFA) for Clustering Count Data
+Analyzers for Clustering Count Data
 
 <!-- badges: start -->
 
