@@ -19,7 +19,7 @@ high-dimensional spaces, especially as the number of clusters increases.
 Subspace clustering allows to clus- ter data in low-dimensional
 subspaces, while keeping all the dimensions and by introducing
 restrictions to mixture parameters (Bouveyron and Brunet, 2014).
-Restrictions are intro- duced to the model parameters with the aim of
+Restrictions are introduced to the model parameters with the aim of
 obtaining parsimonious models, which are sufficiently flexible for
 clustering purposes. Since the largest contribution of free parameters
 is through the covariance matrices, it is a natural focus for the
@@ -39,7 +39,7 @@ family is developed, by considering the constraints. This family is
 referred to as the parsimonious mixtures of MPLN factor analyzers family
 (PMPLNFA).
 
-## References for Package
+## References
 
 -   [Aitchison, J. and C. H. Ho (1989). The multivariate Poisson-log
     normal distribution.
