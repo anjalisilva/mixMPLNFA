@@ -48,7 +48,7 @@ In 2008, a family of eight parsimonious Gaussian mixture models (PGMMs; [McNicho
 
 ## Contributions
 
-`PMPLNFA` repository welcomes issues, enhancement requests, and other contributions. To submit an issue, use the [GitHub issues](https://github.com/anjalisilva/MPLNClust/issues).
+`PMPLNFA` repository welcomes issues, enhancement requests, and other contributions. To submit an issue, use the [GitHub issues](https://github.com/anjalisilva/mixMPLNFA/issues).
 
 
 ## Acknowledgments

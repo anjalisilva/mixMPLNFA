@@ -72,7 +72,7 @@ referred to as the parsimonious mixtures of MPLN factor analyzers family
 
 `PMPLNFA` repository welcomes issues, enhancement requests, and other
 contributions. To submit an issue, use the [GitHub
-issues](https://github.com/anjalisilva/MPLNClust/issues).
+issues](https://github.com/anjalisilva/mixMPLNFA/issues).
 
 ## Acknowledgments
 
