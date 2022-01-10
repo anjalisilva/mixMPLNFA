@@ -59,7 +59,7 @@ referred to as the parsimonious mixtures of MPLN factor analyzers family
     mixture models. *Statistics and Computing.* 18,
     285–296.](https://link.springer.com/article/10.1007/s11222-008-9056-0)
 
-## Authoers
+## Authors
 
 -   Anjali Silva (<anjali@alumni.uoguelph.ca>).
 -   Sanjeena Dang (<sanjeena.dang@carleton.ca>).
