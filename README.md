@@ -26,11 +26,13 @@ is through the covariance matrices, it is a natural focus for the
 introduction of parsimony.
 
 In 2008, a family of eight parsimonious Gaussian mixture models (PGMMs;
-McNicholas and Murphy, 2008) were introduced with parsimonious
-covariance structures. In 2019, a model-based clustering methodology
-using mixtures of multivariate Poisson-log normal distribution (MPLN;
-Aitchison and Ho, 1989) was developed to analyze multivariate count
-measurements [Silva et al.,
+[McNicholas and Murphy,
+2008](https://link.springer.com/article/10.1007/s11222-008-9056-0)) were
+introduced with parsimonious covariance structures. In 2019, a
+model-based clustering methodology using mixtures of multivariate
+Poisson-log normal distribution (MPLN; [Aitchison and Ho,
+1989](mixMPLNFA)) was developed to analyze multivariate count
+measurements by [Silva et al.,
 2019](https://pubmed.ncbi.nlm.nih.gov/31311497/). In this work, a family
 of mixtures of MPLN factor analyzers that is analogous to the PGMM
 family is developed, by considering the constraints. This family is
