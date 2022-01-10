@@ -1,0 +1,516 @@
+\documentclass[12pt]{article}
+
+\textwidth=165mm \headheight=0mm \headsep=10mm \topmargin=0mm
+\textheight=210mm %\footskip=1.5cm
+\oddsidemargin=0mm
+
+\usepackage{graphicx}
+%\usepackage[dvips]{graphics} 
+
+\usepackage{natbib}
+\usepackage{epsfig}
+\usepackage{amsfonts} 
+\usepackage{amsmath}
+\usepackage{amssymb,longtable,enumitem}
+\usepackage{mathrsfs}
+\usepackage{setspace}
+\usepackage{longtable}
+
+\newcommand{\real}{\text{\rm I\hspace{-0.6mm}R}}  
+\date{}
+\LTcapwidth=\textwidth
+%%%%%%%%%%%%%%%
+
+\newcommand{\bA}{\mathbf{A}}
+\newcommand{\bD}{\mathbf{D}}
+\newcommand{\bI}{\mathbf{I}}
+\newcommand{\bP}{\mathbf{P}}
+\newcommand{\bQ}{\mathbf{Q}}
+\newcommand{\bS}{\mathbf{S}}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bW}{\mathbf{W}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\bZ}{\mathbf{Z}}
+
+\newcommand{\bm}{\mathbf{m}}
+\newcommand{\bmm}{\mathbf{m}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bw}{\mathbf{w}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\by}{\mathbf{y}}
+\newcommand{\bz}{\mathbf{z}}
+
+\newcommand{\bpi}{\boldsymbol{\pi}}
+
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\bTheta}{\boldsymbol{\Theta}}
+\newcommand{\bmu}{\boldsymbol{\mu}}
+\newcommand{\bSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bLambda}{\boldsymbol{\Lambda}}
+\newcommand{\bPsi}{\boldsymbol{\Psi}}
+
+\newcommand{\tr}{\,\mbox{tr}}
+\newcommand{\diag}{\,\mbox{diag}}
+
+\DeclareMathOperator{\Ev}{\mathbb{E}}
+\DeclareMathOperator{\Var}{\mathbb{V}}
+\DeclareMathOperator{\R}{\mathbb{R}}
+
+
+\begin{document}
+\doublespacing
+
+\title{Mixtures of multivariate Poisson lognormal factor analyzers for high dimensional RNAseq data}
+
+\author{}
+
+
+
+
+\maketitle
+
+\begin{abstract}
+\end{abstract}
+
+
+
+\section{Introduction}
+
+
+
+
+%\cite{silva2019} developed a mixtures of multivariate Poisson-lognormal \citep[MPLN;][]{aitchison1989} distributions to cluster multivariate count measurements. In MPLN models, the counts are modeled using a hierarchical structure such that $$Y_{ij}\mid {\theta_{ij}} \sim \text{Poisson} (e^{\theta_{ij}} ) ~\text{and}~ \btheta_i =(\theta_{i1},\ldots,\theta_{id})=(\log\lambda_{i1},\ldots,\log \lambda_{id})  \sim \mathscr{N}_d (\bmu,\bSigma),$$
+%where $\mathscr{N}_d (\bmu,\bSigma)$ denotes a $d$-dimensional Gaussian distribution with mean $\bmu$ and covariance $\bSigma$. An attractive property of the MPLN model is that is can account for over-dispersion and allows for unrestricted correlation. However, the parameter estimation of mixtures of MPLN distribution relies on the the posterior of the latent variables which do not have a closed form. Therefore, these models came with heavy computation cost as they relied on Bayesian MCMC-based approaches and the computational time is further compounded in model-based clustering where the expected value of the latent variable needs to be computed several times therefore making it infeasible for high dimensional data. 
+
+
+ 
+
+ \section{Methodology}
+ \subsection{Mixtures of Factor Analyzer}
+We assume the following hierarchical structure:
+\begin{align*}
+Y_{ij}&\mid X_{ij}=x_{ij}\sim \text{Poisson}\left(\exp\{x_{ij}+\log{k_j}\}\right)\\
+\bX_i&\mid \bU_i=\bu_i \sim N(\bmu_g+\bLambda_g \bu_i,\bPsi_g)\\
+\bU_i &\sim N(\mathbf{0}_p,\bI_p).
+\end{align*}
+In model-based clustering, we also have unobserved component membership indicator variable $\mathbf{Z}$ such that $Z_{ig}=1$ if the observation $i^{th}$ belongs to group $g$ and $Z_{ig}=0$ otherwise. 
+Hence, the complete data now comprises of observed expression levels $\by$, underlying latent variable $\btheta$, and unknown group membership $\mathbf{z}$. 
+
+The complete data likelihood can therefore be written as:
+\begin{align*}
+L(\boldsymbol{\vartheta}) &= \prod_{g=1}^G\prod_{i=1}^n\left[\pi_g \left\{\prod_{j=1}^d f(y_{ij}\mid x_{ij},k_j)\right\}~f(\bx_i\mid \bu_i,\bmu_g,\bLambda_g,\bPsi_g)~ f(\bu_i)\right]^{z_{ig}}
+\end{align*}
+where $\boldsymbol{\vartheta}$ denotes all the model parameters. The complete data log-likelihood can therefore be written as:
+\begin{align*}
+l_c(\boldsymbol{\vartheta}) &= \sum_{g=1}^G\sum_{i=1}^n z_{ig} \left[\log \pi_g + \left\{\sum_{j=1}^d \log f(y_{ij}\mid x_{ij},k_j)\right\}+ \log f(\bx_i\mid \bu_i,\bmu_g,\bLambda_g,\bPsi_g) + \log f(\bu_i)\right]
+\end{align*}
+In order to utilize the EM framework for parameter estimation, we require 
+$\Ev(Z_{ig}\bX_i\mid \by_i,\bu_i, \bmu_g,\bLambda_g,\bPsi_g)$, $\Ev(Z_{ig}\bX_i\bX_i'\mid\by_i,\bu_i, \bmu_g,\bLambda_g,\bPsi_g)$, $\Ev(Z_{ig}\bU_i\mid \by_i,\bx_i, \bmu_g,\bLambda_g,\bPsi_g)$ and $\Ev(Z_{ig}\bU_i\bU_i'\mid\by_i,\bx_i, \bmu_g,\bLambda_g,\bPsi_g)$. 
+
+\subsection{Variational approximation of mixtures of MPLN factor analyzers}\label{sec:method3}
+
+Recently, \cite{subedi2020parsimonious} proposed an alternate framework for parameter estimation utilizing variational Gaussian approximation (VGA). Variational  approximation \citep{wainwright2008} is an approximate inference technique that uses a computationally convenient approximating density in place of a more complex but `true' posterior density obtained by minimizing the Kullback-Leibler (KL) divergence between the true and the approximating densities. This alleviates the computational cost that comes with MCMC-EM algorithm.
+Here, we propose a mixtures of Poisson log-normal distributions with factor analyzers that utilizes a variational EM framework for parameter estimation.
+
+Parameter estimation for a mixtures of factor analyzers is typically done using alternating expectation conditional maximization framework that assumes different specification of missing data at different stages. Here, we will adapt a similar notion resulting in a two stage iterative EM-type approach.
+
+\subsection{Stage 1}
+In Stage 1, we treat $\bX$ and $\bZ$ as missing such that
+\begin{align*}
+Y_{ij}&\mid X_{ij}=x_{ij}\sim \text{Poisson}\left(\exp\{x_{ij}+\log{k_j}\}\right)\\
+\bX_i&\sim N(\bmu_g,\bSigma_g),
+\end{align*}
+where $\bSigma_g=\bLambda_g\bLambda_g^T+\bPsi_g$.Therefore, the component specific marginal density of the observed data $\by_i$ can be written as
+\vspace{-0.05in}
+\begin{align*}
+ f(\by_i\mid Z_{ig}=1,\bmu_g,\bSigma_g)=\int_{\real^d} \left[ \prod _{j=1}^d f_p(y_{ij}\mid x_{ij},k_j, Z_{ig}=1)\right] ~f_N(\bx_i\mid Z_{ig}=1,\bmu_g,\bSigma_g)~d\bx_i,
+\end{align*}
+%\vspace{-0.05in}
+where $x_{ij}$ and $y_{ij}$ are the $j^{th}$ element of $\bx_i$ and $\by_i$ respectively, $f_p(\cdot)$ is the probability mass function of the Poisson distribution with mean $e^{x_{ij}+\log k_j}$ and $f_N(\cdot)$ is the probability density function of  $d$-dimensional Gaussian distribution with mean $\bmu_g$ and covariance $\bSigma_g$. Note that the marginal distribution of $Y$ involves multiple integrals and cannot be further simplified. The the complete-data log-likelihood using the marginal density of $\by_i\mid Z_{ig}=1$ can be written as:
+$$l(\boldsymbol{\vartheta})=\sum_{g=1}^G\sum_{i=1}^n z_{ig}\log \pi_g+ \sum_{g=1}^G\sum_{i=1}^n z_{ig}\log f(\by_{i}\mid Z_{ig}=1, \bmu_g,\bSigma_g).$$
+As the marginal of $\by_i\mid Z_{ig}=1$ cannot be simplified, we use variational Gaussian approximation to approximate the marginal log-density of the observed variable $\by_i$ from component $g$ in the mixtures of MPLN distributions. Suppose, we have an approximating density $q(\bx_{ig})$, the marginal log-density of $\by_i\mid Z_{ig}=1$ can be written as
+\begin{align*}
+\log f(\by_i\mid Z_{ig}=1) &= \int_{\real^d} \log f(\by_i\mid Z_{ig}=1) ~q(\bx_{ig}) ~d\bx_{ig}\\
+&=  \int_{\real^d} \log \frac{f(\by_i,\bx_i\mid Z_{ig}=1)/q(\bx_{ig})}{f(\bx_i\mid\by_i,Z_{ig}=1)/q(\bx_{ig})} ~q(\bx_{ig}) ~d\bx_{ig}\\
+&= \int_{\real^d} \left[\log f(\by_i,\bx_i\mid Z_{ig}=1) - \log q(\bx_{ig})\right] q(\bx_{ig}) ~ d\bx_{ig} + D_{KL}(q_{ig}\|f_{ig}) \\
+&= F(q_{ig},\by_i) + D_{KL}(q_{ig}\|f_{ig}),
+\end{align*}
+
+\noindent where $D_{KL}(q_{ig}\|f_{ig})= \int_{\real^d} q(\bx_{ig}) \log \frac{q(\bx_{ig})}{f(\bx_{i}\mid\by_i,Z_{ig}=1)} d\bx_{ig}$ is the Kullback-Leibler (KL) divergence between $f(\bx_{i}\mid \by_i,Z_{ig}=1)$ and approximating distribution $q(\bx_{ig})$, and 
+$$F(q_{ig},\by_i)=\int_{\real^d} \left[\log f(\by_i,\bx_i\mid Z_{ig}=1) - \log q(\bx_{ig})\right] q(\bx_{ig})  d\bx_{ig},$$ is our evidence lower bound (ELBO) for each observation $\by_i$. 
+\noindent The complete data log-likelihood of the mixtures of MPLN distributions can be written as:
+\begin{align*}
+l_c(\boldsymbol{\vartheta}\mid \by) &= \sum_{g=1}^G \sum_{i=1}^n z_{ig} \log \pi_g +  \sum_{g=1}^G \sum_{i=1}^n z_{ig} \left[ F(q_{ig},\by_i) + D_{KL}(q_{ig}\|f_{ig}) \right].
+\end{align*}
+
+\noindent To minimize the KL divergence, we maximize our ELBO. In VGA, $q(\bx_{ig})$ is assumed to be a Gaussian distribution. Assuming $q(\bx_{ig}) = \mathscr{N}(\mathbf{m}_{ig}, \mathbf{S}_{ig})$, the ELBO for each observation $\by_i$ becomes
+\begin{align*}
+F(q_{ig},\by_i) &=-\frac{1}{2}(\bmm_{ig}-\bmu_g)'\bSigma_g^{-1}(\bmm_{ig}-\bmu_g)-\frac{1}{2} \tr(\bSigma_g^{-1}\mathbf{S}_{ig})+\frac{1}{2} \log |\mathbf{S}_{ig}| -\frac{1}{2} \log |\bSigma_g| + \frac{d}{2}+ \bmm_{ig}'\by_i \\
+&+\sum_{j=1}^d\left(\log k_j\right)y_{ij}-   \sum_{j=1}^d \left\{e^{\log k_j+m_{igj}+\frac{1}{2}S_{ig,jj}}+\log(y_{ij}!)\right\}.
+\end{align*}
+
+This lower bound is strictly jointly concave with respect to the mean ($\bmm_{ig}$) and variance ($\mathbf{S}_{ig}$) of the approximating distribution and hence, similar to \cite{arridge2018} and \cite{subedi2020parsimonious}, estimation can be obtained via Newton's method and fixed-point method.
+  
+\noindent Therefore, in stage 1, we update $\Ev(Z_{ig}\mid \by_i)$, variational parameters $\bmm_{ig}$  and $\mathbf{S}_{ig}$, and model parameters $\pi_g$ and $\bmu_g$.
+\begin{enumerate}
+\item Conditional on the variational parameters $\bmm_{ig},\mathbf{S}_{ig}$ and on $\bmu_g$ and $\bSigma_g$, the  $\Ev(Z_{ig})$ is computed. Given $\bmu_g$ and $\bSigma_g$, 
+\begin{align*}
+\Ev(Z_{ig}\mid \by_i)=\frac{\pi_g f(\by\mid \bmu_g,\bSigma_g)}{\sum_{h=1}^G\pi_h f(\by\mid \bmu_h,\bSigma_h)}.
+\end{align*}
+Note that this involves the marginal distribution of $Y$ which is difficult to compute. Hence, we use an approximation of $\Ev(Z_{ig})$ where we replace the marginal density of the exponent of ELBO such that 
+\begin{align*}
+\widehat{Z}_{ig}\stackrel{\text{def}}{=}\frac{\pi_g \exp\left[F\left(q_{ig},\by_i\right) \right]}{\sum_{h=1}^G\pi_h \exp\left[F\left(q_{ih},\by_i\right) \right]}.
+\end{align*}
+This approximation is computationally convenient and a similar framework was utilized by \cite{tang2015,gollini2014}. 
+
+\item Update the variationalparameters $\bmm_{ig}$ and $\bS_{ig}$ as following:
+\begin{enumerate}
+ \item Fixed-point method for updating $\mathbf{S}_{ig}$ is
+\begin{align*}
+\hspace{-0.65in} \mathbf{S}_{ig}^{(t+1)}=\left\{\bSigma_g^{-1}+ \bI \odot \mathbf{exp}\left[\log k_j+\bmm_{ig}^{(t)}+\frac{1}{2} \diag \left(\mathbf{S}_{ig}^{(t)}\right)\right] \mathbf{1}_d'  \right\}^{-1}
+\end{align*}
+where the vector function $\mathbf{exp}\left[ \mathbf{a} \right] = (e^{a_1}, \ldots, e^{a_d})'$ is a vector of exponential each element of the $d$-dimensional vector $\mathbf{a}$, $\mbox{diag}( \mathbf{S} ) = ( \mathbf{S}_{11} \ldots,  \mathbf{S}_{dd})$ puts the diagonal elements of the $d\times d$ matrix  $\mathbf{S}$ into a d-dimensional vector, $\odot$ the Hadmard product and $\mathbf{1}_d$ is a d-dimensional vector of ones ;
+\item Newton's method to update $\bmm_{ig}$ is
+\begin{align*}
+ \bmm_{ig}^{(t+1)}&=\bmm_{ig}^{(t)}\! -\! \mathbf{S}_{ig}^{(t+1)}\! \left\{ \! \by_i - \mathbf{exp}\left[\log k_j+\bmm_{ig}^{(t)}\! +\! \frac{1}{2}\diag\left(\mathbf{S}_{ig}^{(t+1)}\right)\right]\! -\! \bSigma_g^{-1} \left(\bmm_{ig}^{(t)}-\bmu_g\right)\! \right\}\!.
+\end{align*}
+\end{enumerate}
+\item Given $\widehat{Z}_{ig}$ and the variational parameters $\bmm_{ig}$ and $\mathbf{S}_{ig}$, the parameters $\bpi$ and $\bmu_g$ are updated as:
+\begin{align*}
+\widehat{\pi}_g&=\frac{\sum_{i=1}^n \widehat{Z}_{ig}}{n},\\
+\widehat{\bmu}_g& = \frac{\sum_{i=1}^n \widehat{Z}_{ig} \bmm_{ig}^{(t+1)}}{\sum_{i=1}^n \widehat{Z}_{ig}}.
+\end{align*}
+\end{enumerate}
+
+
+\subsection{Stage 2}
+In Stage 2, we treat $\bX$, $\bU$ and $\bZ$ as missing such that
+\begin{align*}
+Y_{ij}&\mid X_{ij}=x_{ij}\sim \text{Poisson}\left(\exp\{x_{ij}+\log{k_j}\}\right)\\
+\bX_i&\mid \bU_i=\bu_i\sim N(\bmu_g+\bLambda_g \bu_i,\bPsi_g),\\
+\bU_i&\sim N(\mathbf{0}_p,\bI_p).
+\end{align*}
+Here, we use $d$ for the dimensionality of the observed data and $p$ as the dimensionality of the latent variable.
+Suppose, we have an approximating density $q_{\bx,\bu}(\bx_{ig},\bu_{ig})$, the marginal log-density of $\by_i\mid Z_{ig}=1$ can be written as
+\begin{align*}
+\log f(\by_i\mid Z_{ig}=1) &= \int_{\real^p} \int_{\real^d} \log f(\by_i\mid Z_{ig}=1) ~q_{\bx,\bu}(\bx_{ig},\bu_{ig}) ~d\bx_{ig}~d\bu_{ig}\\
+&= \int_{\real^p} \int_{\real^d} \log \frac{f(\by_i,\bx_i,\bu_i\mid Z_{ig}=1)/q_{\bx,\bu}(\bx_{ig},\bu_{ig})}{f(\bx_i,\bu_i\mid\by_i,Z_{ig}=1)/q_{\bx,\bu}(\bx_{ig},\bu_{ig})} ~q_{\bx,\bu}(\bx_{ig},\bu_{ig}) ~d\bx_{ig}\\
+&= \int_{\real^p} \int_{\real^d} \Big[\log f(\by_i,\bx_i,\bu_i\mid Z_{ig}=1) - \log q_{\bx,\bu}(\bx_{ig},\bu_{ig})\Big] q_{\bx,\bu}(\bx_{ig},\bu_{ig}) ~ d\bx_{ig} ~d\bu_{ig}\\
+&+ D_{KL}(q_{ig}\|f_{ig}) \\
+&= F(q_{ig},\by_i) + D_{KL}(q_{ig}\|f_{ig}),
+\end{align*}
+
+\noindent where $D_{KL}(q_{ig}\|f_{ig})= \int_{\real^p} \int_{\real^d} q_{\bx,\bu}(\bx_{ig},\bu_{ig}) \log \frac{q_{\bx,\bu}(\bx_{ig},\bu_{ig})}{f(\bx_{i},\bu_{i}\mid\by_i,Z_{ig}=1)} ~d\bx_{ig}~d\bu_{ig}$ is the Kullback-Leibler (KL) divergence between $f(\bx_{i},\bu_i \mid \by_i,Z_{ig}=1)$ and approximating distribution $q(\bx_{ig},\bu_{ig})$, and 
+$$F(q_{ig},\by_i)=\int_{\real^p} \int_{\real^d} \Big[\log f(\by_i,\bx_i,\bu_i\mid Z_{ig}=1) - \log q_{\bx,\bu}(\bx_{ig},\bu_{ig})\Big] q_{\bx,\bu}(\bx_{ig},\bu_{ig})  ~d\bx_{ig}~d\bu_{ig},$$ is our evidence lower bound (ELBO) for each observation $\by_i$. 
+If we assume $q_{\bx,\bu}(\bx_{ig},\bu_{ig})$ to be factorable such that $q_{\bx,\bu}(\bx_{ig},\bu_{ig})=q_{\bx}(\bx_{ig})q_{\bu}(\bu_{ig})$,
+\begin{align*}
+F(q_{ig},\by_i)&=\int_{\real^p} \int_{\real^d} \Big[ \log f(\by_i \mid \bx_i,\bu_i, Z_{ig}=1) +\log f(\bx_i\mid \bu_i,Z_{ig}=1)+\log f(\bu_i\mid Z_{ig}=1)\\
+&- \log q_{\bx}(\bx_{ig}) - \log q_{\bu}(\bu_{ig}) \Big] ~q_{\bx}(\bx_{ig})~q_{\bu}(\bu_{ig})~d\bx_{ig}~d\bu_{ig}\\
+&=\int_{\real^p} \left\{\int_{\real^d} \Big[ \log f(\by_i \mid \bx_i,\bu_i, Z_{ig}=1) +\log f(\bx_i\mid \bu_i,Z_{ig}=1)+ \log f(\bu_i\mid Z_{ig}=1) \right.\\
+&\left.- \log q_{\bx}(\bx_{ig}) - \log q_{\bu}(\bu_{ig}) \Big] ~q_{\bx}(\bx_{ig})~d\bx_{ig} \right\} ~q_{\bu}(\bu_{ig}) ~d\bu_{ig}\\
+&=\int_{\real^p} \Bigg[\left\{\int_{\real^d} \Big[ \log f(\by_i \mid \bx_i,\bu_i, Z_{ig}=1) +\log f(\bx_i\mid \bu_i,Z_{ig}=1) -\log q_\bx(\bx_i)\Big]~q_{\bx}(\bx_{ig})~d\bx_{ig} \right\}\\
+&+ \log f(\bu_i\mid Z_{ig}=1)  - \log q_{\bu}(\bu_{ig}) \Bigg] q_{\bu}(\bu_{ig}) ~d\bu_{ig}.
+\end{align*}
+Using the approximating density $q_\bx(\bx_{ig})$ from Stage 1 (i.e. $q_\bx(\bx_{ig}) = N (\bmm_{ig},\mathbf{S}_{ig})$) and assuming $q_\bu(\bu_{ig}) = N (\bP_{ig},\mathbf{Q}_{ig})$, we get
+
+\begin{align*}
+F(q_{ig},\by_i)&=\int_{\real^p} \Bigg[\bmm_{ig}'\by_i + \sum_{j=1}^d\left(\log k_j\right)y_{ij}-   \sum_{j=1}^d \left\{e^{\log k_j+m_{igj}+\frac{1}{2}S_{ig,jj}}+\log(y_{ij}!)\right\} +\frac{1}{2} \log |\bS_{ig}| +\frac{d}{2}\\
+&-\frac{1}{2}(\bmm_{ig}-\bmu_g-\bLambda_g\bu_i)'\bPsi_g^{-1}(\bmm_{ig}-\bmu_g-\bLambda_g\bu_i)-\frac{1}{2}\tr\left(\bPsi_g^{-1}\mathbf{S}_{ig}\right)  -\frac{1}{2} \log |\bPsi_g| \\
+&+ \log f(\bu_i\mid Z_{ig}=1)  - \log q_{\bu}(\bu_{ig}) \Bigg] q_{\bu}(\bu_{ig}) ~d\bu_{ig}\\[3pt]
+&=\int_{\real^p} \Bigg[\bmm_{ig}'\by_i + \sum_{j=1}^d\left(\log k_j\right)y_{ij}-   \sum_{j=1}^d \left\{e^{\log k_j+m_{igj}+\frac{1}{2}S_{ig,jj}}+\log(y_{ij}!)\right\} +\frac{1}{2} \log |\bS_{ig}| +\frac{d}{2}\\
+&-\frac{1}{2}(\bmm_{ig}-\bmu_{ig})^T\bPsi_g^{-1}(\bmm_{ig}-\bmu_{ig})+(\bmm_{ig}-\bmu_g)^T\bPsi_g^{-1}\bLambda_g\bu_{ig}-\frac{1}{2}\bu_{ig}^T\bLambda_g^T\bPsi_g^{-1}\bLambda_g\bu_{ig}\\
+&-\frac{1}{2}\tr\left(\bPsi_g^{-1}\mathbf{S}_{ig}\right)  -\frac{1}{2} \log |\bPsi_g|+ \log f(\bu_i\mid Z_{ig}=1)  - \log q_{\bu}(\bu_{ig}) \Bigg] q_{\bu}(\bu_{ig}) ~d\bu_{ig}\\[3pt]
+&=\bmm_{ig}'\by_i + \sum_{j=1}^d\left(\log k_j\right)y_{ij}-   \sum_{j=1}^d \left\{e^{\log k_j+m_{igj}+\frac{1}{2}S_{ig,jj}}+\log(y_{ij}!)\right\} +\frac{1}{2} \log |\bS_{ig}| +\frac{d}{2}\\
+&-\frac{1}{2}(\bmm_{ig}-\bmu_{ig})^T\bPsi_g^{-1}(\bmm_{ig}-\bmu_{ig})+(\bmm_{ig}-\bmu_g)^T\bPsi_g^{-1}\bLambda_g\bP_{ig}-\frac{1}{2}\bP_{ig}^T\bLambda_g^T\bPsi_g^{-1}\bLambda_g\bP_{ig}\\
+&-\frac{1}{2}\tr(\bLambda_g^T\bPsi_g^{-1}\bLambda_g\bQ_{ig})-\frac{1}{2}\tr\left(\bPsi_g^{-1}\mathbf{S}_{ig}\right)  -\frac{1}{2} \log |\bPsi_g|-\frac{1}{2}\bP_{ig}^T\bP_{ig}+\frac{1}{2}\log | \bQ_{ig}^{-1}|\\
+&-\frac{1}{2}\tr( \bQ_{ig}) + \frac{p}{2}.
+\end{align*}
+The variational parameters $\bP_{ig}$ and $\bQ_{ig}$ that maximize this ELBO will also minimize the KL divergence.
+Therefore, in Stage 2, we update variational parameters $\bP_{ig}$ and $\bQ_{ig}$, and model parameters $\bLambda_g$ and $\bPsi_g$.
+\begin{enumerate}
+\item The update for the variational parameters $\bP_{ig}$ and $\bQ_{ig}$ are:
+\begin{align*}
+\widehat{\bQ}_{ig}^{(t+1)}&=(\bI_p+\hat{\bLambda}_g^T\hat{\bPsi}_g^{-1}\hat{\bLambda}_g)^{-1}\\
+&=\bI_p-\hat{\bbeta}_g\hat{\bLambda}_g (\text{after a bit of simplification where }\hat{\bbeta}_g=\hat{\bLambda}_g^T(\hat{\bPsi}_g+\hat{\bLambda}_g\hat{\bLambda}_g^T)^{-1}).\\
+\widehat{\bP}_{ig}^{(t+1)}&=\widehat{\bQ}_{ig}^{(t+1)}\hat{\bLambda}_g^T\hat{\bPsi}^{-1}_g(\bmm_{ig}^{(t+1)}-\hat{\bmu}_{g})\\
+&=\hat{\bbeta}_g(\bmm_{ig}^{(t+1)}-\hat{\bmu}_{g}) \left(\text{after a bit of simplification}\right).
+\end{align*}
+\item The update for $\bPsi_g$ and $\bLambda_g$ are obtained by repeating the following steps until convergence:
+\begin{align}
+\widehat{\bTheta}_g&=\bI_p-\hat{\bbeta}_g\hat{\bLambda}_g+\hat{\bbeta}_g\bW_g\hat{\bbeta}_g^T \nonumber\\
+\hat{\bbeta}_g&=\hat{\bLambda}_g^T(\hat{\bLambda}_g\hat{\bLambda}_g^T+\hat{\bPsi}_g)^{-1} \nonumber \\
+\hat{\bLambda}_g&=\bW_g\hat{\bbeta}^T\widehat{\bTheta}_g^{-1}.\\
+\hat{\bPsi}_g&=\diag\left(\bW_g-\hat{\bLambda}_g\hat{\bbeta}_g\bW_g+\frac{\sum_{i=1}^n \widehat{Z}_{ig}\bS_{ig}}{\sum_{i=1}^n\widehat{Z}_{ig}}\right)
+\end{align}
+where $\bW_{g}=\frac{\sum_{i=1}^n\widehat{Z}_{ig}(\bmm_{ig}^{(t+1)}-\hat{\bmu}_g)(\bmm_{ig}^{(t+1)}-\hat{\bmu}_g)^T}{\sum_{i=1}^n\widehat{Z}_{ig}}$Note: convergence is assumed when the difference in Frobenius norm of $\hat{\bLambda}_g$ and $\hat{\bPsi}_g$ from successive iterations are both less than $10^{-6}$.
+\end{enumerate}
+
+\section{Family of models}
+Constraints can be imposed on $\bLambda_g$ and $\bPsi_g$ as described in Table \ref{tabfam} that results in a family of 8 models.
+\begin{table}
+\caption{Family of models based on the constraints on $\bLambda_g$ and $\bPsi_g$.}\label{tabfam}
+\begin{tabular}{llllc} 
+\hline
+Model ID & Loading Matrix $\bLambda_g$  & Error Variance $\bPsi_g$ & Isotropic $\psi_g \mathbf{I}$ & Covariance parameters \\
+\hline
+UUU & unconstrained   & unconstrained & unconstrained & $ G\left[dq - q\left(q -1\right)/2\right] + Gd$ \\
+UUC &  unconstrained   & unconstrained & constrained & $G\left[dq -q\left(q-1\right)/2\right] +G$\\
+UCU &  unconstrained   & constrained & unconstrained & $G\left[dq -q\left(q -1\right)/2\right] + d$ \\
+UCC & unconstrained   & constrained & constrained & $ G\left[dq -q\left(q-1\right)/2\right] + 1$ \\
+CUU &  constrained   & unconstrained & unconstrained & $ \left[dq -q\left(q - 1\right)/2\right] + Gd$ \\
+CUC &  constrained   & unconstrained & constrained & $ \left[dq -q\left(q - 1\right)/2\right] + G$ \\
+CCU &  constrained   & constrained & unconstrained & $ \left[dq -q\left(q - 1\right)/2\right] + d$ \\
+CCC &  constrained   & constrained & constrained & $ \left[dq -q\left(q - 1\right)/2\right] + 1$   \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Isotropic assumption: $\bPsi_g = \psi_g \bI_d$}
+\begin{align*}
+l(\boldsymbol{\vartheta})&=\sum_{g=1}^G\sum_{i=1}^n z_{ig}\log \pi_g+ \sum_{g=1}^G\sum_{i=1}^n z_{ig}\log f(\by_{i}\mid Z_{ig}=1, \bmu_g,\bPsi_g,\bLambda_g).\\
+&=\sum_{g=1}^G\sum_{i=1}^n z_{ig}\log \pi_g+ \sum_{g=1}^G\sum_{i=1}^n z_{ig} \left \{F(q_{ig},\by_i) + D_{KL}(q_{ig}\mid\mid f_{ig})\right \}
+\end{align*}
+Under the isotropic constraint (i.e. $\bPsi_g = \psi_g \bI_d$),
+\begin{align*}
+\sum_{g=1}^G\sum_{i=1}^nz_{ig}F(q_{ig},\by_i)&=\sum_{g=1}^G\sum_{i=1}^nz_{ig}\left[-\frac{\psi_g^{-1}}{2}(\bmm_{ig}-\bmu_{ig})^T(\bmm_{ig}-\bmu_{ig})+\psi_g^{-1}(\bmm_{ig}-\bmu_g)^T\bLambda_g\bP_{ig}  \right.\\
+&\left.+\frac{d}{2} \log \psi_g^{-1}-\frac{\psi_g^{-1}}{2}\bP_{ig}^T\bLambda_g^T\bLambda_g\bP_{ig}-\frac{\psi_g^{-1}}{2}\tr(\bLambda_g^T\bLambda_g\bQ_{g})-\frac{\psi_g^{-1}}{2}\tr\left(\mathbf{S}_{ig}\right)  \right]+C,\\[3pt]
+&=\sum_{g=1}^G\left[-\frac{\psi_g^{-1}}{2}n_g\tr(\bW_{g})+\psi_g^{-1}n_g\tr(\bW_g\bLambda_g\bbeta_g)+\frac{dn_g}{2}\log \psi_g^{-1}-\frac{\psi_g{^{-1}}n_g}{2}\tr(\bLambda_g^T\bLambda_g\bQ_{g})\right.\\
+&\left.-\frac{\psi_g{^{-1}}}{2}n_g\tr(\bbeta^T\bLambda_g^T\bLambda_g\bbeta_g\bW_g)-\frac{\psi_g^{-1}}{2}\tr\left(\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}\right)\right]+C,
+\end{align*}
+where $C$ is a constant with respect to $\psi_g^{-1}$ and $n_g=\sum_{i=1}^nz_{ig}$. Taking derivative with respect to $\psi^{-1}_g$ and setting it to 0, we get
+\begin{align*}
+d\hat{\psi}_g-\tr(\bW_g)+2\tr(\bW_g\hat{\bLambda}_g\hat{\bbeta}_g)-\tr(\hat{\bbeta}^T\hat{\bLambda}_g^T\hat{\bLambda}_g\hat{\bbeta}_g\bW_g)-\tr(\hat{\bLambda}_g^T\hat{\bLambda}_g\bQ_{g})-\tr\left(\frac{\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}}{n_g}\right)=0.
+\end{align*}
+And,
+\begin{align*}
+\hat{\psi}_g&=\frac{1}{d}\tr\left(\bW_g-2\bW_g\hat{\bLambda}_g\hat{\bbeta}_g+\hat{\bbeta}^T\hat{\bLambda}_g^T\hat{\bLambda}_g\hat{\bbeta}_g\bW_g+\hat{\bLambda}_g^T\hat{\bLambda}_g\bQ_{g}+\frac{\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}}{n_g}\right)\\
+&=\frac{1}{d}\tr\left(\bW_g-2\bW_g\hat{\bLambda}_g\hat{\bbeta}_g+\hat{\bLambda}_g\hat{\bTheta}_g\hat{\bLambda}_g^T+\frac{\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}}{n_g}\right)\\
+&=\frac{1}{d}\tr\left(\bW_g-2\bW_g\hat{\bLambda}_g\hat{\bbeta}_g-\hat{\bLambda}_g\hat{\bTheta}_g\hat{\bTheta}_g^{-1}\hat{\bbeta}_g\bW_g+\frac{\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}}{n_g}\right)\\
+&=\frac{1}{d}\tr\left(\bW_g-\bW_g\hat{\bLambda}_g\hat{\bbeta}_g+\frac{\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}}{n_g}\right)\\
+&=\frac{1}{d}\tr\left(\bW_g-\hat{\bLambda}_g\hat{\bbeta}_g\bW_g+\frac{\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}}{n_g}\right).
+\end{align*}
+Therefore,
+\begin{equation}
+\hat{\psi}_g=\frac{1}{d}\tr\left(\bW_g-\hat{\bLambda}_g\hat{\bbeta}_g\bW_g+\frac{\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}}{n_g}\right).
+\end{equation}
+
+\subsection{Equal Variance: $\bPsi_g = \bPsi$}
+Under the equal variance constraint (i.e. $\bPsi_g = \bPsi$),
+\begin{align*}
+\sum_{g=1}^G\sum_{i=1}^nz_{ig}F(q_{ig},\by_i)&=\sum_{g=1}^G\sum_{i=1}^nz_{ig}\left[-\frac{1}{2}(\bmm_{ig}-\bmu_{ig})^T\bPsi^{-1}(\bmm_{ig}-\bmu_{ig})+(\bmm_{ig}-\bmu_g)^T\bPsi^{-1}\bLambda_g\bP_{ig}  \right.\\
+&\left.+\frac{1}{2} \log |\bPsi^{-1}|-\frac{1}{2}\bP_{ig}^T\bLambda_g^T\bPsi^{-1}\bLambda_g\bP_{ig}-\frac{1}{2}\tr(\bLambda_g^T\bPsi^{-1}\bLambda_g\bQ_{g})-\frac{1}{2}\tr\left(\bPsi^{-1}\mathbf{S}_{ig}\right)  \right]+C,\\[3pt]
+&=\sum_{g=1}^G\left[-\frac{n_g}{2}\tr(\bPsi^{-1}\bW_{g})+n_g\tr(\bW_g\bPsi^{-1}\bLambda_g\bbeta_g)-\frac{n_g}{2}\tr(\bLambda_g^T\bPsi^{-1}\bLambda_g\bQ_{g})\right.\\
+&\left.+\frac{n_g}{2}\log |\bPsi^{-1}|-\frac{\psi_g{^{-1}}}{2}n_g\tr(\bbeta^T\bLambda_g^T\bPsi^{-1}\bLambda_g\bbeta_g\bW_g)-\frac{1}{2}\tr\left(\bPsi^{-1}\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}\right)\right]+C,
+\end{align*}
+where $C$ is a constant with respect to $\bPsi$ and $n_g=\sum_{i=1}^nz_{ig}$. Taking derivative with respect to $\bPsi^{-1}$ and setting it to 0, we get
+\begin{align*}
+n\hat{\bPsi}-\sum_{g=1}^Gn_g\bW_g+2\sum_{g=1}^Gn_g\hat{\bLambda}_g\hat{\bbeta}_g\bW_g-\sum_{g=1}^Gn_g\hat{\bbeta}^T\hat{\bLambda}_g^T\hat{\bLambda}_g\hat{\bbeta}_g\bW_g-\sum_{g=1}^Gn_g\hat{\bLambda}_g^T\hat{\bLambda}_g\bQ_{g}-\tr\left(\frac{\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}}{n_g}\right)=0.
+\end{align*}
+Simplifying this, we get
+\begin{align*}
+\hat{\bPsi}&=\diag\left(\sum_{g=1}^G\frac{n_g}{n}\bW_g-\sum_{g=1}^G\frac{n_g}{n}\hat{\bLambda}_g\hat{\bbeta}_g\bW_g+\frac{1}{n}\sum_{g=1}^G\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}\right).\\
+&=\diag\left(\sum_{g=1}^G\frac{n_g}{n}\bW_g-\sum_{g=1}^G\frac{n_g}{n}\hat{\bLambda}_g\hat{\bbeta}_g\bW_g+\frac{1}{n}\sum_{g=1}^G\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}\right)
+\end{align*}
+
+\subsection{Equal Variance and isotropic constraint $\bPsi_g=\psi\bI_d$}
+\begin{align*}
+\sum_{g=1}^G\sum_{i=1}^nz_{ig}F(q_{ig},\by_i)&=\sum_{g=1}^G\sum_{i=1}^nz_{ig}\left[-\frac{\psi^{-1}}{2}(\bmm_{ig}-\bmu_{ig})^T(\bmm_{ig}-\bmu_{ig})+\psi^{-1}(\bmm_{ig}-\bmu_g)^T\bLambda_g\bP_{ig}  \right.\\
+&\left.+\frac{d}{2} \log \psi^{-1}-\frac{\psi^{-1}}{2}\bP_{ig}^T\bLambda_g^T\bLambda_g\bP_{ig}-\frac{\psi^{-1}}{2}\tr(\bLambda_g^T\bLambda_g\bQ_{g})-\frac{\psi^{-1}}{2}\tr\left(\mathbf{S}_{ig}\right)  \right]+C,\\[3pt]
+&=\sum_{g=1}^G\left[-\frac{\psi^{-1}}{2}n_g\tr(\bW_{g})+\psi^{-1}n_g\tr(\bW_g\bLambda_g\bbeta_g)+\frac{dn_g}{2}\log \psi^{-1}-\frac{\psi{^{-1}}n_g}{2}\tr(\bLambda_g^T\bLambda_g\bQ_{g})\right.\\
+&\left.-\frac{\psi{^{-1}}}{2}n_g\tr(\bbeta^T\bLambda_g^T\bLambda_g\bbeta_g\bW_g)-\frac{\psi^{-1}}{2}\tr\left(\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}\right)\right]+C,
+\end{align*}
+where $C$ is a constant with respect to $\psi^{-1}$ and $n_g=\sum_{i=1}^nz_{ig}$. Taking derivative with respect to $\psi^{-1}_g$ and setting it to 0, we get
+ \begin{align*}
+dn\hat{\psi}&-\tr(\sum_{g=1}^Gn_g\bW_g)+ 2\tr(\sum_{g=1}^Gn_g\bW_g\hat{\bLambda}_g\hat{\bbeta}_g)-\tr(\sum_{g=1}^Gn_g\hat{\bbeta}^T\hat{\bLambda}_g^T\hat{\bLambda}_g\hat{\bbeta}_g\bW_g)-\tr(\sum_{g=1}^Gn_g\hat{\bLambda}_g^T\hat{\bLambda}_g\bQ_{g})\\
+&-\tr\left(\sum_{g=1}^G\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}\right)=0.
+\end{align*}
+
+And, simplifying this, we get
+\begin{align}
+\hat{\psi}&=\frac{1}{d}\tr\left(\sum_{g=1}^G\frac{n_g}{n}\bW_g-\sum_{g=1}^G\frac{n_g}{n}\hat{\bLambda}_g\hat{\bbeta}_g\bW_g+\frac{1}{n}\sum_{g=1}^G\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}\right)
+\end{align}
+
+
+\subsection{Equal Loading Matrices: $\bLambda_g = \bLambda$}
+Under the equal loading matrices constraint (i.e. $\bLambda_g = \bLambda$),
+\begin{align*}
+\sum_{g=1}^G\sum_{i=1}^nz_{ig}F(q_{ig},\by_i)&=
+\sum_{g=1}^G\sum_{i=1}^nz_{ig}\left((\bmm_{ig}-\bmu_g)^T\bPsi_g^{-1}\bLambda\bP_{ig}-\frac{1}{2}\bP_{ig}^T\bLambda^T\bPsi_g^{-1}\bLambda\bP_{ig}-\frac{1}{2}\tr(\bLambda^T\bPsi_g^{-1}\bLambda\bQ_{g})\right)\\
+&=\sum_{g=1}^G\left(n_g\tr\left(\bbeta_g\bW_g\bPsi_g^{-1}\bLambda\right)-\frac{n_g}{2}\tr\left(\bbeta_g^T\bLambda^T\bPsi_g^{-1}\bLambda\bbeta_g\bW_{g}\right) -\frac{n_g}{2}tr(\bLambda^T\bPsi_g^{-1}\bLambda\bQ_{g})\right).
+\end{align*}
+Taking derivative with respect to $\bLambda$ and setting it equal to 0, we get
+\begin{align*}
+0&=\sum_{g=1}^Gn_g \hat{\bPsi}_g^{-1}\bW_g\hat{\bbeta}_g^T-\sum_{g=1}^Gn_g\hat{\bPsi}_g^{-1}\hat{\bLambda}\hat{\bbeta}_g\bW_g\hat{\bbeta}_g^T-\sum_{g=1}^G n_g\hat{\bPsi}_g^{-1}\hat{\bLambda}\bQ_{g}\\
+&=\sum_{g=1}^G n_g\hat{\bPsi}_g^{-1}\bW_g\hat{\bbeta}_g^T-\sum_{g=1}^Gn_g\hat{\bPsi}_g^{-1}\hat{\bLambda}\left(\hat{\bbeta}_g\bW_g\hat{\bbeta}_g^T-\bI_p-\hat{\bbeta}_g\hat{\bLambda}\right)\\
+&=\sum_{g=1}^Gn_g \hat{\bPsi}_g^{-1}\bW_g\hat{\bbeta}_g^T-\sum_{g=1}^Gn_g\hat{\bPsi}_g^{-1}\hat{\bLambda}\hat{\bTheta}_g.
+\end{align*}
+In this case, the loading matrix cannot be solved directly and must be solved in a row-by-row manner as suggested by \cite{mcnicholas2008}. Hence,
+\begin{align}
+\hat{\lambda}_i&=\mathbf{r}_i\left(\sum_{g=1}^G\frac{n_g}{\hat{\Psi}_{g,(i)}} \hat{\bTheta}_g\right)^{-1},\label{common_lambda}
+%\hat{\bbeta}_g&=\hat{\bLambda}^T(\hat{\bLambda}\hat{\bLambda}^T+\hat{\bPsi}_g)^{-1},\nonumber \\
+%\hat{\bTheta}_g&=\bI_p-\hat{\bbeta}_g\hat{\bLambda}+\hat{\bbeta}_g\bW_g\hat{\bbeta}_g^T, \nonumber
+\end{align}
+where $\lambda_i$ is the $i^{th}$ row of the matrix $\bLambda$, $\Psi_{g,(i)}$ is the $i^{th}$ diagonal element of $\bPsi_g$ and $\mathbf{r}_i$ is the $i^{th}$ row of the matrix $\sum_{g=1}^Gn_g \bPsi_g^{-1}\bW_g \hat{\bbeta}_g^T$.
+
+\newpage
+\begin{longtable}{p{.10\textwidth}  p{.15\textwidth}p{.75\textwidth}} 
+\caption{Parameter Updates for the family of models based on constraints on $\bLambda_g$ and $\bPsi_g$.}
+\hline
+Model & Parameters & Estimates \\
+\hline
+\endfirsthead
+
+\hline
+Model & Parameters & Estimates \\
+\hline 
+\endhead
+
+ &&Continued on next page...\\ \hline
+\endfoot
+
+\endlastfoot
+
+UUU &$\bbeta_g$& $\hat{\bbeta}_g=\hat{\bLambda}_g^T(\hat{\bLambda}_g\hat{\bLambda}_g^T+\bPsi_g)^{-1}$\\
+&$\bTheta_g$   & $\hat{\bTheta}_g=\bI_p -\hat{\bbeta_g}\hat{\bLambda}_g+\hat{\bbeta}_g\bW_g\hat{\bbeta_g}^T$\\
+&$\bLambda_g$& $\hat{\bLambda}_g=\bW_g\hat{\bbeta}^T\widehat{\bTheta}_g^{-1}$\\
+&$\bPsi_g$&$\hat{\bPsi}_g=\diag\left(\bW_g-\hat{\bLambda}_g\hat{\bbeta}_g\bW_g+\frac{\sum_{i=1}^n \widehat{Z}_{ig}\bS_{ig}}{\sum_{i=1}^n\widehat{Z}_{ig}}\right)$ \\
+\\
+UUC&$\bbeta_g$& $\hat{\bbeta}_g=\hat{\bLambda}_g^T(\hat{\bLambda}_g\hat{\bLambda}_g^T+\psi_g\bI_d)^{-1}$\\
+&$\bTheta_g$   & $\hat{\bTheta}_g=\bI_p -\hat{\bbeta_g}\hat{\bLambda}_g+\hat{\bbeta}_g\bW_g\hat{\bbeta_g}^T$\\
+&$\bLambda_g$& $\hat{\bLambda}_g=\bW_g\hat{\bbeta}^T\widehat{\bTheta}_g^{-1}$\\
+&$\bPsi_g=\psi_g\bI_d$&$\hat{\psi}_g=\frac{1}{d}\tr\left(\bW_g-\hat{\bLambda}_g\hat{\bbeta}_g\bW_g+\frac{\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}}{n_g}\right)$\\
+\\
+UCU & $\bbeta_g$& $\hat{\bbeta}_g=\hat{\bLambda}_g^T(\hat{\bLambda}_g\hat{\bLambda}_g^T+\bPsi)^{-1}$\\
+&$\bTheta_g$   & $\hat{\bTheta}_g=\bI_p -\hat{\bbeta_g}\hat{\bLambda}_g+\hat{\bbeta}_g\bW_g\hat{\bbeta_g}^T$\\
+&$\bLambda_g$& $\hat{\bLambda}_g=\bW_g\hat{\bbeta}^T\widehat{\bTheta}_g^{-1}$\\
+&$\bPsi_g=\bPsi$&$\hat{\bPsi}=\diag\left(\sum_{g=1}^G\frac{n_g}{n}\bW_g-\sum_{g=1}^G\frac{n_g}{n}\hat{\bLambda}_g\hat{\bbeta}_g\bW_g+\frac{1}{n}\sum_{g=1}^G\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}\right)$ \\ 
+\\
+UCC & $\bbeta_g$& $\hat{\bbeta}_g=\hat{\bLambda}_g^T(\hat{\bLambda}_g\hat{\bLambda}_g^T+\psi\bI)^{-1}$\\
+&$\bTheta_g$   & $\hat{\bTheta}_g=\bI_p -\hat{\bbeta_g}\hat{\bLambda}_g+\hat{\bbeta}_g\bW_g\hat{\bbeta_g}^T$\\
+&$\bLambda_g$& $\hat{\bLambda}_g=\bW_g\hat{\bbeta}^T\widehat{\bTheta}_g^{-1}$\\
+&$\bPsi_g=\psi\bI$&$\hat{\psi}=\frac{1}{d}\tr\left(\sum_{g=1}^G\frac{n_g}{n}\bW_g-\sum_{g=1}^G\frac{n_g}{n}\hat{\bLambda}_g\hat{\bbeta}_g\bW_g+\frac{1}{n}\sum_{g=1}^G\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}\right)$ \\
+\\
+CUU &$\bbeta_g$& $\hat{\bbeta}_g=\hat{\bLambda}^T(\hat{\bLambda}\hat{\bLambda}^T+\bPsi_g)^{-1}$\\
+&$\bTheta_g$   & $\hat{\bTheta}_g=\bI_p -\hat{\bbeta_g}\hat{\bLambda}+\hat{\bbeta}_g\bW_g\hat{\bbeta_g}^T$\\
+&$\bLambda_g=\bLambda$&  Updated using Equation \ref{common_lambda}.\\[3pt]
+&$\bPsi_g$&$\hat{\bPsi}_g=\diag\left(\bW_g-\hat{\bLambda}\hat{\bbeta}_g\bW_g+\frac{\sum_{i=1}^n \widehat{Z}_{ig}\bS_{ig}}{\sum_{i=1}^n\widehat{Z}_{ig}}\right)$ \\
+\\
+CUC &  $\bbeta_g$& $\hat{\bbeta}_g=\hat{\bLambda}^T(\hat{\bLambda}\hat{\bLambda}^T+\psi_g\bI_d)^{-1}$\\
+&$\bTheta_g$   & $\hat{\bTheta}_g=\bI_p -\hat{\bbeta_g}\hat{\bLambda}+\hat{\bbeta}_g\bW_g\hat{\bbeta_g}^T$\\
+&$\bLambda_g=\bLambda$&  Updated using Equation \ref{common_lambda}.\\
+&$\bPsi_g=\psi_g\bI_d$&$\hat{\psi}_g=\frac{1}{d}\tr\left(\bW_g-\hat{\bLambda}\hat{\bbeta}_g\bW_g+\frac{\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}}{n_g}\right)$\\
+\\
+CCU &  $\bbeta_g=\bbeta$& $\hat{\bbeta}=\hat{\bLambda}^T(\hat{\bLambda}\hat{\bLambda}^T+\bPsi)^{-1}$\\
+&$\bTheta_g$   & $\hat{\bTheta}_g=\bI_p -\hat{\bbeta}\hat{\bLambda}+\hat{\bbeta}\bW_g\hat{\bbeta}^T$\\
+&$\bLambda_g=\bLambda$&  Updated using Equation \ref{common_lambda}.\\
+&$\bPsi_g=\bPsi$&$\hat{\bPsi}=\diag\left(\sum_{g=1}^G\frac{n_g}{n}\bW_g-\sum_{g=1}^G\frac{n_g}{n}\hat{\bLambda}\hat{\bbeta}\bW_g+\frac{1}{n}\sum_{g=1}^G\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}\right)$ \\ 
+\\
+CCC & $\bbeta_g=\bbeta$& $\hat{\bbeta}=\hat{\bLambda}^T(\hat{\bLambda}\hat{\bLambda}^T+\psi\bI_d)^{-1}$\\
+&$\bTheta_g$   & $\hat{\bTheta}_g=\bI_p -\hat{\bbeta}\hat{\bLambda}+\hat{\bbeta}\bW_g\hat{\bbeta}^T$\\
+&$\bLambda_g=\bLambda$&  Updated using Equation \ref{common_lambda}.    \\
+&$\bPsi_g=\psi\bI$&$\hat{\psi}=\frac{1}{d}\tr\left(\sum_{g=1}^G\frac{n_g}{n}\bW_g-\sum_{g=1}^G\frac{n_g}{n}\hat{\bLambda}\hat{\bbeta}\bW_g+\frac{1}{n}\sum_{g=1}^G\sum_{i=1}^nz_{ig}\mathbf{S}_{ig}\right)$ \\
+\hline
+\end{longtable}
+
+\section{Test Data}
+I did a small test set containing 200 datasets of $d=5$ with $p=2$ and $N=1000$ simulated from a $G=2$ model for UUU model only. Using 6 cores on my laptop, the combined run time for all 200 dataset was 225.510 seconds ($\sim$3.7 minutes). This is a substantial improvement in the speed. Do note that I am only running $p=2$ and $G=2$. But again, I am running a very crude version of the code and there are ways to parallelize it and make it even faster. We can always look into that later.
+
+\begin{verbatim}
+> total_run<-200
+> ptm<-proc.time()
+> output_all<-list()
+> output_all <- foreach(run = 1:total_run, .errorhandling = "pass") %dopar% {
++   parallel_FA(run)
++ }
+> proc.time()-ptm
+    user   system  elapsed 
+1253.871   18.508  223.510 
+\end{verbatim}
+Initialization was done using $k$-means. The mean ARI for 200 runs is  0.9977813 (sd of 0.003179812). Summary of the parameter estimates from the 200 runs:
+
+\begin{table}[!ht]
+\caption{Summary of the average and standard errors (SE) of the estimated parameters from the 200 datasets.}
+\begin{center}
+	\begin{tabular*}{0.95\textwidth}{@{\extracolsep{\fill}}lll}
+	\hline
+	& True Parameters & Average of Estimated Parameters \\
+	&&(Standard errors)\\
+	\hline
+	$\bmu_1$&(6, 3, 3, 6, 3)&(6.00, 3.00, 3.00, 6.00, 3.00)\\
+	&&\text{SE}~=~(0.05, 0.07, 0.06, 0.06, 0.05)\\[5pt]
+	$\bmu_2$&(5, 3, 5, 3, 5)&(5.00, 3.00, 5.00, 3.00, 5.00)\\
+	&&\text{SE}~=~(0.04, 0.04, 0.02, 0.02, 0.04)\\
+	\hline
+\end{tabular*}
+\end{center}
+
+
+
+\begin{equation*}
+\bSigma_1 =
+\begin{bmatrix}
+ 0.86 & 0.47 & 0.35 & 0.28 & 0.23 \\ 
+0.47 & 1.44 & 0.44 & 0.46 & 0.26 \\ 
+0.35 & 0.44 & 0.98 & 0.23 & 0.32 \\ 
+0.28 & 0.46 & 0.23 & 1.05 & 0.12 \\ 
+0.23 & 0.26 & 0.32 & 0.12 & 0.67 \\
+\end{bmatrix}, \quad
+\bSigma_2 =
+\begin{bmatrix}
+1.01 & 0.69 & 0.41 & 0.49 & 0.94 \\ 
+0.69 & 0.99 & 0.32 & 0.43 & 0.81 \\ 
+0.41 & 0.32 & 0.38 & 0.24 & 0.46 \\ 
+0.49 & 0.43 & 0.24 & 0.46 & 0.55 \\ 
+0.94 & 0.81 & 0.46 & 0.55 & 1.23 \\ 
+\end{bmatrix},
+\end{equation*}
+
+\begin{equation*}
+\text{mean}~\hat{\bSigma}_1 =
+\begin{bmatrix}
+0.87 & 0.45 & 0.36 & 0.29 & 0.24 \\ 
+0.45 & 1.43 & 0.41 & 0.43 & 0.26 \\ 
+0.36 & 0.41 & 0.99 & 0.23 & 0.25 \\ 
+0.29 & 0.43 & 0.23 & 1.05 & 0.12 \\ 
+0.24 & 0.26 & 0.25 & 0.12 & 0.67 \\ 
+\end{bmatrix}, \quad
+\text{mean}~\hat{\bSigma}_2 =
+\begin{bmatrix}
+1.01 & 0.69 & 0.41 & 0.48 & 0.93 \\ 
+0.69 & 1.00 & 0.34 & 0.41 & 0.80 \\ 
+ 0.41 & 0.34 & 0.38 & 0.23 & 0.46 \\ 
+ 0.48 & 0.41 & 0.23 & 0.46 & 0.54 \\ 
+0.93 & 0.80 & 0.46 & 0.54 & 1.23 \\ 
+\end{bmatrix},
+\end{equation*}
+
+
+\begin{equation*}
+\text{SE}~\hat{\bSigma}_1 =
+\begin{bmatrix}
+0.07 & 0.06 & 0.06 & 0.06 & 0.05 \\ 
+0.06 & 0.11 & 0.07 & 0.07 & 0.05 \\ 
+0.06 & 0.07 & 0.09 & 0.06 & 0.05 \\ 
+0.06 & 0.07 & 0.06 & 0.08 & 0.05 \\ 
+0.05 & 0.05 & 0.05 & 0.05 & 0.06 \\ 
+\end{bmatrix}, \quad
+\text{SE}~\hat{\bSigma}_2=
+\begin{bmatrix}
+0.06 & 0.05 & 0.03 & 0.03 & 0.06 \\ 
+0.05 & 0.06 & 0.03 & 0.03 & 0.06 \\ 
+0.03 & 0.03 & 0.02 & 0.02 & 0.03 \\ 
+0.03 & 0.03 & 0.02 & 0.03 & 0.04 \\ 
+0.06 & 0.06 & 0.03 & 0.04 & 0.07 \\ 
+\end{bmatrix}.
+\end{equation*}
+\end{table}
+
+\newpage
+
+\bibliographystyle{chicago}
+\bibliography{reference}
+
+
+\end{document}

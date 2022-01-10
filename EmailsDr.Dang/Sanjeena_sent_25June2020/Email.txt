@@ -1,0 +1,49 @@
+Thu 6/25/2020 10:44 PM
+Hey Anjali,
+
+It looks like the problem is that you have everything in inside a loop for g. For unconstrained model (UUU), all g’s have their respective lambda, beta, and psi so it doesn’t make a difference. But for UCC model, lambda is unconstrained but the Psi is constrained. So, in order to update Psi, you need lambdas for all g updated so you need to have them in separate loop. I wrote a mini function for UCC modifying the code that I sent you and my old code. Also notice there are some changes in the convergence check for the internal loop as well. It seems to be working fine. Take a look and we can always have a zoom meeting if you have any questions.
+
+Best wishes,
+Sanjeena
+-------
+Sanjeena Dang, Ph.D.
+Assistant Professor,
+Department of Mathematical Sciences,
+Binghamton University (SUNY),
+4400 Vestal Parkway E.,
+Binghamton NY, 13902.
+Phone: +1-607-777-4275
+ web: www.sanjeena.com
+
+
+
+
+
+Mon 6/29/2020 11:40 AM
+Hey Anjali,
+
+Thank you for sending this. I will take a look at towards end of the week.
+
+Sounds good. I just wanted to further clarify the changes. If you want to modify your code, you basically need to follow the structure below:
+
+1st Loop: Update the variational parameters for all Gs and the means.
+2nd Loop: Update Lambda for all Gs.
+3rd Loop: Update Psi for all Gs.
+
+This is because for constrained Psi, you are using information from all Lambda, not just the g^th lambda so you need all Lambdas updated before you can update Psi and vice-versa.
+
+
+
+
+Best wishes,
+Sanjeena
+
+-------
+Sanjeena Dang, Ph.D.
+Assistant Professor,
+Department of Mathematical Sciences,
+Binghamton University (SUNY),
+4400 Vestal Parkway E.,
+Binghamton NY, 13902.
+Phone: +1-607-777-4275
+ web: www.sanjeena.com

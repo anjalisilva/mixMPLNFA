@@ -1,0 +1,42 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\citeauthoryear{Arridge, Ito, Jin, and Zhang}{Arridge
+  et~al.}{2018}]{arridge2018}
+Arridge, S.~R., K.~Ito, B.~Jin, and C.~Zhang (2018).
+\newblock Variational gaussian approximation for poisson data.
+\newblock {\em Inverse Problems\/}~{\em 34\/}(2), 025005.
+
+\bibitem[\protect\citeauthoryear{Gollini and Murphy}{Gollini and
+  Murphy}{2014}]{gollini2014}
+Gollini, I. and T.~B. Murphy (2014).
+\newblock Mixture of latent trait analyzers for model-based clustering of
+  categorical data.
+\newblock {\em Statistics and Computing\/}~{\em 24\/}(4), 569--588.
+
+\bibitem[\protect\citeauthoryear{Mcnicholas and Murphy}{Mcnicholas and
+  Murphy}{2008}]{mcnicholas2008}
+Mcnicholas, P.~D. and T.~B. Murphy (2008).
+\newblock Parsimonious gaussian mixture models.
+\newblock {\em Statistics and Computing\/}~{\em 18\/}(3), 285--296.
+
+\bibitem[\protect\citeauthoryear{Subedi and Browne}{Subedi and
+  Browne}{2020}]{subedi2020parsimonious}
+Subedi, S. and R.~Browne (2020).
+\newblock A parsimonious family of multivariate poisson-lognormal distributions
+  for clustering multivariate count data.
+\newblock {\em arXiv preprint arXiv:2004.06857\/}.
+
+\bibitem[\protect\citeauthoryear{Tang, Browne, and McNicholas}{Tang
+  et~al.}{2015}]{tang2015}
+Tang, Y., R.~P. Browne, and P.~D. McNicholas (2015).
+\newblock Model based clustering of high-dimensional binary data.
+\newblock {\em Computational Statistics \& Data Analysis\/}~{\em 87}, 84--101.
+
+\bibitem[\protect\citeauthoryear{Wainwright, Jordan, et~al.}{Wainwright
+  et~al.}{2008}]{wainwright2008}
+Wainwright, M.~J., M.~I. Jordan, et~al. (2008).
+\newblock Graphical models, exponential families, and variational inference.
+\newblock {\em Foundations and Trends{\textregistered} in Machine
+  Learning\/}~{\em 1\/}(1--2), 1--305.
+
+\end{thebibliography}
