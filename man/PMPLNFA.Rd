@@ -38,32 +38,32 @@ are calculated using TMM method of edgeR package. Default is "Yes".}
 \value{
 Returns an S3 object of class mplnVariational with results.
 \itemize{
-  \item dataset - The input dataset on which clustering is performed.
-  \item dimensionality - Dimensionality of the input dataset.
-  \item normalizationFactors - A vector of normalization factors used
-     for input dataset.
-  \item gmin - Minimum number of components/clusters considered in the clustering
-     run.
-  \item gmax - Maximum number of components/clusters considered in the clustering
-     run.
-  \item initalizationMethod - Method used for initialization.
-  \item allResults - A list with all results.
-  \item logLikelihood - A vector with value of final log-likelihoods for
-     each component/cluster size.
-  \item numbParameters - A vector with number of parameters for each
-     component/cluster size.
-  \item trueLabels - The vector of true labels, if provided by user.
-  \item ICLresults - A list with all ICL model selection results.
-  \item BICresults - A list with all BIC model selection results.
-  \item AICresults - A list with all AIC model selection results.
-  \item AIC3results - A list with all AIC3 model selection results.
-  \item slopeHeuristics - If more than 10 models are considered, slope heuristic
-     results as obtained via capushe::capushe().
-  \item DjumpModelSelected - If more than 10 models are considered, slope heuristic
-     results as obtained via capushe::capushe().
-  \item DDSEModelSelected - If more than 10 models are considered, slope heuristic
-     results as obtained via capushe::capushe().
-  \item totalTime - Total time used for clustering and model selection.
+\item dataset - The input dataset on which clustering is performed.
+\item dimensionality - Dimensionality of the input dataset.
+\item normalizationFactors - A vector of normalization factors used
+for input dataset.
+\item gmin - Minimum number of components/clusters considered in the clustering
+run.
+\item gmax - Maximum number of components/clusters considered in the clustering
+run.
+\item initalizationMethod - Method used for initialization.
+\item allResults - A list with all results.
+\item logLikelihood - A vector with value of final log-likelihoods for
+each component/cluster size.
+\item numbParameters - A vector with number of parameters for each
+component/cluster size.
+\item trueLabels - The vector of true labels, if provided by user.
+\item ICLresults - A list with all ICL model selection results.
+\item BICresults - A list with all BIC model selection results.
+\item AICresults - A list with all AIC model selection results.
+\item AIC3results - A list with all AIC3 model selection results.
+\item slopeHeuristics - If more than 10 models are considered, slope heuristic
+results as obtained via capushe::capushe().
+\item DjumpModelSelected - If more than 10 models are considered, slope heuristic
+results as obtained via capushe::capushe().
+\item DDSEModelSelected - If more than 10 models are considered, slope heuristic
+results as obtained via capushe::capushe().
+\item totalTime - Total time used for clustering and model selection.
 }
 }
 \description{
@@ -74,11 +74,11 @@ be done using AIC, AIC3, BIC and ICL.
 }
 \details{
 Starting values (argument: initMethod) and the number of
-    iterations for each MCMC chain (argument: nIterations) play an
-    important role in the successful operation of this algorithm.
-    Occasionally an error may result due to singular matrix. In that
-    case rerun the method and may set a different seed to ensure
-    a different set of initialization values.
+iterations for each MCMC chain (argument: nIterations) play an
+important role in the successful operation of this algorithm.
+Occasionally an error may result due to singular matrix. In that
+case rerun the method and may set a different seed to ensure
+a different set of initialization values.
 }
 \examples{
 \dontrun{
