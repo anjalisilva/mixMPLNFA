@@ -1,10 +1,9 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# PMPLNFA
+# mixMPLNFA
 
-Parsimonious Finite Mixtures of Multivariate Poisson-Log Normal Factor
-Analyzers for Clustering Count Data
+Mixtures of Multivariate Poisson-Log Normal Factor Analyzers for Clustering Count Data
 
 <!-- badges: start -->
 
@@ -14,7 +13,7 @@ Analyzers for Clustering Count Data
 
 
 ## Description
-`mixMPLNFA` is an R package for performing clustering using parsimonious mixtures of multivariate Poisson-log normal  factor analyzers family (PMPLNFA) via variational Gaussian approximations. It was developed for count data, with clustering of RNA sequencing data as a motivation. However, the clustering method may be applied to other types of count data. The package provides functions for functions for parameter estimation via a variational Gaussian approximation with Expectation-Maximization (EM) algorithm. Information criteria (AIC, BIC, AIC3 and ICL) are offered for model selection. 
+`mixMPLNFA` is an R package for performing clustering using parsimonious mixtures of multivariate Poisson-log normal factor analyzers family (PMPLNFA) via variational Gaussian approximations. It was developed for count data, with clustering of RNA sequencing data as a motivation. However, the clustering method may be applied to other types of count data. The package provides functions for functions for parameter estimation via a variational Gaussian approximation with Expectation-Maximization (EM) algorithm. Information criteria (AIC, BIC, AIC3 and ICL) are offered for model selection. 
 
 ## Installation
 
