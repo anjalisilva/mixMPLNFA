@@ -78,6 +78,31 @@ The Shiny app employing __*PMPLNFAClust*__ could be run and results could be vis
 mixMPLNFA::runMixMPLNFA()
 ```
 
+## Tutorials  
+  
+For tutorials and plot interpretation, refer to the vignette (under construction):
+
+``` r
+browseVignettes("mixMPLNFA")
+```
+  
+## Citation for Package
+``` r
+citation("mixMPLNFA")
+```
+Finite Mixtures of Multivariate Poisson-Log Normal
+Factor Analyzers for Clustering Count Data. *Unpublished*. 
+``` r
+A BibTeX entry for LaTeX users is
+
+  @Article{,
+    title = {Finite Mixtures of Multivariate Poisson-Log Normal
+Factor Analyzers for Clustering Count Data},
+    year = {2019},
+  }
+```
+
+
 ## References
 
 - [Aitchison, J. and C. H. Ho (1989). The multivariate Poisson-log
@@ -118,4 +143,4 @@ issues](https://github.com/anjalisilva/mixMPLNFA/issues).
 - Dr. Marcelo Ponce, SciNet HPC Consortium, University of Toronto, ON, Canada for all the computational support.
 - Early work was funded by Natural Sciences and Engineering Research
   Council of Canada (Subedi) and Queen Elizabeth II Graduate Scholarship (Silva).
-- Later research was supported by the Postdoctoral Fellowship award from the Canadian Institutes of Health Research (Silva) and the Canada Natural Sciences and Engineering Research Council grant 400920-2013 (Subedi).
+- Later work was supported by the Postdoctoral Fellowship award from the Canadian Institutes of Health Research (Silva) and the Canada Natural Sciences and Engineering Research Council grant 400920-2013 (Subedi).
