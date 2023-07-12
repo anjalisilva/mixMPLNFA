@@ -48,7 +48,7 @@ To list all functions available in the package (under construction):
 ls("package:mixMPLNFA")
 ```
 
-`MPLNClust` contains 14 functions.
+`MPLNClust` contains 7 functions.
 
 1.  ***PMPLNFAClust*** for carrying out clustering of count data using
     mixtures of MPLN via variational expectation-maximization
