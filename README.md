@@ -1,10 +1,10 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# PMPLNFA
+# mixMPLNFA
 
-Parsimonious Finite Mixtures of Multivariate Poisson-Log Normal Factor
-Analyzers for Clustering Count Data
+Mixtures of Multivariate Poisson-Log Normal Factor Analyzers for
+Clustering Count Data
 
 <!-- badges: start -->
 
