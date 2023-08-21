@@ -116,23 +116,18 @@ modelName <- "CCC"
 clustersize <- 2
 pSize <-2
 
-PMPLNFA <- function(dataset, gmin, gmax, pmin, pmax, modelName){
+PMPLNFA <- function(dataset, gmin, gmax, pmin, pmax, modelName) {
+}
 
 
-
-    Grange <- 1:(gmax - gmin + 1)
-    pmax.var<-pmax_given
-
-
+  PMPLNFAind <- function(dataset, clustersize, pSize){
     # Start
     lambdanew <- psinew <-list()
 
 
     # normFactors <- as.vector(edgeR::calcNormFactors(as.matrix(dataset), method="TMM"))
-    normFactors <- read.csv("norm.csv")[,2]
-    lib_mat<-matrix(normFactors, nrow=N,ncol=d, byrow=F)
-    libMatFull<-lib_mat
-
+    normFactors <-edgeR::calcNormFactors(dataset, method = "TMM")
+    libMat <- matrix(normFactors, nrow = N, ncol = d, byrow = F)
 
 
     #### Initialization ###
@@ -144,7 +139,7 @@ PMPLNFA <- function(dataset, gmin, gmax, pmin, pmax, modelName){
     N <- nrow(dataset)
 
     Sk <- array(0, c(d, d, clustersize) )
-    start <- GX <- dGX <- z_S<-list()
+    start <- GX <- dGX <- zS<-list()
 
 
     kmeansOut <- stats::kmeans(log(dataset + 1), centers = gmax,
@@ -190,15 +185,15 @@ PMPLNFA <- function(dataset, gmin, gmax, pmin, pmax, modelName){
 
 
       for (g in 1:clustersize){
-        GX[[g]] <- dGX[[g]] <- z_S[[g]] <- list()
+        GX[[g]] <- dGX[[g]] <- zS[[g]] <- list()
         z[is.nan(z)] <- 0
         for (i in 1:N) {
           print(i)
-          dGX[[g]][[i]] <- diag(exp(log(lib_mat[i, ]) + start[[g]][i, ] +
+          dGX[[g]][[i]] <- diag(exp(log(libMat[i, ]) + start[[g]][i, ] +
                                       0.5 * diag(S[[g]][[i]])), d) + isigma[[g]]
           S[[g]][[i]] <- solve(dGX[[g]][[i]])
-          z_S[[g]][[i]] <- z[i,g] * S[[g]][[i]]
-          GX[[g]][[i]] <- dataset[i,]-exp(start[[g]][i,] + log(lib_mat[i, ]) +
+          zS[[g]][[i]] <- z[i,g] * S[[g]][[i]]
+          GX[[g]][[i]] <- dataset[i,]-exp(start[[g]][i,] + log(libMat[i, ]) +
                                             0.5 * diag(S[[g]][[i]])) -
                                             (isigma[[g]]) %*% (start[[g]][i, ] -
                                             mu[[g]])
@@ -222,7 +217,7 @@ PMPLNFA <- function(dataset, gmin, gmax, pmin, pmax, modelName){
       for (rep in 1:repmax) {
         lambda_old <- lambda
         psi_old <-psi
-        updates <- model_updates(modelName=modelName,z_S=z_S,ng=ng,z=z,lambda=lambda,isigma=isigma,G=G,pmax.var=pmax.var,Sk=Sk,psi=psi)
+        updates <- model_updates(modelName=modelName,zS=zS,ng=ng,z=z,lambda=lambda,isigma=isigma,G=G,pmax.var=pmax.var,Sk=Sk,psi=psi)
 
 
         sigmaVar <- updates$sigmaVar
@@ -243,7 +238,7 @@ PMPLNFA <- function(dataset, gmin, gmax, pmin, pmax, modelName){
 
       piG <- colSums(z) / N
       ng <- colSums(z)
-      # libMatFull<-matrix(normFactors,ncol=d,nrow=N, byrow=T) ###Matrix containing normalization factor
+      # libMat<-matrix(normFactors,ncol=d,nrow=N, byrow=T) ###Matrix containing normalization factor
       ### Some useful functions
       fun_five <- function(x, y = isigma[[g]]) {
         sum(diag(x %*% y))
@@ -252,13 +247,13 @@ PMPLNFA <- function(dataset, gmin, gmax, pmin, pmax, modelName){
       F <- matrix(NA, ncol = G, nrow = N)
 
       for (g in 1:clustersize) {
-        two <- rowSums(exp(m[[g]] + log(libMatFull) + 0.5 *
+        two <- rowSums(exp(m[[g]] + log(libMat) + 0.5 *
                              matrix(unlist(lapply(S[[g]], diag)), ncol = d, byrow = TRUE)))
         five <- 0.5 * unlist(lapply(S[[g]], fun_five))
         six <- 0.5 * log(unlist(lapply(S[[g]], det)))
         Ffunction[, g] <- piG[g] * exp(rowSums(m[[g]] * dataset) - two -
                                   rowSums(lfactorial(dataset)) +
-                                  rowSums(log(libMatFull) * dataset) -
+                                  rowSums(log(libMat) * dataset) -
                                   0.5 * mahalanobis(m[[g]], center = mu[[g]], cov = isigma[[g]], inverted = TRUE) -
                                   five + six - 0.5 * log(det(sigmaVar[[g]])) - d / 2)
       }
@@ -275,12 +270,12 @@ PMPLNFA <- function(dataset, gmin, gmax, pmin, pmax, modelName){
 
       if (it > 5) {
         #Aitkaine's stopping criterion
-        if ((loglik[it-1] - loglik[it-2]) == 0) checks <- 1 else{
-          a <- (loglik[it]-loglik[it-1]) / (loglik[it-1] - loglik[it-2])
+        if ((loglik[it - 1] - loglik[it - 2]) == 0) checks <- 1 else{
+          a <- (loglik[it] - loglik[it-1]) / (loglik[it - 1] - loglik[it - 2])
           add_to <- (1 / (1 - a) * (loglik[it] - loglik[it-1]))
           # }
-          aloglik[it] <- loglik[it-1] + add_to
-          if (abs(aloglik[it] - loglik[it-1]) < 0.001) checks <- 1 else checks <- checks
+          aloglik[it] <- loglik[it - 1] + add_to
+          if (abs(aloglik[it] - loglik[it - 1]) < 0.001) checks <- 1 else checks <- checks
         }
       }
       # print(it)
@@ -327,7 +322,7 @@ PMPLNFA <- function(dataset, gmin, gmax, pmin, pmax, modelName){
 
 
 modelName <- function(modelName,
-                      z_S,
+                      zS,
                       ng,
                       z,
                       lambda,
@@ -340,7 +335,7 @@ modelName <- function(modelName,
   bigTheta <- list()
   sigmaVar <- list()
   Sk <<- Sk
-  z_S <<- z_S
+  zS <<- zS
   ng <<- ng
   z <<- z
   psi <<- psi
