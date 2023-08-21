@@ -5,7 +5,7 @@ Version: 0.1.0
 Authors@R: c(
     person("Anjali", "Silva", email = "anjali@alumni.uoguelph.ca", role = c("aut", "cre")),
     person("Andrea", "Payne", email = "andreapayne@cmail.carleton.ca", role = "aut"),
-    person("Sanjeena", "Dang", role = "aut")
+    person("Sanjeena", "Dang", email = "andreapayne@cmail.carleton.ca", ", role = "aut")
     )
 Maintainer: Anjali Silva <anjali@alumni.uoguelph.ca>
 Description: Performs clustering using mixtures of multivariate Poisson-log normal factor 

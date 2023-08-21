@@ -1,7 +1,7 @@
 #' Clustering via Parsimonious Mixtures of MPLN Factor Analyzers Family
 #'
 #' Performs clustering using parsimonious mixtures of multivariate
-#' Poisson-log normal  factor analyzers family (PMPLNFA) via
+#' Poisson-log normal factor analyzers family (PMPLNFA) via
 #' variational Gaussian approximations. Model selection can
 #' be done using AIC, AIC3, BIC and ICL.
 #'
