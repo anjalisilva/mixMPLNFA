@@ -65,7 +65,7 @@ ls("package:mixMPLNFA")
 Mixture model-based clustering methods can be over-parameterized in
 high-dimensional spaces, especially as the number of clusters increases.
 Subspace clustering allows to cluster data in low-dimensional subspaces,
-while keeping all the dimensions and by introducingrestrictions to
+while keeping all the dimensions and by introducing restrictions to
 mixture parameters (Bouveyron and Brunet, 2014). Restrictions are
 introduced to the model parameters with the aim of obtaining
 parsimonious models, which are sufficiently flexible for clustering
