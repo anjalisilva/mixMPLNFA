@@ -5,12 +5,8 @@
 #' variational Gaussian approximations. Model selection can
 #' be done using AIC, AIC3, BIC and ICL.
 #'
-#' @details Starting values (argument: initMethod) and the number of
-#'     iterations for each MCMC chain (argument: nIterations) play an
+#' @details Starting values (argument: initMethod) play an
 #'     important role in the successful operation of this algorithm.
-#'     Occasionally an error may result due to singular matrix. In that
-#'     case rerun the method and may set a different seed to ensure
-#'     a different set of initialization values.
 #'
 #' @param dataset A dataset of class matrix and type integer such that
 #'    rows correspond to observations and columns correspond to variables.
@@ -34,7 +30,7 @@
 #'     if normalization should be performed. Currently, normalization factors
 #'     are calculated using TMM method of edgeR package. Default is "Yes".
 #'
-#' @return Returns an S3 object of class mplnVariational with results.
+#' @return Returns an S3 object of class mixMPLNFA with results.
 #' \itemize{
 #'   \item dataset - The input dataset on which clustering is performed.
 #'   \item dimensionality - Dimensionality of the input dataset.
@@ -110,210 +106,225 @@
 #' @importFrom mvtnorm rmvnorm
 #' @importFrom utils tail
 #'
-PMPLNFA <- function(dataset) {
 
-  parallelFA<-function(run,G_given,pmax_given, modelName){
+dataset <- Y
+gmin <- 2
+gmax <- 3
+pmin <- 1
+pmax <- 2
+modelName <- "CCC"
+clustersize <- 2
+pSize <-2
+
+PMPLNFA <- function(dataset, gmin, gmax, pmin, pmax, modelName){
 
 
-    G<-G_given
+
+    Grange <- 1:(gmax - gmin + 1)
     pmax.var<-pmax_given
 
 
-    lambdanew<<-list()
-    psinew<<-list()
+    # Start
+    lambdanew <- psinew <-list()
 
 
-
-
-    # normFactors <- as.vector(edgeR::calcNormFactors(as.matrix(Y), method="TMM"))
-    normFactors<-read.csv("norm.csv")[,2]
+    # normFactors <- as.vector(edgeR::calcNormFactors(as.matrix(dataset), method="TMM"))
+    normFactors <- read.csv("norm.csv")[,2]
     lib_mat<-matrix(normFactors, nrow=N,ncol=d, byrow=F)
-    lib_mat_full<-lib_mat
+    libMatFull<-lib_mat
 
 
 
     #### Initialization ###
-    mu<-list()
-    psi<-list()
-    lambda<-list()
-    sigma.var<-list()
-    isigma<-list()
-    m<-list()
-    S<-list()
-    P<-list()
-    Q<-list()
+    mu <- psi<- lambda <- sigmaVar <- isigma <- list()
+    m <- S <- P <- Q <- list()
 
     ###Other intermediate items initialized
-    start<-list()
-    Sk<-array(0, c(d,d,G) )
-    GX<-list()
-    dGX<-list()
-    z_S<-list()
+    d <- ncol(dataset)
+    N <- nrow(dataset)
+
+    Sk <- array(0, c(d, d, clustersize) )
+    start <- GX <- dGX <- z_S<-list()
 
 
-    k_means<-kmeans(log(Y+1),centers=G,nstart=100)$cluster
-    z<-mclust::unmap(k_means)
+    kmeansOut <- stats::kmeans(log(dataset + 1), centers = gmax,
+                               nstart = 100)$cluster
+    z <- mclust::unmap(kmeansOut)
     #View(z)
-    pi_g<-colSums(z)/N
-    ng<-colSums(z)
+    piG <- colSums(z) / N
+    ng <- colSums(z)
 
-    for (g in 1:G){
-      obs<-which(z[,g]==1)
-      mu[[g]]<-colMeans(log(Y[obs,]+1))
-      sigma.var[[g]]<-var(log(Y[obs,]+1))
-      isigma[[g]]<-ginv(sigma.var[[g]]) #tried replacing this with Woodbury and moving it to line 71 but still gives singularity error
-      temp<-eigen(sigma.var[[g]])
-      lambda[[g]]<-matrix(NA,ncol=pmax.var,nrow=d)
-      for (q in 1:pmax.var){
-        lambda[[g]][,q]<-temp$vectors[,q]*sqrt(temp$values[q])
+    for (g in 1:clustersize) {
+
+      obs <- which(z[, clustersize] == 1)
+      mu[[clustersize]] <- colMeans(log(dataset[obs, ] + 1))
+      sigmaVar[[clustersize]] <- var(log(dataset[obs, ] + 1))
+      isigma[[clustersize]] <- solve(sigmaVar[[clustersize]]) #tried replacing this with Woodbury and moving it to line 71 but still gives singularity error
+      temp <- eigen(sigmaVar[[clustersize]])
+      lambda[[clustersize]] <- matrix(NA, ncol= pSize, nrow=d)
+      for (q in 1:pSize) {
+        lambda[[clustersize]][, q] <- temp$vectors[, q] * sqrt(temp$values[q])
       }
-      psi[[g]]<-diag(sigma.var[[g]]-lambda[[g]]%*%t(lambda[[g]]))*diag(d)
+      psi[[clustersize]] <- diag(sigmaVar[[clustersize]] -
+                                   lambda[[clustersize]] %*%
+                                   t(lambda[[clustersize]])) * diag(d)
     }
 
-    for (g in 1:G){
-      start[[g]]<-log(Y+1) ###Starting value for M
-      m[[g]]<-log(Y+1)
-      S[[g]]<-list()
-      for (i in 1:N){
-        S[[g]][[i]]<-diag(d)*0.000000001
+    for (g in 1:clustersize) {
+      start[[clustersize]] <- log(dataset + 1) ###Starting value for M
+      m[[clustersize]] <- log(dataset + 1)
+      S[[clustersize]] <- list()
+      for (i in 1:N) {
+        S[[clustersize]][[i]] <- diag(d) * 0.000000001
       }
     }
 
-    checks<-0
-    it<-1
-    aloglik<-NULL
-    loglik<-NULL
-    aloglik[c(1,2,3)]<-0
-    it_max<-100
+    checks <- 0
+    it <- 1
+    aloglik <- loglik <- NULL
+    aloglik[c(1, 2, 3)] <- 0
+    itMax <- 100
 
 
-    while (checks==0){
+    while (checks == 0){
 
 
-      for (g in 1:G){
-        GX[[g]]<-list()
-        dGX[[g]]<-list()
-        z_S[[g]]<-list()
+      for (g in 1:clustersize){
+        GX[[g]] <- dGX[[g]] <- z_S[[g]] <- list()
         z[is.nan(z)] <- 0
-        for (i in 1:N){
+        for (i in 1:N) {
           print(i)
-          dGX[[g]][[i]]<-diag(exp(log(lib_mat[i,])+start[[g]][i,]+0.5*diag(S[[g]][[i]])),d)+isigma[[g]]
-          S[[g]][[i]]<- solve(dGX[[g]][[i]])
-          z_S[[g]][[i]]<-z[i,g]*S[[g]][[i]]
-          GX[[g]][[i]]<-Y[i,]-exp(start[[g]][i,]+log(lib_mat[i,])+0.5*diag(S[[g]][[i]]))-(isigma[[g]])%*%(start[[g]][i,]-mu[[g]])
-          m[[g]][i, ]<-start[[g]][i,]+S[[g]][[i]]%*% GX[[g]][[i]]
+          dGX[[g]][[i]] <- diag(exp(log(lib_mat[i, ]) + start[[g]][i, ] +
+                                      0.5 * diag(S[[g]][[i]])), d) + isigma[[g]]
+          S[[g]][[i]] <- solve(dGX[[g]][[i]])
+          z_S[[g]][[i]] <- z[i,g] * S[[g]][[i]]
+          GX[[g]][[i]] <- dataset[i,]-exp(start[[g]][i,] + log(lib_mat[i, ]) +
+                                            0.5 * diag(S[[g]][[i]])) -
+                                            (isigma[[g]]) %*% (start[[g]][i, ] -
+                                            mu[[g]])
+          m[[g]][i, ] <- start[[g]][i, ] + S[[g]][[i]] %*% GX[[g]][[i]]
         }
 
-        start[[g]]<-m[[g]]
+        start[[g]] <- m[[g]]
+
         ####Updating mu
-        mu[[g]]<-colSums(z[,g]*m[[g]])/sum(z[,g])
+        mu[[g]] <- colSums(z[ ,g] * m[[g]]) / sum(z[ ,g])
 
         ####Updating Sample covariance
-        mu_mat<-matrix(rep(mu[[g]],N),nrow=N,byrow=TRUE)
-        res<-m[[g]]-mu_mat
-        temp <- cov.wt(res, wt=z[,g], center=FALSE, method="ML")
-        Sk[,,g]<- temp$cov
+        mu_mat <- matrix(rep(mu[[g]], N), nrow = N, byrow = TRUE)
+        res <- m[[g]] - mu_mat
+        temp <- cov.wt(res, wt = z[,g], center = FALSE, method = "ML")
+        Sk[,,g] <- temp$cov
       }
 
 
-      if (it<10) repmax<-10 else repmax<-1
-      for (rep in 1:repmax){
-        lambda_old<- lambda
+      if (it < 10) repmax <- 10 else repmax <- 1
+      for (rep in 1:repmax) {
+        lambda_old <- lambda
         psi_old <-psi
-        updates<-model_updates(modelName=modelName,z_S=z_S,ng=ng,z=z,lambda=lambda,isigma=isigma,G=G,pmax.var=pmax.var,Sk=Sk,psi=psi)
+        updates <- model_updates(modelName=modelName,z_S=z_S,ng=ng,z=z,lambda=lambda,isigma=isigma,G=G,pmax.var=pmax.var,Sk=Sk,psi=psi)
 
 
-        sigma.var <- updates$sigma.var
+        sigmaVar <- updates$sigmaVar
         psi <- updates$psi
         lambda <- updates$lambda
         par <- updates$par
 
 
-        for (g in 1:G){
+        for (g in 1:clustersize) {
           ## check diag dimension
-          isigma[[g]]<-solve(psi[[g]]) - (solve(psi[[g]])%*%lambda[[g]]%*%solve(diag(dim(bigTheta[[g]])[1])+(t(lambda[[g]])%*%solve(psi[[g]])%*%lambda[[g]]))%*%t(lambda[[g]])%*%solve(psi[[g]]))
+          isigma[[g]]<-solve(psi[[g]]) -
+            (solve(psi[[g]]) %*% lambda[[g]] %*% solve(diag(dim(bigTheta[[g]])[1]) +
+            (t(lambda[[g]]) %*% solve(psi[[g]]) %*% lambda[[g]])) %*% t(lambda[[g]]) %*% solve(psi[[g]]))
         }
 
       }
 
 
-      pi_g<-colSums(z)/N
-      ng<-colSums(z)
-      # lib_mat_full<-matrix(normFactors,ncol=d,nrow=N, byrow=T) ###Matrix containing normalization factor
+      piG <- colSums(z) / N
+      ng <- colSums(z)
+      # libMatFull<-matrix(normFactors,ncol=d,nrow=N, byrow=T) ###Matrix containing normalization factor
       ### Some useful functions
-      fun_five<-function(x,y=isigma[[g]]){
-        sum(diag(x%*%y))
+      fun_five <- function(x, y = isigma[[g]]) {
+        sum(diag(x %*% y))
       }
 
-      F<-matrix(NA,ncol=G,nrow=N)
+      F <- matrix(NA, ncol = G, nrow = N)
 
-      for (g in 1:G){
-        two<-rowSums(exp(m[[g]]+log(lib_mat_full)+0.5*matrix(unlist(lapply(S[[g]],diag)),ncol=d,byrow=TRUE)))
-        five<-0.5*unlist(lapply(S[[g]],fun_five))
-        six<-0.5*log(unlist(lapply(S[[g]],det)))
-        F[,g]<-pi_g[g]*exp(rowSums(m[[g]]*Y)-two-rowSums(lfactorial(Y))+rowSums(log(lib_mat_full)*Y)-0.5*mahalanobis(m[[g]],center=mu[[g]],cov=isigma[[g]], inverted = TRUE)-five+six-0.5*log(det(sigma.var[[g]]))-d/2)
+      for (g in 1:clustersize) {
+        two <- rowSums(exp(m[[g]] + log(libMatFull) + 0.5 *
+                             matrix(unlist(lapply(S[[g]], diag)), ncol = d, byrow = TRUE)))
+        five <- 0.5 * unlist(lapply(S[[g]], fun_five))
+        six <- 0.5 * log(unlist(lapply(S[[g]], det)))
+        Ffunction[, g] <- piG[g] * exp(rowSums(m[[g]] * dataset) - two -
+                                  rowSums(lfactorial(dataset)) +
+                                  rowSums(log(libMatFull) * dataset) -
+                                  0.5 * mahalanobis(m[[g]], center = mu[[g]], cov = isigma[[g]], inverted = TRUE) -
+                                  five + six - 0.5 * log(det(sigmaVar[[g]])) - d / 2)
       }
 
 
-      loglik[it]<-sum(log(rowSums(F)))
-      z<-F/rowSums(F)
-      if (it<=5){
-        z[z=="NaN"]<-0
+      loglik[it] <- sum(log(rowSums(Ffunction)))
+      z <- Ffunction / rowSums(Ffunction)
+      if (it <= 5) {
+        z[z == "NaN"] <- 0
       }
       #print(loglik)
       #plot(loglik,type="l")
 
 
-      if (it>5){
+      if (it > 5) {
         #Aitkaine's stopping criterion
-        if ((loglik[it-1]-loglik[it-2])==0) checks<-1 else{
-          a<-(loglik[it]-loglik[it-1])/(loglik[it-1]-loglik[it-2])
-          add_to<-(1/(1-a)*(loglik[it]-loglik[it-1]))
+        if ((loglik[it-1] - loglik[it-2]) == 0) checks <- 1 else{
+          a <- (loglik[it]-loglik[it-1]) / (loglik[it-1] - loglik[it-2])
+          add_to <- (1 / (1 - a) * (loglik[it] - loglik[it-1]))
           # }
-          aloglik[it]<-loglik[it-1]+add_to
-          if (abs(aloglik[it]-loglik[it-1])<0.001) checks<-1 else checks<-checks
+          aloglik[it] <- loglik[it-1] + add_to
+          if (abs(aloglik[it] - loglik[it-1]) < 0.001) checks <- 1 else checks <- checks
         }
       }
       # print(it)
-      it<-it+1
-      if (it==it_max) checks<-1
+      it <- it + 1
+      if (it == itMax) {
+        checks <- 1}
     }
     # plot(loglik,type="l")
 
     # par<-G*(d*pmax-0.5*pmax*(pmax-1))+G*d
     ##par from covariance only has the covariance parameters so now we need to add the parameters for the mean and pi
-    BIC<-2*loglik[it-1]-(par+(G-1)+G*d)*log(N)
-    mapz<-matrix(0,ncol=G,nrow=N)
-    for (g in 1:G){
-      mapz[which(mclust::map(z)==g),g]<-1
+    BIC <- 2 * loglik[it-1] - (par + (clustersize-1) + clustersize * d) * log(N)
+    mapz <- matrix(0, ncol = G, nrow = N)
+    for (g in 1:clustersize) {
+      mapz[which(mclust::map(z) == g), g] <- 1
     }
-    forICL<-function(g){if (sum(mapz[,g])==0){0} else
-      if (sum(mapz[,g])>0){sum(log(z[which(mapz[,g]==1),g]))}}
-    ICL<-BIC-2*sum(sapply(1:G,forICL))
-    true<-NA
+    forICL <- function(g) {if (sum(mapz[, g]) == 0){0} else
+      if (sum(mapz[, g]) > 0){sum(log(z[which(mapz[, g] == 1), g]))}}
+    ICL <- BIC - 2 * sum(sapply(1:clustersize, forICL))
+    true <- NA
 
     modelList <- list()
-    modelList[[1]]<-pi_g
-    modelList[[2]]<-mu
-    modelList[[3]]<-sigma.var
-    modelList[[4]]<-lambda
-    modelList[[5]]<-psi
-    modelList[[6]]<-z
-    modelList[[7]]<-loglik
-    modelList[[8]]<-k_means
-    modelList[[9]]<-true
-    modelList[[10]]<-BIC
-    modelList[[11]]<-ICL
-    modelList[[12]]<-modelName
-    modelList[[13]]<-G
-    modelList[[14]]<-pmax.var
-    names(modelList)<-c("pi_g", "mu", "sigma.var", "lambda", "psi", "z", "loglik", "kmeans", "true", "BIC", "ICL", "modelName", "G", "p")
+    modelList[[1]]<- piG
+    modelList[[2]]<- mu
+    modelList[[3]]<- sigmaVar
+    modelList[[4]]<- lambda
+    modelList[[5]]<- psi
+    modelList[[6]]<- z
+    modelList[[7]]<- loglik
+    modelList[[8]]<- kmeansOut
+    modelList[[9]]<- true
+    modelList[[10]]<- BIC
+    modelList[[11]]<- ICL
+    modelList[[12]]<- modelName
+    modelList[[13]]<- clustersize
+    modelList[[14]]<- pmax
+    names(modelList)<-c("piG", "mu", "sigmaVar", "lambda", "psi", "z", "loglik", "kmeans", "true", "BIC", "ICL", "modelName", "G", "p")
 
+
+    class(modelList) <- "mixMPLNFA"
     ## calc best model
     return(modelList)
   }
 
-}
 
 modelName <- function(modelName,
                       z_S,
@@ -327,7 +338,7 @@ modelName <- function(modelName,
                       psi) {
   beta.var <- list()
   bigTheta <- list()
-  sigma.var <- list()
+  sigmaVar <- list()
   Sk <<- Sk
   z_S <<- z_S
   ng <<- ng
@@ -351,7 +362,7 @@ modelName <- function(modelName,
       psinew[[g]] <- fun_psi_uuu(g)
     }
     for (g in 1:G) {
-      sigma.var[[g]] <- (lambdanew[[g]] %*% t(lambdanew[[g]]) +
+      sigmaVar[[g]] <- (lambdanew[[g]] %*% t(lambdanew[[g]]) +
                            psinew[[g]])
       lambda[[g]] <- lambdanew[[g]]
       psi[[g]] <- psinew[[g]]
@@ -377,7 +388,7 @@ modelName <- function(modelName,
     }
     psi <- psinew
     for (g in 1:G) {
-      sigma.var[[g]] <- (lambdanew[[g]] %*% t(lambdanew[[g]]) +
+      sigmaVar[[g]] <- (lambdanew[[g]] %*% t(lambdanew[[g]]) +
                            psinew[[g]])
       lambda[[g]] <- lambdanew[[g]]
     }
@@ -399,7 +410,7 @@ modelName <- function(modelName,
     lambdanew <<- lambdanew
     psinew[[1]] <- rowSums(sapply(1:G, fun_psi_ucu)) * diag(d)
     for (g in 1:G) {
-      sigma.var[[g]] <- (lambdanew[[g]] %*% t(lambdanew[[g]]) +
+      sigmaVar[[g]] <- (lambdanew[[g]] %*% t(lambdanew[[g]]) +
                            psinew[[1]])
       lambda[[g]] <- lambdanew[[g]]
       psi[[g]] <- psinew[[1]]
@@ -422,7 +433,7 @@ modelName <- function(modelName,
     lambdanew <<- lambdanew
     psinew[[1]] <- sum(sapply(1:G, fun_psi_ucc)) * diag(d)
     for (g in 1:G) {
-      sigma.var[[g]] <- (lambdanew[[g]] %*% t(lambdanew[[g]]) +
+      sigmaVar[[g]] <- (lambdanew[[g]] %*% t(lambdanew[[g]]) +
                            psinew[[1]])
       lambda[[g]] <- lambdanew[[g]]
       psi[[g]] <- psinew[[1]]
@@ -457,7 +468,7 @@ modelName <- function(modelName,
     lambdanew <<- lambdanew
     for (g in 1:G) {
       psinew[[g]] <- fun_psi_cuu(g) * diag(d)
-      sigma.var[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
+      sigmaVar[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
                            psinew[[g]])
       lambda[[g]] <- lambdanew[[1]]
     }
@@ -486,7 +497,7 @@ modelName <- function(modelName,
     lambdanew <<- lambdanew
     for (g in 1:G) {
       psinew[[g]] <- fun_psi_cuc(g) * diag(d)
-      sigma.var[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
+      sigmaVar[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
                            psinew[[g]])
       lambda[[g]] <- lambdanew[[1]]
       psi[[g]] <- psinew[[g]]
@@ -508,7 +519,7 @@ modelName <- function(modelName,
     psinew[[1]] <- fun_psi_ccu() * diag(d)
     bigtheta_old <- bigTheta[[1]]
     for (g in 1:G) {
-      sigma.var[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
+      sigmaVar[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
                            psinew[[1]])
       lambda[[g]] <- lambdanew[[1]]
       psi[[g]] <- psinew[[1]]
@@ -532,7 +543,7 @@ modelName <- function(modelName,
     psinew[[1]] <- fun_psi_ccc() * diag(d)
     bigtheta_old <- bigTheta[[1]]
     for (g in 1:G) {
-      sigma.var[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
+      sigmaVar[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
                            psinew[[1]])
       lambda[[g]] <- lambdanew[[1]]
       psi[[g]] <- psinew[[1]]
@@ -542,7 +553,7 @@ modelName <- function(modelName,
     par <- (d * pmax.var - 0.5 * pmax.var * (pmax.var - 1)) +
       1
   }
-  return(list(sigma.var = sigma.var, psi = psi, lambda = lambda,
+  return(list(sigmaVar = sigmaVar, psi = psi, lambda = lambda,
               par = par, isigma = isigma))
 }
 
