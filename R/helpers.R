@@ -1,3 +1,4 @@
+# Helper functions used
 
 ## functions for updating lambda
 fun_lambda_g<-function(g){Sk[,,g]%*%t(beta.var[[g]])%*%solve(bigTheta[[g]])}
@@ -8,27 +9,27 @@ fun_lambda_cuc_2<-function(g){ng[g]/(diag(psi[[g]])[1])*bigTheta[[g]]}
 fun_lambda_ccu_ccc<-function(){Sg_av%*%t(beta.var[[1]])%*%solve(bigTheta_av)}
 
 ## functions for updating psi
-fun_psi_uuu<-function(g){diag(Sk[,,g]-lambdanew[[g]]%*%beta.var[[g]]%*%Sk[,,g]+Reduce("+",z_S[[g]])/sum(z[,g]))*diag(d)}
-fun_psi_uuc<-function(g){mean(diag(Sk[,,g]-lambdanew[[g]]%*%beta.var[[g]]%*%Sk[,,g]+Reduce("+",z_S[[g]])/ng[g]))}
-fun_psi_ucu<-function(g){ng[g]/N*diag(Sk[,,g]-lambdanew[[g]]%*%beta.var[[g]]%*%Sk[,,g])+diag(Reduce("+",z_S[[g]])/N)}
-fun_psi_ucc<-function(g){1/d*ng[g]/N*sum(diag(Sk[,,g]-lambdanew[[g]]%*%beta.var[[g]]%*%Sk[,,g]))+sum(diag(Reduce("+",z_S[[g]])))/(N*d)}
-fun_psi_cuu<-function(g){diag(Sk[,,g]-2*lambdanew[[1]]%*%beta.var[[g]]%*%Sk[,,g]+lambdanew[[1]]%*%bigTheta[[g]]%*%t(lambdanew[[1]])+Reduce("+",z_S[[g]])/sum(z[,g]))*diag(d)}
-fun_psi_cuc<-function(g){mean(diag(Sk[,,g]-2*lambdanew[[1]]%*%beta.var[[g]]%*%Sk[,,g]+lambdanew[[1]]%*%bigTheta[[g]]%*%t(lambdanew[[1]])+Reduce("+",z_S[[g]])/ng[g]))}
-fun_psi_ccu<-function(){diag(Sg_av-lambdanew[[1]]%*%beta.var[[1]]%*%Sg_av)+diag(Reduce("+",z_S[[1]])/N)}
-fun_psi_ccc<-function(){mean(diag(Sg_av-lambdanew[[1]]%*%beta.var[[1]]%*%Sg_av))+sum(diag(Reduce("+",z_S[[1]])))/(N*d)}
+fun_psi_uuu<-function(g){diag(Sk[,,g]-lambdanew[[g]]%*%beta.var[[g]]%*%Sk[,,g]+Reduce("+",zS[[g]])/sum(z[,g]))*diag(d)}
+fun_psi_uuc<-function(g){mean(diag(Sk[,,g]-lambdanew[[g]]%*%beta.var[[g]]%*%Sk[,,g]+Reduce("+",zS[[g]])/ng[g]))}
+fun_psi_ucu<-function(g){ng[g]/N*diag(Sk[,,g]-lambdanew[[g]]%*%beta.var[[g]]%*%Sk[,,g])+diag(Reduce("+",zS[[g]])/N)}
+fun_psi_ucc<-function(g){1/d*ng[g]/N*sum(diag(Sk[,,g]-lambdanew[[g]]%*%beta.var[[g]]%*%Sk[,,g]))+sum(diag(Reduce("+",zS[[g]])))/(N*d)}
+fun_psi_cuu<-function(g){diag(Sk[,,g]-2*lambdanew[[1]]%*%beta.var[[g]]%*%Sk[,,g]+lambdanew[[1]]%*%bigTheta[[g]]%*%t(lambdanew[[1]])+Reduce("+",zS[[g]])/sum(z[,g]))*diag(d)}
+fun_psi_cuc<-function(g){mean(diag(Sk[,,g]-2*lambdanew[[1]]%*%beta.var[[g]]%*%Sk[,,g]+lambdanew[[1]]%*%bigTheta[[g]]%*%t(lambdanew[[1]])+Reduce("+",zS[[g]])/ng[g]))}
+fun_psi_ccu<-function(){diag(Sg_av-lambdanew[[1]]%*%beta.var[[1]]%*%Sg_av)+diag(Reduce("+",zS[[1]])/N)}
+fun_psi_ccc<-function(){mean(diag(Sg_av-lambdanew[[1]]%*%beta.var[[1]]%*%Sg_av))+sum(diag(Reduce("+",zS[[1]])))/(N*d)}
 
 fun_sgav<-function(g){ng[g]/N*Sk[,,g]}
 
 
 
 ## model updates
-model_updates<-function(modelName,z_S,ng,z,lambda,isigma,G,pmax.var,Sk,psi){
+model_updates<-function(modelName, zS, ng, z, lambda, isigma, G, pmax.var, Sk, psi) {
   beta.var <- list()
   bigTheta <- list()
-  sigma.var<-list()
+  sigma.var <- list()
 
   Sk<<-Sk
-  z_S<<-z_S
+  zS<<-zS
   ng<<-ng
   z<<-z
   psi<<-psi
