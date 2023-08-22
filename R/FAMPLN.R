@@ -242,8 +242,8 @@ PMPLNFAind <- function(dataset, clustersize, pSize){
 
       if (it < 10) repmax <- 10 else repmax <- 1
       for (rep in 1:repmax) {
-        lambda_old <- lambda
-        psi_old <-psi
+        lambdaOld <- lambda
+        psiOld <-psi
         updates <- modelUpdates(modelName = modelName,
                                 zS = zS,
                                 ng = ng,
@@ -265,8 +265,10 @@ PMPLNFAind <- function(dataset, clustersize, pSize){
         for (g in 1:clustersize) {
           ## check diag dimension
           isigma[[g]] <- solve(psi[[g]]) -
-            (solve(psi[[g]]) %*% lambda[[g]] %*% solve(diag(dim(bigTheta[[g]])[1]) +
-            (t(lambda[[g]]) %*% solve(psi[[g]]) %*% lambda[[g]])) %*% t(lambda[[g]]) %*%
+            (solve(psi[[g]]) %*% lambda[[g]] %*%
+            solve(diag(dim(bigTheta[[g]])[1]) +
+            (t(lambda[[g]]) %*% solve(psi[[g]]) %*%
+            lambda[[g]])) %*% t(lambda[[g]]) %*%
             solve(psi[[g]]))
         }
       }
@@ -306,14 +308,22 @@ PMPLNFAind <- function(dataset, clustersize, pSize){
 
       if (it > 5) {
         #Aitkaine's stopping criterion
-        if ((loglik[it - 1] - loglik[it - 2]) == 0) checks <- 1 else{
+        if ((loglik[it - 1] - loglik[it - 2]) == 0) {
+          checks <- 1
+        } else {
           a <- (loglik[it] - loglik[it-1]) / (loglik[it - 1] - loglik[it - 2])
-          add_to <- (1 / (1 - a) * (loglik[it] - loglik[it-1]))
+          addTo <- (1 / (1 - a) * (loglik[it] - loglik[it-1]))
           # }
-          aloglik[it] <- loglik[it - 1] + add_to
-          if (abs(aloglik[it] - loglik[it - 1]) < 0.001) checks <- 1 else checks <- checks
+          aloglik[it] <- loglik[it - 1] + addTo
+          if (abs(aloglik[it] - loglik[it - 1]) < 0.001) {
+            checks <- 1
+          } else {
+            checks <- checks
+          }
         }
       }
+
+
       # print(it)
       it <- it + 1
       if (it == itMax) {

@@ -2,7 +2,6 @@
 ## functions for updating lambda
 funLambdag <- function(g){Sk[,,g] %*% t(beta.var[[g]]) %*% solve(bigTheta[[g]])}
 funLambdaCUU1 <- function(g){ng[g] * solve(psi[[g]]) %*% Sk[,,g] %*% t(beta.var[[g]])}
-funLambdaCUU2 <- function(g){ng[g] * diag(solve(psi[[g]]))[k] * bigTheta[[g]]}
 funLambdaCUC1 <- function(g){ng[g] / (diag(psi[[g]])[1]) * (Sk[,,g] %*% t(beta.var[[g]]))}
 funLambdaCUC2 <- function(g){ng[g] / (diag(psi[[g]])[1]) * bigTheta[[g]]}
 funLambdaCCUnCCC <- function(){Sgav %*% t(beta.var[[1]]) %*% solve(bigThetaav)}
