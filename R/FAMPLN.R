@@ -207,7 +207,7 @@ PMPLNFAind <- function(dataset,
 
     # Begin clusterig
     while (checks == 0) {
-
+      print(it)
 
       for (g in 1:clustersize) {
         GX[[g]] <- dGX[[g]] <- zS[[g]] <- list()
@@ -241,17 +241,20 @@ PMPLNFAind <- function(dataset,
         # Updating Sample covariance
         muMatrix <- matrix(rep(mu[[g]], N), nrow = N, byrow = TRUE)
         res <- m[[g]] - muMatrix
-        temp <- stats::cov.wt(res, wt = z[, g],
+        temp <- stats::cov.wt(x = res, wt = z[, g],
                               center = FALSE,
                               method = "ML")
         Sk[,,g] <- temp$cov
       }
 
 
-      if (it < 10) repmax <- 10 else repmax <- 1
+      if (it < 10) {repmax <- 10
+      } else {
+        repmax <- 1
+      }
       for (rep in 1:repmax) {
         lambdaOld <- lambda
-        psiOld <-psi
+        psiOld <- psi
         updates <- modelUpdates(modelName = modelName,
                                 zS = zS,
                                 ng = ng,
@@ -345,10 +348,11 @@ PMPLNFAind <- function(dataset,
       }
 
 
-      # print(it)
+      print(it)
       it <- it + 1
       if (it == itMax) {
-        checks <- 1}
+        checks <- 1
+      }
     }
     # plot(loglik,type="l")
 
