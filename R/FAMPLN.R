@@ -107,30 +107,23 @@
 #' @importFrom utils tail
 #'
 
-dataPath <- "/Users/as/Library/CloudStorage/GoogleDrive-anjali@alumni.uoguelph.ca/My Drive/UGuelph/Analysis_AnjaliLaptop/AlgorithmsAndCode/MPLN_Factor_analyzers/For_Anjali_3July2023/Sanjeena_July2023/"
-dataset <- as.matrix(read.csv(file = paste0(dataPath, "Yfinal.csv"), header = TRUE, row.names = 1))
-dim(dataset) #  712 20502
-class(dataset)
-typeof(dataset)
 
-subestData <- dataset[1:20, 1:100]
-dataset<-subestData
-
-gmin <- 2
-gmax <- 3
-pmin <- 1
-pmax <- 2
-modelName <- "CCC"
+PMPLNFA <- function(dataset,
+                    gmin, gmax,
+                    pmin, pmax,
+                    modelName,
+                    trueLabels) {
+    return(invisible(NULL))
+  }
 
 
-PMPLNFA <- function(dataset, gmin, gmax, pmin, pmax, modelName) {
-}
-
-clustersize <- 2
-pSize <-2
 
 
-PMPLNFAind <- function(dataset, clustersize, pSize){
+
+PMPLNFAind <- function(dataset,
+                       clustersize,
+                       pSize,
+                       modelName) {
 
 
   # Initialize variables
@@ -166,16 +159,21 @@ PMPLNFAind <- function(dataset, clustersize, pSize){
         if(length(obs) > 1) {
           mu[[g]] <- colMeans(log(dataset[obs, ] + 1 / d))
           sigmaVar[[g]] <- var(log(dataset[obs, ] + 1 / d))
-          # isigma issue
-          # tried replacing this with Woodbury and moving it to line
+
+          # solve issue anticipation
+          # isigma[[g]]<-solve(sigma.var[[g]])
+          # SD comment: tried replacing this with Woodbury and moving it to line
           # 71 but still gives singularity error
           isigma[[g]] <- tryCatch(solve(sigmaVar[[g]]), error = function(err) NA)
           if(all(is.na(isigma[[g]]))) {
             isigma[[g]] <- diag(ncol(dataset[obs, ])) # if error with inverse
           }
+
         } else if (length(obs) == 1) { # if only one observation in a cluster
           mu[[g]] <- log(dataset[obs, ] + 1 / d)
           sigmaVar[[g]] <- diag(ncol(dataset))
+
+          # solve issue anticipation
           isigma[[g]] <- tryCatch(solve(sigmaVar[[g]]), error = function(err) NA)
           if(all(is.na(isigma[[g]]))) {
             isigma[[g]] <- diag(ncol(dataset))
@@ -218,7 +216,15 @@ PMPLNFAind <- function(dataset, clustersize, pSize){
           #print(i)
           dGX[[g]][[i]] <- diag(exp(log(libMat[i, ]) + start[[g]][i, ] +
                                       0.5 * diag(S[[g]][[i]])), d) + isigma[[g]]
-          S[[g]][[i]] <- solve(dGX[[g]][[i]])
+
+          # solve issue anticipation
+          # S[[g]][[i]] <- solve(dGX[[g]][[i]])
+          # solve if singular
+          S[[g]][[i]] <- tryCatch(solve(dGX[[g]][[i]]), error = function(err) NA)
+          if(all(is.na(S[[g]][[i]]))) {
+            S[[g]][[i]] <- diag(ncol(dGX[[g]][[i]]))
+          }
+
           zS[[g]][[i]] <- z[i,g] * S[[g]][[i]]
           GX[[g]][[i]] <- dataset[i, ] - exp(start[[g]][i, ] + log(libMat[i, ]) +
                                             0.5 * diag(S[[g]][[i]])) -
@@ -265,13 +271,26 @@ PMPLNFAind <- function(dataset, clustersize, pSize){
 
 
         for (g in 1:clustersize) {
-          ## check diag dimension
-          isigma[[g]] <- solve(psi[[g]]) -
-            (solve(psi[[g]]) %*% lambda[[g]] %*%
+
+          # solve issue anticipation
+          # isigma[[g]] <- solve(psi[[g]]) -
+          #   (solve(psi[[g]]) %*% lambda[[g]] %*%
+          #      solve(diag(dim(bigTheta[[g]])[1]) +
+          #              (t(lambda[[g]]) %*% solve(psi[[g]]) %*%
+          #                 lambda[[g]])) %*% t(lambda[[g]]) %*%
+          #      solve(psi[[g]]))
+
+          solvePsig <- tryCatch(solve(psi[[g]]), error = function(err) NA)
+          if(all(is.na(solvePsig))) {
+            solvePsig <- diag(ncol(psi[[g]]))
+          }
+
+          isigma[[g]] <- solvePsig -
+            (solvePsig %*% lambda[[g]] %*%
             solve(diag(dim(bigTheta[[g]])[1]) +
-            (t(lambda[[g]]) %*% solve(psi[[g]]) %*%
+            (t(lambda[[g]]) %*% solvePsig %*%
             lambda[[g]])) %*% t(lambda[[g]]) %*%
-            solve(psi[[g]]))
+              solvePsig)
         }
       }
 
@@ -340,32 +359,39 @@ PMPLNFAind <- function(dataset, clustersize, pSize){
     for (g in 1:clustersize) {
       mapz[which(mclust::map(z) == g), g] <- 1
     }
-    forICL <- function(g) {if (sum(mapz[, g]) == 0){0} else
-      if (sum(mapz[, g]) > 0){sum(log(z[which(mapz[, g] == 1), g]))}}
+    forICL <- function(g) {
+      if (sum(mapz[, g]) == 0) {
+        returnValICL <- 0
+      } else if (sum(mapz[, g]) > 0) {
+        returnValICL <- sum(log(z[which(mapz[, g] == 1), g]))
+      }
+      return(returnValICL)
+    }
     ICL <- BIC - 2 * sum(sapply(1:clustersize, forICL))
     true <- NA
 
     modelList <- list()
-    modelList[[1]]<- piG
-    modelList[[2]]<- mu
-    modelList[[3]]<- sigmaVar
-    modelList[[4]]<- lambda
-    modelList[[5]]<- psi
-    modelList[[6]]<- z
-    modelList[[7]]<- loglik
-    modelList[[8]]<- kmeansOut
-    modelList[[9]]<- true
-    modelList[[10]]<- BIC
-    modelList[[11]]<- ICL
-    modelList[[12]]<- modelName
-    modelList[[13]]<- clustersize
-    modelList[[14]]<- pmax
-    names(modelList)<-c("piG", "mu", "sigmaVar", "lambda", "psi", "z", "loglik", "kmeans", "true", "BIC", "ICL", "modelName", "G", "p")
-
+    modelList[[1]] <- piG
+    modelList[[2]] <- mu
+    modelList[[3]] <- sigmaVar
+    modelList[[4]] <- lambda
+    modelList[[5]] <- psi
+    modelList[[6]] <- z
+    modelList[[7]] <- loglik
+    modelList[[8]] <- kmeansOut
+    modelList[[9]] <- BIC
+    modelList[[10]] <- ICL
+    modelList[[11]] <- modelName
+    modelList[[12]] <- clustersize
+    modelList[[13]] <- pmax
+    names(modelList) <-c("piG", "mu", "sigmaVar",
+                        "lambda", "psi", "z", "loglik",
+                        "kmeans", "BIC", "ICL",
+                        "modelName", "G", "p")
 
     class(modelList) <- "mixMPLNFA"
-    ## calc best model
     return(modelList)
+
   }
 
 
@@ -387,6 +413,7 @@ modelUpdates <- function(modelName,
   z <<- z
   psi <<- psi
   lambda <<- lambda
+
   if (substr(modelName, 1, 3) == "UUU") {
     for (g in 1:clustersize) {
       betaVar[[g]] <- t(lambda[[g]]) %*% isigma[[g]]
@@ -397,7 +424,10 @@ modelUpdates <- function(modelName,
     betaVar <<- betaVar
     bigTheta <<- bigTheta
     for (g in 1:clustersize) {
-      lambdanew[[g]] <- funLambdag(g)
+      lambdanew[[g]] <- funLambdag(g = g,
+                                   Sk = Sk,
+                                   betaVar = betaVar,
+                                   bigTheta = bigTheta)
     }
     lambdanew <<- lambdanew
     for (g in 1:clustersize) {
@@ -409,8 +439,8 @@ modelUpdates <- function(modelName,
       lambda[[g]] <- lambdanew[[g]]
       psi[[g]] <- psinew[[g]]
     }
-    par <- clustersize * (d * pmaxVar - 0.5 * pmaxVar * (pmaxVar -
-                                                   1)) + clustersize * d
+    par <- clustersize *
+      (d * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) + clustersize * d
   }
   if (substr(modelName, 1, 3) == "UUC") {
     for (g in 1:clustersize) {
@@ -434,8 +464,8 @@ modelUpdates <- function(modelName,
                            psinew[[g]])
       lambda[[g]] <- lambdanew[[g]]
     }
-    par <- clustersize * (d * pmaxVar - 0.5 * pmaxVar * (pmaxVar -
-                                                   1)) + clustersize
+    par <- clustersize *
+      (d * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) + clustersize
   }
   if (substr(modelName, 1, 3) == "UCU") {
     for (g in 1:clustersize) {
@@ -457,8 +487,8 @@ modelUpdates <- function(modelName,
       lambda[[g]] <- lambdanew[[g]]
       psi[[g]] <- psinew[[1]]
     }
-    par <- clustersize * (d * pmaxVar - 0.5 * pmaxVar * (pmaxVar -
-                                                   1)) + d
+    par <- clustersize *
+      (d * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) + d
   }
   if (substr(modelName, 1, 3) == "UCC") {
     for (g in 1:clustersize) {
@@ -480,8 +510,8 @@ modelUpdates <- function(modelName,
       lambda[[g]] <- lambdanew[[g]]
       psi[[g]] <- psinew[[1]]
     }
-    par <- clustersize * (d * pmaxVar - 0.5 * pmaxVar * (pmaxVar -
-                                                   1)) + 1
+    par <- clustersize *
+      (d * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) + 1
   }
   if (substr(modelName, 1, 3) == "CUU") {
     for (g in 1:clustersize) {
@@ -492,20 +522,38 @@ modelUpdates <- function(modelName,
     }
     betaVar <<- betaVar
     bigTheta <<- bigTheta
-    for_lam_1 <- matrix(rowSums(sapply(1:clustersize, funLambdaCUU1)),
-                        d, pmaxVar)
-    for_lam_2 <- list()
+    forLam1 <- matrix(data =
+                      rowSums(sapply(1:clustersize, funLambdaCUU1, ng = ng, psi = psi, Sk = Sk, betaVar = betaVar)),
+                      nrow = d, ncol = pmaxVar)
+    forLam2 <- list()
     for (k in 1:d) {
       k <<- k
-      if (pmaxVar > 1)
-        for_lam_2[[k]] <- solve(matrix(rowSums(sapply(1:clustersize,
-                                                      funLambdaCUU2)), pmaxVar, pmaxVar))
-      else for_lam_2[[k]] <- solve(matrix(sum(sapply(1:clustersize,
-                                                     funLambdaCUU2)), pmaxVar, pmaxVar))
+      if (pmaxVar > 1) {
+
+        # solve issue anticipation
+        # forLam2[[k]] <- solve(matrix(rowSums(sapply(1:clustersize,
+        #                                              funLambdaCUU2)), pmaxVar, pmaxVar))
+        matLambdaCUU2 <- matrix(rowSums(sapply(1:clustersize,
+                              funLambdaCUU2)), pmaxVar, pmaxVar)
+        forLam2[[k]] <- tryCatch(solve(matLambdaCUU2), error = function(err) NA)
+        if(all(is.na(forLam2[[k]]))) {
+          forLam2[[k]] <- diag(ncol(matLambdaCUU2)) # if error with inverse
+        }
+      } else {
+        # solve issue anticipation
+        # forLam2[[k]] <- solve(matrix(sum(sapply(1:clustersize,
+        #                                              funLambdaCUU2)), pmaxVar, pmaxVar))
+        matLambdaCUU2 <- matrix(sum(sapply(1:clustersize,
+                                           funLambdaCUU2)), pmaxVar, pmaxVar)
+        forLam2[[k]] <- tryCatch(solve(matLambdaCUU2), error = function(err) NA)
+        if(all(is.na(forLam2[[k]]))) {
+          forLam2[[k]] <- diag(ncol(matLambdaCUU2)) # if error with inverse
+        }
+      }
     }
     lambdanew[[1]] <- matrix(NA, d, pmaxVar)
     for (k in 1:d) {
-      lambdanew[[1]][k, ] <- for_lam_1[k, ] %*% for_lam_2[[k]]
+      lambdanew[[1]][k, ] <- forLam1[k, ] %*% forLam2[[k]]
     }
     lambdanew <<- lambdanew
     for (g in 1:clustersize) {

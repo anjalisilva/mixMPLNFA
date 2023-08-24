@@ -4,7 +4,14 @@ funLambdag <- function(g, Sk, betaVar, bigTheta) {
   Sk[,,g] %*% t(betaVar[[g]]) %*% solve(bigTheta[[g]])
 }
 
-funLambdaCUU1 <- function(g){ng[g] * solve(psi[[g]]) %*% Sk[,,g] %*% t(betaVar[[g]])}
+funLambdaCUU1 <- function(g, ng, psi, Sk, betaVar) {
+  ng[g] * solve(psi[[g]]) %*% Sk[,,g] %*% t(betaVar[[g]])
+}
+
+funLambdaCUU2 <- function(g) {
+  ng[g] * diag(solve(psi[[g]]))[k] * bigTheta[[g]]
+}
+
 funLambdaCUC1 <- function(g){ng[g] / (diag(psi[[g]])[1]) * (Sk[,,g] %*% t(betaVar[[g]]))}
 funLambdaCUC2 <- function(g){ng[g] / (diag(psi[[g]])[1]) * bigTheta[[g]]}
 funLambdaCCUnCCC <- function(){Sgav %*% t(betaVar[[1]]) %*% solve(bigThetaav)}
