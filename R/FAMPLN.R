@@ -551,6 +551,7 @@ modelUpdates <- function(modelName,
         }
       }
     }
+
     lambdanew[[1]] <- matrix(NA, d, pmaxVar)
     for (k in 1:d) {
       lambdanew[[1]][k, ] <- forLam1[k, ] %*% forLam2[[k]]
@@ -576,13 +577,39 @@ modelUpdates <- function(modelName,
     betaVar <<- betaVar
     bigTheta <<- bigTheta
     if (pmaxVar > 1) {
-      lambdanew[[1]] <- matrix(rowSums(sapply(1:clustersize, funLambdaCUC1)),
-                               d, pmaxVar) %*% solve(matrix(rowSums(sapply(1:clustersize,
-                                                                            funLambdaCUC2)), pmaxVar, pmaxVar))
+      # solve issue anticipation
+      # lambdanew[[1]] <- matrix(rowSums(sapply(1:clustersize, funLambdaCUC1)), d, pmaxVar) %*%
+      #                          solve(matrix(rowSums(sapply(1:clustersize,
+      #                                funLambdaCUC2)), pmaxVar, pmaxVar))
+
+      matLambdaCUC2 <- matrix(rowSums(sapply(1:clustersize,
+                            funLambdaCUC2)), pmaxVar, pmaxVar)
+
+      imatLambdaCUC2 <-  tryCatch(solve(matLambdaCUC2), error = function(err) NA)
+      if(all(is.na(imatLambdaCUC2))) {
+        imatLambdaCUC2 <- diag(ncol(matLambdaCUC2)) # if error with inverse
+      }
+
+      lambdanew[[1]] <- matrix(rowSums(sapply(1:clustersize, funLambdaCUC1)), d, pmaxVar) %*%
+        imatLambdaCUC2
+
+
+    } else {
+      # solve issue anticipation
+      # lambdanew[[1]] <- matrix(rowSums(sapply(1:clustersize, funLambdaCUC1)), d, pmaxVar) %*%
+      #                          solve(matrix(sum(sapply(1:clustersize, funLambdaCUC2)),
+      #                          pmaxVar, pmaxVar))
+
+      matLambdaCUC2 <- matrix(sum(sapply(1:clustersize, funLambdaCUC2)),
+             pmaxVar, pmaxVar)
+      imatLambdaCUC2 <-  tryCatch(solve(matLambdaCUC2), error = function(err) NA)
+      if(all(is.na(imatLambdaCUC2))) {
+        imatLambdaCUC2 <- diag(ncol(matLambdaCUC2)) # if error with inverse
+      }
+
+      lambdanew[[1]] <- matrix(rowSums(sapply(1:clustersize, funLambdaCUC1)), d, pmaxVar) %*%
+                        imatLambdaCUC2
     }
-    else lambdanew[[1]] <- matrix(rowSums(sapply(1:clustersize, funLambdaCUC1)),
-                                  d, pmaxVar) %*% solve(matrix(sum(sapply(1:clustersize, funLambdaCUC2)),
-                                                                pmaxVar, pmaxVar))
     lambda[[1]] <- lambdanew[[1]]
     lambdanew <<- lambdanew
     for (g in 1:clustersize) {
