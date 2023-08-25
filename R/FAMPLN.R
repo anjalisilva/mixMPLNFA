@@ -143,7 +143,7 @@ PMPLNFAind <- function(dataset,
     normFactors <- edgeR::calcNormFactors(t(dataset), method = "TMM")
     libMat <- matrix(normFactors, nrow = N, ncol = d, byrow = F)
 
-    kmeansOut <- stats::kmeans(log(dataset + 1), centers = gmax,
+    kmeansOut <- stats::kmeans(log(dataset + 1), centers = clustersize,
                                nstart = 100)$cluster
 
     # Initialize z
@@ -264,7 +264,8 @@ PMPLNFAind <- function(dataset,
                                 clustersize = clustersize,
                                 pmaxVar = pSize,
                                 Sk = Sk,
-                                psi = psi)
+                                psi = psi,
+                                d = d)
 
 
         sigmaVar <- updates$sigmaVar
@@ -363,7 +364,7 @@ PMPLNFAind <- function(dataset,
     for (g in 1:clustersize) {
       mapz[which(mclust::map(z) == g), g] <- 1
     }
-    forICL <- function(g) {
+    forICL <- function(g, mapz, z) {
       if (sum(mapz[, g]) == 0) {
         returnValICL <- 0
       } else if (sum(mapz[, g]) > 0) {
@@ -371,7 +372,8 @@ PMPLNFAind <- function(dataset,
       }
       return(returnValICL)
     }
-    ICL <- BIC - 2 * sum(sapply(1:clustersize, forICL))
+    ICL <- BIC - 2 * sum(sapply(1:clustersize, forICL,
+                         g = g, mapz = mapz, z = z))
     true <- NA
 
     modelList <- list()
@@ -387,7 +389,7 @@ PMPLNFAind <- function(dataset,
     modelList[[10]] <- ICL
     modelList[[11]] <- modelName
     modelList[[12]] <- clustersize
-    modelList[[13]] <- pmax
+    modelList[[13]] <- pSize
     names(modelList) <-c("piG", "mu", "sigmaVar",
                         "lambda", "psi", "z", "loglik",
                         "kmeans", "BIC", "ICL",
@@ -408,9 +410,10 @@ modelUpdates <- function(modelName,
                       clustersize,
                       pmaxVar,
                       Sk,
-                      psi) {
+                      psi,
+                      d) {
 
-  betaVar <- bigTheta <- sigmaVar <- list()
+  betaVar <- bigTheta <- sigmaVar <- lambdanew <- list()
   Sk <<- Sk
   zS <<- zS
   ng <<- ng
@@ -484,7 +487,11 @@ modelUpdates <- function(modelName,
       lambdanew[[g]] <- funLambdag(g)
     }
     lambdanew <<- lambdanew
-    psinew[[1]] <- rowSums(sapply(1:clustersize, funpsiUCU)) * diag(d)
+    psinew[[1]] <- rowSums(sapply(1:clustersize, funpsiUCU,
+                           g = g, N = N, ng = ng, Sk = Sk,
+                           lambdanew = lambdanew,
+                           betaVar = betaVar,
+                           zS = zS)) * diag(d)
     for (g in 1:clustersize) {
       sigmaVar[[g]] <- (lambdanew[[g]] %*% t(lambdanew[[g]]) +
                            psinew[[1]])
@@ -537,8 +544,12 @@ modelUpdates <- function(modelName,
         # solve issue anticipation
         # forLam2[[k]] <- solve(matrix(rowSums(sapply(1:clustersize,
         #                                              funLambdaCUU2)), pmaxVar, pmaxVar))
-        matLambdaCUU2 <- matrix(rowSums(sapply(1:clustersize,
-                              funLambdaCUU2)), pmaxVar, pmaxVar)
+        matLambdaCUU2 <- matrix(data =
+                                rowSums(sapply(1:clustersize,
+                                funLambdaCUU2, g = g, ng = ng, psi = psi,
+                                k = k, bigTheta = bigTheta)),
+                                nrow = pmaxVar,
+                                ncol = pmaxVar)
         forLam2[[k]] <- tryCatch(solve(matLambdaCUU2), error = function(err) NA)
         if(all(is.na(forLam2[[k]]))) {
           forLam2[[k]] <- diag(ncol(matLambdaCUU2)) # if error with inverse
@@ -547,8 +558,11 @@ modelUpdates <- function(modelName,
         # solve issue anticipation
         # forLam2[[k]] <- solve(matrix(sum(sapply(1:clustersize,
         #                                              funLambdaCUU2)), pmaxVar, pmaxVar))
-        matLambdaCUU2 <- matrix(sum(sapply(1:clustersize,
-                                           funLambdaCUU2)), pmaxVar, pmaxVar)
+        matLambdaCUU2 <- matrix(data = sum(sapply(1:clustersize,
+                                funLambdaCUU2, g = g, ng = ng, psi = psi,
+                                k = k, bigTheta = bigTheta)),
+                                nrow = pmaxVar,
+                                ncol = pmaxVar)
         forLam2[[k]] <- tryCatch(solve(matLambdaCUU2), error = function(err) NA)
         if(all(is.na(forLam2[[k]]))) {
           forLam2[[k]] <- diag(ncol(matLambdaCUU2)) # if error with inverse
@@ -562,7 +576,7 @@ modelUpdates <- function(modelName,
     }
     lambdanew <<- lambdanew
     for (g in 1:clustersize) {
-      psinew[[g]] <- fun_psi_cuu(g) * diag(d)
+      psinew[[g]] <- funpsiCUU(g) * diag(d)
       sigmaVar[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
                            psinew[[g]])
       lambda[[g]] <- lambdanew[[1]]
@@ -586,16 +600,22 @@ modelUpdates <- function(modelName,
       #                          solve(matrix(rowSums(sapply(1:clustersize,
       #                                funLambdaCUC2)), pmaxVar, pmaxVar))
 
-      matLambdaCUC2 <- matrix(rowSums(sapply(1:clustersize,
-                            funLambdaCUC2)), pmaxVar, pmaxVar)
+      matLambdaCUC2 <- matrix(data = rowSums(sapply(1:clustersize,
+                            funLambdaCUC2, g = g, ng = ng,
+                            psi = psi, bigTheta = bigTheta)),
+                            nrow = pmaxVar,
+                            ncol = pmaxVar)
 
       imatLambdaCUC2 <-  tryCatch(solve(matLambdaCUC2), error = function(err) NA)
       if(all(is.na(imatLambdaCUC2))) {
         imatLambdaCUC2 <- diag(ncol(matLambdaCUC2)) # if error with inverse
       }
 
-      lambdanew[[1]] <- matrix(rowSums(sapply(1:clustersize, funLambdaCUC1)), d, pmaxVar) %*%
-        imatLambdaCUC2
+      lambdanew[[1]] <- matrix(data = rowSums(sapply(1:clustersize, funLambdaCUC1,
+                               g = g, ng = ng, psi = psi, Sk = Sk, betaVar = betaVar)),
+                               nrow = d,
+                               ncol = pmaxVar) %*%
+                               imatLambdaCUC2
 
 
     } else {
@@ -604,15 +624,20 @@ modelUpdates <- function(modelName,
       #                          solve(matrix(sum(sapply(1:clustersize, funLambdaCUC2)),
       #                          pmaxVar, pmaxVar))
 
-      matLambdaCUC2 <- matrix(sum(sapply(1:clustersize, funLambdaCUC2)),
-             pmaxVar, pmaxVar)
+      matLambdaCUC2 <- matrix(data = sum(sapply(1:clustersize, funLambdaCUC2,
+                              g = g, ng = ng, psi = psi, bigTheta = bigTheta)),
+                              nrow = pmaxVar,
+                              ncol = pmaxVar)
       imatLambdaCUC2 <-  tryCatch(solve(matLambdaCUC2), error = function(err) NA)
       if(all(is.na(imatLambdaCUC2))) {
         imatLambdaCUC2 <- diag(ncol(matLambdaCUC2)) # if error with inverse
       }
 
-      lambdanew[[1]] <- matrix(rowSums(sapply(1:clustersize, funLambdaCUC1)), d, pmaxVar) %*%
-                        imatLambdaCUC2
+      lambdanew[[1]] <- matrix(data = rowSums(sapply(1:clustersize, funLambdaCUC1,
+                               g = g, ng = ng, psi = psi, Sk = Sk, betaVar = betaVar)),
+                               nrow = d,
+                               ncol = pmaxVar) %*%
+                               imatLambdaCUC2
     }
     lambda[[1]] <- lambdanew[[1]]
     lambdanew <<- lambdanew
@@ -628,23 +653,26 @@ modelUpdates <- function(modelName,
   }
   if (substr(modelName, 1, 3) == "CCU") {
     betaVar[[1]] <- t(lambda[[1]]) %*% isigma[[1]]
-    Sg_av <- matrix(rowSums(sapply(1:clustersize, funSgav)), d, d)
+    Sgav <- matrix(data = rowSums(sapply(1:clustersize, funSgav,
+                   g = g, ng = ng, N = N, Sk = Sk)),
+                   nrow = d,
+                   ncol = d)
     bigTheta[[1]] <- diag(pmaxVar) - betaVar[[1]] %*% lambda[[1]] +
-      betaVar[[1]] %*% Sg_av %*% t(betaVar[[1]])
-    bigTheta_av <- bigTheta[[1]]
+      betaVar[[1]] %*% Sgav %*% t(betaVar[[1]])
+    bigThetaav <- bigTheta[[1]]
     betaVar <<- betaVar
-    bigTheta_av <<- bigTheta_av
-    Sg_av <<- Sg_av
+    bigThetaav <<- bigThetaav
+    Sgav <<- Sgav
     lambdanew[[1]] <- funLambdaCCUnCCC()
     lambdanew <<- lambdanew
     psinew[[1]] <- funpsiCCU() * diag(d)
-    bigtheta_old <- bigTheta[[1]]
+    bigthetaOld <- bigTheta[[1]]
     for (g in 1:clustersize) {
       sigmaVar[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
                            psinew[[1]])
       lambda[[g]] <- lambdanew[[1]]
       psi[[g]] <- psinew[[1]]
-      bigTheta[[g]] <- bigtheta_old
+      bigTheta[[g]] <- bigthetaOld
     }
     bigTheta <<- bigTheta
     par <- (d * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) +
@@ -652,9 +680,12 @@ modelUpdates <- function(modelName,
   }
   if (substr(modelName, 1, 3) == "CCC") {
     betaVar[[1]] <- t(lambda[[1]]) %*% isigma[[1]]
-    Sgav <- matrix(rowSums(sapply(1:clustersize, funSgav)), d, d)
+    Sgav <- matrix(data = rowSums(sapply(1:clustersize, funSgav,
+                   g = g, ng = ng, N = N, Sk = Sk)),
+                   nrow = d,
+                   ncol = d)
     bigTheta[[1]] <- diag(pmaxVar) - betaVar[[1]] %*% lambda[[1]] +
-      betaVar[[1]] %*% Sgav %*% t(betaVar[[1]])
+                     betaVar[[1]] %*% Sgav %*% t(betaVar[[1]])
     bigThetaav <- bigTheta[[1]]
     betaVar <<- betaVar
     bigThetaav <<- bigThetaav
