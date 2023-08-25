@@ -127,13 +127,11 @@ PMPLNFAind <- function(dataset,
 
 
   # Initialize variables
-    lambdanew <- psinew <-list()
-
     d <- ncol(dataset)
     N <- nrow(dataset)
 
     mu <- psi<- lambda <- sigmaVar <- isigma <- list()
-    m <- S <- P <- Q <- list()
+    m <- S <- P <- Q <- lambdanew <- psinew <- list()
 
     # Other intermediate terms
     Sk <- array(0, c(d, d, clustersize))
@@ -143,7 +141,8 @@ PMPLNFAind <- function(dataset,
     normFactors <- edgeR::calcNormFactors(t(dataset), method = "TMM")
     libMat <- matrix(normFactors, nrow = N, ncol = d, byrow = F)
 
-    kmeansOut <- stats::kmeans(log(dataset + 1), centers = clustersize,
+    kmeansOut <- stats::kmeans(log(dataset + 1),
+                               centers = clustersize,
                                nstart = 100)$cluster
 
     # Initialize z
@@ -438,7 +437,13 @@ modelUpdates <- function(modelName,
     }
     lambdanew <<- lambdanew
     for (g in 1:clustersize) {
-      psinew[[g]] <- funpsiUUU(g)
+      psinew[[g]] <- funpsiUUU(g = g,
+                               Sk = Sk,
+                               lambdanew = lambdanew,
+                               betaVar = betaVar,
+                               z = z,
+                               d = d,
+                               zS = zS)
     }
     for (g in 1:clustersize) {
       sigmaVar[[g]] <- (lambdanew[[g]] %*% t(lambdanew[[g]]) +
@@ -671,7 +676,11 @@ modelUpdates <- function(modelName,
                                        betaVar = betaVar,
                                        bigThetaav = bigThetaav)
     lambdanew <<- lambdanew
-    psinew[[1]] <- funpsiCCU() * diag(d)
+    psinew[[1]] <- funpsiCCU(Sgav = Sgav,
+                             lambdanew = lambdanew,
+                             betaVar = betaVar,
+                             zS = zS,
+                             N = N) * diag(d)
     bigthetaOld <- bigTheta[[1]]
     for (g in 1:clustersize) {
       sigmaVar[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
@@ -695,9 +704,16 @@ modelUpdates <- function(modelName,
     betaVar <<- betaVar
     bigThetaav <<- bigThetaav
     Sgav <<- Sgav
-    lambdanew[[1]] <- funLambdaCCUnCCC()
+    lambdanew[[1]] <- funLambdaCCUnCCC(Sgav = Sgav,
+                                       betaVar = betaVar,
+                                       bigThetaav = bigThetaav)
     lambdanew <<- lambdanew
-    psinew[[1]] <- funpsiCCC() * diag(d)
+    psinew[[1]] <- funpsiCCC(Sgav = Sgav,
+                             lambdanew = lambdanew,
+                             betaVar = betaVar,
+                             zS = zS,
+                             N = N,
+                             d = d) * diag(d)
     bigthetaOld <- bigTheta[[1]]
     for (g in 1:clustersize) {
       sigmaVar[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
