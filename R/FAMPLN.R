@@ -373,7 +373,7 @@ PMPLNFAind <- function(dataset,
       return(returnValICL)
     }
     ICL <- BIC - 2 * sum(sapply(1:clustersize, forICL,
-                         g = g, mapz = mapz, z = z))
+                         mapz = mapz, z = z))
     true <- NA
 
     modelList <- list()
@@ -488,7 +488,7 @@ modelUpdates <- function(modelName,
     }
     lambdanew <<- lambdanew
     psinew[[1]] <- rowSums(sapply(1:clustersize, funpsiUCU,
-                           g = g, N = N, ng = ng, Sk = Sk,
+                           N = N, ng = ng, Sk = Sk,
                            lambdanew = lambdanew,
                            betaVar = betaVar,
                            zS = zS)) * diag(d)
@@ -514,7 +514,10 @@ modelUpdates <- function(modelName,
       lambdanew[[g]] <- funLambdag(g)
     }
     lambdanew <<- lambdanew
-    psinew[[1]] <- sum(sapply(1:clustersize, funPsiUCC)) * diag(d)
+    psinew[[1]] <- sum(sapply(1:clustersize, funPsiUCC,
+                   ng = ng, d = d, N = N, Sk = Sk,
+                   lambdanew = lambdanew, zS = zS, betaVar = betaVar),
+                   na.rm = TRUE) * diag(d)
     for (g in 1:clustersize) {
       sigmaVar[[g]] <- (lambdanew[[g]] %*% t(lambdanew[[g]]) +
                            psinew[[1]])
@@ -534,7 +537,8 @@ modelUpdates <- function(modelName,
     betaVar <<- betaVar
     bigTheta <<- bigTheta
     forLam1 <- matrix(data =
-                      rowSums(sapply(1:clustersize, funLambdaCUU1, ng = ng, psi = psi, Sk = Sk, betaVar = betaVar)),
+                      rowSums(sapply(1:clustersize, funLambdaCUU1,
+                      ng = ng, psi = psi, Sk = Sk, betaVar = betaVar)),
                       nrow = d, ncol = pmaxVar)
     forLam2 <- list()
     for (k in 1:d) {
@@ -546,7 +550,7 @@ modelUpdates <- function(modelName,
         #                                              funLambdaCUU2)), pmaxVar, pmaxVar))
         matLambdaCUU2 <- matrix(data =
                                 rowSums(sapply(1:clustersize,
-                                funLambdaCUU2, g = g, ng = ng, psi = psi,
+                                funLambdaCUU2, ng = ng, psi = psi,
                                 k = k, bigTheta = bigTheta)),
                                 nrow = pmaxVar,
                                 ncol = pmaxVar)
@@ -559,7 +563,7 @@ modelUpdates <- function(modelName,
         # forLam2[[k]] <- solve(matrix(sum(sapply(1:clustersize,
         #                                              funLambdaCUU2)), pmaxVar, pmaxVar))
         matLambdaCUU2 <- matrix(data = sum(sapply(1:clustersize,
-                                funLambdaCUU2, g = g, ng = ng, psi = psi,
+                                funLambdaCUU2, ng = ng, psi = psi,
                                 k = k, bigTheta = bigTheta)),
                                 nrow = pmaxVar,
                                 ncol = pmaxVar)
@@ -601,7 +605,7 @@ modelUpdates <- function(modelName,
       #                                funLambdaCUC2)), pmaxVar, pmaxVar))
 
       matLambdaCUC2 <- matrix(data = rowSums(sapply(1:clustersize,
-                            funLambdaCUC2, g = g, ng = ng,
+                            funLambdaCUC2, ng = ng,
                             psi = psi, bigTheta = bigTheta)),
                             nrow = pmaxVar,
                             ncol = pmaxVar)
@@ -612,7 +616,7 @@ modelUpdates <- function(modelName,
       }
 
       lambdanew[[1]] <- matrix(data = rowSums(sapply(1:clustersize, funLambdaCUC1,
-                               g = g, ng = ng, psi = psi, Sk = Sk, betaVar = betaVar)),
+                               ng = ng, psi = psi, Sk = Sk, betaVar = betaVar)),
                                nrow = d,
                                ncol = pmaxVar) %*%
                                imatLambdaCUC2
@@ -625,7 +629,7 @@ modelUpdates <- function(modelName,
       #                          pmaxVar, pmaxVar))
 
       matLambdaCUC2 <- matrix(data = sum(sapply(1:clustersize, funLambdaCUC2,
-                              g = g, ng = ng, psi = psi, bigTheta = bigTheta)),
+                              ng = ng, psi = psi, bigTheta = bigTheta)),
                               nrow = pmaxVar,
                               ncol = pmaxVar)
       imatLambdaCUC2 <-  tryCatch(solve(matLambdaCUC2), error = function(err) NA)
@@ -634,7 +638,7 @@ modelUpdates <- function(modelName,
       }
 
       lambdanew[[1]] <- matrix(data = rowSums(sapply(1:clustersize, funLambdaCUC1,
-                               g = g, ng = ng, psi = psi, Sk = Sk, betaVar = betaVar)),
+                               ng = ng, psi = psi, Sk = Sk, betaVar = betaVar)),
                                nrow = d,
                                ncol = pmaxVar) %*%
                                imatLambdaCUC2
@@ -654,7 +658,7 @@ modelUpdates <- function(modelName,
   if (substr(modelName, 1, 3) == "CCU") {
     betaVar[[1]] <- t(lambda[[1]]) %*% isigma[[1]]
     Sgav <- matrix(data = rowSums(sapply(1:clustersize, funSgav,
-                   g = g, ng = ng, N = N, Sk = Sk)),
+                   ng = ng, N = N, Sk = Sk)),
                    nrow = d,
                    ncol = d)
     bigTheta[[1]] <- diag(pmaxVar) - betaVar[[1]] %*% lambda[[1]] +
@@ -663,7 +667,9 @@ modelUpdates <- function(modelName,
     betaVar <<- betaVar
     bigThetaav <<- bigThetaav
     Sgav <<- Sgav
-    lambdanew[[1]] <- funLambdaCCUnCCC()
+    lambdanew[[1]] <- funLambdaCCUnCCC(Sgav = Sgav,
+                                       betaVar = betaVar,
+                                       bigThetaav = bigThetaav)
     lambdanew <<- lambdanew
     psinew[[1]] <- funpsiCCU() * diag(d)
     bigthetaOld <- bigTheta[[1]]
@@ -675,13 +681,12 @@ modelUpdates <- function(modelName,
       bigTheta[[g]] <- bigthetaOld
     }
     bigTheta <<- bigTheta
-    par <- (d * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) +
-      d
+    par <- (d * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) + d
   }
   if (substr(modelName, 1, 3) == "CCC") {
     betaVar[[1]] <- t(lambda[[1]]) %*% isigma[[1]]
     Sgav <- matrix(data = rowSums(sapply(1:clustersize, funSgav,
-                   g = g, ng = ng, N = N, Sk = Sk)),
+                   ng = ng, N = N, Sk = Sk)),
                    nrow = d,
                    ncol = d)
     bigTheta[[1]] <- diag(pmaxVar) - betaVar[[1]] %*% lambda[[1]] +

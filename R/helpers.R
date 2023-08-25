@@ -22,7 +22,9 @@ funLambdaCUC2 <- function(g, ng, psi, bigTheta) {
 }
 
 
-funLambdaCCUnCCC <- function(){Sgav %*% t(betaVar[[1]]) %*% solve(bigThetaav)}
+funLambdaCCUnCCC <- function(Sgav, betaVar, bigThetaav) {
+  Sgav %*% t(betaVar[[1]]) %*% solve(bigThetaav)
+}
 
 ## functions for updating psi
 funpsiUUU <- function(g){diag(Sk[,,g] - lambdanew[[g]] %*%
@@ -39,10 +41,11 @@ funpsiUCU <- function(g, N, ng, Sk, lambdanew, betaVar, zS) {
   diag(Reduce("+", zS[[g]]) / N)
 }
 
-funPsiUCC <- function(g){(1 / d) * (ng[g] / N) *
-                         sum(diag(Sk[,,g] - lambdanew[[g]] %*%
-                         betaVar[[g]] %*% Sk[,,g])) +
-                         sum(diag(Reduce("+", zS[[g]]))) / (N * d)}
+funPsiUCC <- function(g, ng, d, N, Sk, lambdanew, zS, betaVar) {
+  (1 / d) * (ng[g] / N) * sum(diag(Sk[,,g] - lambdanew[[g]] %*%
+  betaVar[[g]] %*% Sk[,,g])) + sum(diag(Reduce("+", zS[[g]]))) / (N * d)
+}
+
 funpsiCUU <- function(g){diag(Sk[,,g] - 2*lambdanew[[1]] %*%
                                 betaVar[[g]]%*%Sk[,,g] +
                                 lambdanew[[1]] %*% bigTheta[[g]] %*%
