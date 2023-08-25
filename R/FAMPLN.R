@@ -264,7 +264,8 @@ PMPLNFAind <- function(dataset,
                                 pmaxVar = pSize,
                                 Sk = Sk,
                                 psi = psi,
-                                d = d)
+                                d = d,
+                                N = N)
 
 
         sigmaVar <- updates$sigmaVar
@@ -410,7 +411,8 @@ modelUpdates <- function(modelName,
                       pmaxVar,
                       Sk,
                       psi,
-                      d) {
+                      d,
+                      N) {
 
   betaVar <- bigTheta <- sigmaVar <- lambdanew <- list()
   Sk <<- Sk
@@ -464,11 +466,19 @@ modelUpdates <- function(modelName,
     betaVar <<- betaVar
     bigTheta <<- bigTheta
     for (g in 1:clustersize) {
-      lambdanew[[g]] <- funLambdag(g)
+      lambdanew[[g]] <- funLambdag(g = g,
+                                   Sk = Sk,
+                                   betaVar = betaVar,
+                                   bigTheta = bigTheta)
     }
     lambdanew <<- lambdanew
     for (g in 1:clustersize) {
-      psinew[[g]] <- funpsiUUC(g) * diag(d)
+      psinew[[g]] <- funpsiUUC(g = g,
+                               Sk = Sk,
+                               lambdanew = lambdanew,
+                               betaVar = betaVar,
+                               zS = zS,
+                               ng = ng) * diag(d)
     }
     psi <- psinew
     for (g in 1:clustersize) {
@@ -489,7 +499,10 @@ modelUpdates <- function(modelName,
     betaVar <<- betaVar
     bigTheta <<- bigTheta
     for (g in 1:clustersize) {
-      lambdanew[[g]] <- funLambdag(g)
+      lambdanew[[g]] <- funLambdag(g = g,
+                                   Sk = Sk,
+                                   betaVar = betaVar,
+                                   bigTheta = bigTheta)
     }
     lambdanew <<- lambdanew
     psinew[[1]] <- rowSums(sapply(1:clustersize, funpsiUCU,
@@ -516,7 +529,10 @@ modelUpdates <- function(modelName,
     betaVar <<- betaVar
     bigTheta <<- bigTheta
     for (g in 1:clustersize) {
-      lambdanew[[g]] <- funLambdag(g)
+      lambdanew[[g]] <- funLambdag(g = g,
+                                   Sk = Sk,
+                                   betaVar = betaVar,
+                                   bigTheta = bigTheta)
     }
     lambdanew <<- lambdanew
     psinew[[1]] <- sum(sapply(1:clustersize, funPsiUCC,
@@ -585,7 +601,14 @@ modelUpdates <- function(modelName,
     }
     lambdanew <<- lambdanew
     for (g in 1:clustersize) {
-      psinew[[g]] <- funpsiCUU(g) * diag(d)
+      psinew[[g]] <- funpsiCUU(g = g,
+                               Sk = Sk,
+                               zS = zS,
+                               z = z,
+                               d = d,
+                               lambdanew = lambdanew,
+                               betaVar = betaVar,
+                               bigTheta = bigTheta) * diag(d)
       sigmaVar[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
                            psinew[[g]])
       lambda[[g]] <- lambdanew[[1]]
@@ -651,7 +674,13 @@ modelUpdates <- function(modelName,
     lambda[[1]] <- lambdanew[[1]]
     lambdanew <<- lambdanew
     for (g in 1:clustersize) {
-      psinew[[g]] <- funpsiCUC(g) * diag(d)
+      psinew[[g]] <- funpsiCUC(g = g,
+                               Sk = Sk,
+                               lambdanew = lambdanew,
+                               betaVar = betaVar,
+                               bigTheta = bigTheta,
+                               zS = zS,
+                               ng = ng) * diag(d)
       sigmaVar[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
                            psinew[[g]])
       lambda[[g]] <- lambdanew[[1]]
