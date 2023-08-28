@@ -11,8 +11,9 @@
 #' @param dataset A dataset of class matrix and type integer such that
 #'    rows correspond to observations and columns correspond to variables.
 #'    The dataset have dimensions n x d, where n is the total number of
-#'    observations and d is the dimensionality. If rowSums are zero, these
-#'    rows will be removed prior to cluster analysis.
+#'    observations and d is the dimensionality. The program will cluster
+#'    n observations into gmin:gmax groups. If rowSums are zero,
+#'    these rows should be removed first.
 #' @param membership A numeric vector of length nrow(dataset) containing the
 #'    cluster membership of each observation. If not available,
 #'    leave as "none".
@@ -20,12 +21,6 @@
 #'    to be considered in the clustering run.
 #' @param gmax A positive integer, >= gmin, specifying the maximum number of
 #'    components to be considered in the clustering run.
-#' @param initMethod An algorithm for initialization. Current options are
-#'    "kmeans", "random", "medoids", "clara", or "fanny". Default is "kmeans".
-#' @param nInitIterations A positive integer or zero, specifying the number
-#'    of initialization runs to be performed. This many runs, each with 10
-#'    iterations, will be performed via MPLNClust and values from the run with
-#'    highest log-likelihood will be used as initialization values. Default is 2.
 #' @param normalize A string with options "Yes" or "No" specifying
 #'     if normalization should be performed. Currently, normalization factors
 #'     are calculated using TMM method of edgeR package. Default is "Yes".
@@ -40,7 +35,6 @@
 #'      run.
 #'   \item gmax - Maximum number of components/clusters considered in the clustering
 #'      run.
-#'   \item initalizationMethod - Method used for initialization.
 #'   \item allResults - A list with all results.
 #'   \item logLikelihood - A vector with value of final log-likelihoods for
 #'      each component/cluster size.
@@ -51,12 +45,6 @@
 #'   \item BICresults - A list with all BIC model selection results.
 #'   \item AICresults - A list with all AIC model selection results.
 #'   \item AIC3results - A list with all AIC3 model selection results.
-#'   \item slopeHeuristics - If more than 10 models are considered, slope heuristic
-#'      results as obtained via capushe::capushe().
-#'   \item DjumpModelSelected - If more than 10 models are considered, slope heuristic
-#'      results as obtained via capushe::capushe().
-#'   \item DDSEModelSelected - If more than 10 models are considered, slope heuristic
-#'      results as obtained via capushe::capushe().
 #'   \item totalTime - Total time used for clustering and model selection.
 #' }
 #'
@@ -109,10 +97,116 @@
 
 
 PMPLNFA <- function(dataset,
-                    gmin, gmax,
-                    pmin, pmax,
-                    modelName,
-                    trueLabels) {
+                    gmin = 1,
+                    gmax = 2,
+                    pmin = 1,
+                    pmax = 2,
+                    modelName = "CCC",
+                    trueLabels,
+                    normalize = "Yes") {
+
+  # Keeping track of time
+  ptm <- proc.time()
+
+  # Performing checks of user input
+  if (typeof(dataset) != "double" & typeof(dataset) != "integer") {
+    stop("Dataset type needs to be integer.")
+  }
+
+  if (any((dataset %% 1 == 0) == FALSE)) {
+    stop("Dataset should be a matrix of counts.")
+  }
+
+  if (is.matrix(dataset) != TRUE) {
+    stop("Dataset needs to be a matrix.")
+  }
+
+  if (any(colSums(dataset) <= 0)) {
+    stop("Column sums cannot be less than or equal to 0. Double check dataset.")
+  }
+
+  dimensionality <- ncol(dataset)
+  nObservations <- nrow(dataset)
+
+  if(is.numeric(gmin) != TRUE || is.numeric(gmax) != TRUE) {
+    stop("Class of gmin and gmin should be numeric.")
+  }
+
+  if (gmax < gmin) {
+    stop("gmax cannot be less than gmin.")
+  }
+
+  if (gmax > nObservations) {
+    stop("gmax cannot be larger than nrow(dataset).")
+  }
+
+  # To add:
+  # Initialization methods
+  # Remove rows with only zeros, if present
+
+
+  if (is.character(normalize) != TRUE) {
+    stop("normalize should be a string of class character specifying
+      if normalization should be performed.")
+  }
+
+  if (normalize != "Yes" && normalize != "No") {
+    stop("normalize should be a string indicating Yes or No, specifying
+      if normalization should be performed.")
+  }
+
+  # Calculating normalization factors
+  if(normalize == "Yes") {
+    normFactors <- log(as.vector(edgeR::calcNormFactors(as.matrix(dataset),
+                                                        method = "TMM")))
+  } else if(normalize == "No") {
+    normFactors <- matrix(1, nrow = N, ncol = d, byrow = T)
+  } else{
+    stop("normalize should be 'Yes' or 'No' ")
+  }
+
+
+  clusterResults <- list() # to save cluster output
+  for (gmodel in seq_along(1:(gmax - gmin + 1))) {
+
+    if(length(1:(gmax - gmin + 1)) == gmax) {
+      clustersize <- gmodel
+    } else if(length(1:(gmax - gmin + 1)) < gmax) {
+      clustersize <- seq(gmin, gmax, 1)[gmodel]
+    }
+    cat("\n Running for g =", clustersize)
+    clusterResults[[gmodel]] <- varMPLNClustering(dataset = dataset,
+                                                  initMethod = initMethod,
+                                                  nInitIterations = nInitIterations,
+                                                  G = clustersize,
+                                                  maxIterations = 1000,
+                                                  normFactors = normFactors)
+
+    clusterResults[[gmodel]] <- PMPLNFAind(dataset = dataset,
+                                           clustersize = clustersize,
+                                           pSize,
+                                           modelName)
+
+  }
+
+  names(clusterResults) <- paste0(rep("G=", length(seq(gmin, gmax, 1))), seq(gmin, gmax, 1))
+
+
+
+  BIC <- ICL <- AIC <- AIC3 <- Djump <- DDSE <- nParameters <- logLikelihood <- vector()
+
+  for(g in seq_along(1:(gmax - gmin + 1))) {
+    # save the final log-likelihood
+    logLikelihood[g] <- unlist(tail(parallelRun[[g]]$allResults$logLikelihood,
+                                    n = 1))
+
+    if(length(1:(gmax - gmin + 1)) == gmax) {
+      clustersize <- g
+    } else if(length(1:(gmax - gmin + 1)) < gmax) {
+      clustersize <- seq(gmin, gmax, 1)[g]
+    }
+
+
     return(invisible(NULL))
   }
 
@@ -140,15 +234,15 @@ PMPLNFAind <- function(dataset,
     # Normalization factors
     # normFactors <- edgeR::calcNormFactors(t(dataset), method = "TMM")
     # libMatFull <- libMat <- matrix(normFactors, nrow = N, ncol = d, byrow = F)
-    libMatFull <- libMat <- matrix(1, nrow = N, ncol = d, byrow = T)
+    # libMatFull <- libMat <- matrix(1, nrow = N, ncol = d, byrow = T)
+    libMatFull <- libMat <- normalization
 
-
-    kmeansOut <- stats::kmeans(log(dataset + 1),
+    kmeansOut <- stats::kmeans(x = log(dataset + 1),
                                centers = clustersize,
                                nstart = 100)$cluster
 
     # Initialize z
-    z <- mclust::unmap(kmeansOut)
+    z <- mclust::unmap(classification = kmeansOut)
     # View(z)
     piG <- colSums(z) / N
     ng <- colSums(z)
@@ -310,8 +404,10 @@ PMPLNFAind <- function(dataset,
       ng <- colSums(z)
       # libMat<-matrix(normFactors,ncol=d,nrow=N, byrow=T) ###Matrix containing normalization factor
       ### Some useful functions
-      funFive <- function(x, y = isigma[[g]]) {
-        sum(diag(x %*% y))
+      funFive <- function(x, y, g) {
+        ySpecific = y[[g]]
+        funFiveReturn <- sum(diag(x %*% ySpecific))
+        return(funFiveReturn)
       }
 
       Ffunction <- matrix(NA, ncol = clustersize, nrow = N)
@@ -319,17 +415,25 @@ PMPLNFAind <- function(dataset,
       for (g in 1:clustersize) {
         two <- rowSums(exp(m[[g]] + log(libMatFull) + 0.5 *
                              matrix(unlist(lapply(S[[g]], diag)), ncol = d, byrow = TRUE)))
-        five <- 0.5 * unlist(lapply(S[[g]], funFive))
-        six <- 0.5 * log(unlist(lapply(S[[g]], det)) + 0.000000001)
-        Ffunction[, g] <- piG[g] * exp(rowSums(m[[g]] * dataset) - two -
-                                  rowSums(lfactorial(dataset)) +
-                                  rowSums(log(libMatFull) * dataset) -
-                                  0.5 * mahalanobis(m[[g]], center = mu[[g]], cov = isigma[[g]], inverted = TRUE) -
-                                  five + six - 0.5 * log(det(sigmaVar[[g]])) - d / 2)
+        five <- 0.5 * unlist(lapply(S[[g]], funFive, y = isigma, g = g))
+
+        # detecting if six gives -Inf which happens when
+        # dimensionality is large, e.g., 500
+        six <- 0.5 * log(unlist(lapply(S[[g]], det)))
+        if(any(is.infinite(six)) == TRUE) { # detect if -Inf
+          six <- 0.5 * log(unlist(lapply(testing, det)) + 1e-10)
+        }
+
+        Ffunction[, g] <- piG[g] * exp(rowSums(m[[g]] * dataset) -
+                                       two -
+                                       rowSums(lfactorial(dataset)) +
+                                       rowSums(log(libMatFull) * dataset) -
+                                       0.5 * mahalanobis(m[[g]], center = mu[[g]], cov = isigma[[g]], inverted = TRUE) -
+                                       five +
+                                       six -
+                                       0.5 * log(det(sigmaVar[[g]])) -
+                                       d / 2)
       }
-
-      pi_g[g]*exp(rowSums(m[[g]]*Y)-two-rowSums(lfactorial(Y))+rowSums(log(lib_mat_full)*Y)-0.5*mahalanobis(m[[g]],center=mu[[g]],cov=isigma[[g]], inverted = TRUE)-five+six-0.5*log(det(sigma.var[[g]]))-d/2)
-
 
       loglik[it] <- sum(log(rowSums(Ffunction)))
       z <- Ffunction / rowSums(Ffunction)

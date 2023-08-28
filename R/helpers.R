@@ -276,7 +276,7 @@ modelUpdates <- function(modelName,
                       nrow = d, ncol = pmaxVar)
     forLam2 <- list()
     for (k in 1:d) {
-      cat("k = ", k, "\n")
+      # cat("k = ", k, "\n")
       # k <<- k
       if (pmaxVar > 1) {
 
@@ -291,7 +291,7 @@ modelUpdates <- function(modelName,
                                 ncol = pmaxVar)
         forLam2[[k]] <- tryCatch(solve(matLambdaCUU2), error = function(err) NA)
         if(all(is.na(forLam2[[k]]))) {
-          cat("\n solve issue matLambdaCUU2 line 593")
+          # cat("\n solve issue matLambdaCUU2 line 593")
           forLam2[[k]] <- diag(ncol(matLambdaCUU2)) # if error with inverse
         }
       } else {
@@ -305,7 +305,7 @@ modelUpdates <- function(modelName,
                                 ncol = pmaxVar)
         forLam2[[k]] <- tryCatch(solve(matLambdaCUU2), error = function(err) NA)
         if(all(is.na(forLam2[[k]]))) {
-          cat("\n solve issue matLambdaCUU2 in line 607")
+          # cat("\n solve issue matLambdaCUU2 in line 607")
           forLam2[[k]] <- diag(ncol(matLambdaCUU2)) # if error with inverse
         }
       }
