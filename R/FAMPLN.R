@@ -159,6 +159,8 @@ PMPLNFA <- function(dataset,
   if(normalize == "Yes") {
     normFactors <- log(as.vector(edgeR::calcNormFactors(as.matrix(dataset),
                                                         method = "TMM")))
+    normFactors <- matrix(normFactors, nrow = nObservations,
+                          ncol = dimensionality, byrow = T)
   } else if(normalize == "No") {
     normFactors <- matrix(1, nrow = N, ncol = d, byrow = T)
   } else{
@@ -168,44 +170,51 @@ PMPLNFA <- function(dataset,
 
   clusterResults <- list() # to save cluster output
   for (gmodel in seq_along(1:(gmax - gmin + 1))) {
+    for (pmodel in seq_along(1:(pmax - pmin + 1))) {
 
-    if(length(1:(gmax - gmin + 1)) == gmax) {
-      clustersize <- gmodel
-    } else if(length(1:(gmax - gmin + 1)) < gmax) {
-      clustersize <- seq(gmin, gmax, 1)[gmodel]
+      if(length(1:(gmax - gmin + 1)) == gmax) {
+        clustersize <- gmodel
+      } else if(length(1:(gmax - gmin + 1)) < gmax) {
+        clustersize <- seq(gmin, gmax, 1)[gmodel]
+      }
+
+      # iterating through q
+      clusterResults[[gmodel]] < - list()
+      if(length(1:(pmax - pmin + 1)) == pmax) {
+        pSize <- pmodel
+      } else if(length(1:(pmax - pmin + 1)) < pmax) {
+        pSize <- seq(pmin, pmax, 1)[pmodel]
+      }
+
+
+      cat("\n Running for g =", clustersize, "and q = ", pSize)
+      clusterResults[[gmodel]][[pSize]] <- PMPLNFAind(dataset = dataset,
+                                             clustersize = clustersize,
+                                             pSize = pSize,
+                                             modelName = modelName,
+                                             normFactors = normFactors)
+
     }
-    cat("\n Running for g =", clustersize)
-    clusterResults[[gmodel]] <- varMPLNClustering(dataset = dataset,
-                                                  initMethod = initMethod,
-                                                  nInitIterations = nInitIterations,
-                                                  G = clustersize,
-                                                  maxIterations = 1000,
-                                                  normFactors = normFactors)
-
-    clusterResults[[gmodel]] <- PMPLNFAind(dataset = dataset,
-                                           clustersize = clustersize,
-                                           pSize,
-                                           modelName)
 
   }
-
-  names(clusterResults) <- paste0(rep("G=", length(seq(gmin, gmax, 1))), seq(gmin, gmax, 1))
-
+    names(clusterResults) <- paste0(rep("G=", length(seq(gmin, gmax, 1))), seq(gmin, gmax, 1))
 
 
-  BIC <- ICL <- AIC <- AIC3 <- Djump <- DDSE <- nParameters <- logLikelihood <- vector()
 
-  for(g in seq_along(1:(gmax - gmin + 1))) {
-    # save the final log-likelihood
-    logLikelihood[g] <- unlist(tail(parallelRun[[g]]$allResults$logLikelihood,
-                                    n = 1))
+    BIC <- ICL <- AIC <- AIC3 <- Djump <- DDSE <- nParameters <- logLikelihood <- vector()
 
-    if(length(1:(gmax - gmin + 1)) == gmax) {
-      clustersize <- g
-    } else if(length(1:(gmax - gmin + 1)) < gmax) {
-      clustersize <- seq(gmin, gmax, 1)[g]
+    for(g in seq_along(1:(gmax - gmin + 1))) {
+      # save the final log-likelihood
+      logLikelihood[g] <- unlist(tail(parallelRun[[g]]$allResults$logLikelihood,
+                                      n = 1))
+
+      if(length(1:(gmax - gmin + 1)) == gmax) {
+        clustersize <- g
+      } else if(length(1:(gmax - gmin + 1)) < gmax) {
+        clustersize <- seq(gmin, gmax, 1)[g]
+      }
+
     }
-
 
     return(invisible(NULL))
   }
@@ -217,7 +226,8 @@ PMPLNFA <- function(dataset,
 PMPLNFAind <- function(dataset,
                        clustersize,
                        pSize,
-                       modelName) {
+                       modelName,
+                       normFactors) {
 
 
   # Initialize variables
@@ -235,7 +245,7 @@ PMPLNFAind <- function(dataset,
     # normFactors <- edgeR::calcNormFactors(t(dataset), method = "TMM")
     # libMatFull <- libMat <- matrix(normFactors, nrow = N, ncol = d, byrow = F)
     # libMatFull <- libMat <- matrix(1, nrow = N, ncol = d, byrow = T)
-    libMatFull <- libMat <- normalization
+    libMatFull <- libMat <- normFactors
 
     kmeansOut <- stats::kmeans(x = log(dataset + 1),
                                centers = clustersize,
@@ -512,8 +522,5 @@ PMPLNFAind <- function(dataset,
     return(modelList)
 
   }
-
-
-
 
 # [END]

@@ -4,14 +4,24 @@
 \alias{PMPLNFA}
 \title{Clustering via Parsimonious Mixtures of MPLN Factor Analyzers Family}
 \usage{
-PMPLNFA(dataset, gmin, gmax, pmin, pmax, modelName, trueLabels)
+PMPLNFA(
+  dataset,
+  gmin = 1,
+  gmax = 2,
+  pmin = 1,
+  pmax = 2,
+  modelName = "CCC",
+  trueLabels,
+  normalize = "Yes"
+)
 }
 \arguments{
 \item{dataset}{A dataset of class matrix and type integer such that
 rows correspond to observations and columns correspond to variables.
 The dataset have dimensions n x d, where n is the total number of
-observations and d is the dimensionality. If rowSums are zero, these
-rows will be removed prior to cluster analysis.}
+observations and d is the dimensionality. The program will cluster
+n observations into gmin:gmax groups. If rowSums are zero,
+these rows should be removed first.}
 
 \item{gmin}{A positive integer specifying the minimum number of components
 to be considered in the clustering run.}
@@ -19,21 +29,13 @@ to be considered in the clustering run.}
 \item{gmax}{A positive integer, >= gmin, specifying the maximum number of
 components to be considered in the clustering run.}
 
-\item{membership}{A numeric vector of length nrow(dataset) containing the
-cluster membership of each observation. If not available,
-leave as "none".}
-
-\item{initMethod}{An algorithm for initialization. Current options are
-"kmeans", "random", "medoids", "clara", or "fanny". Default is "kmeans".}
-
-\item{nInitIterations}{A positive integer or zero, specifying the number
-of initialization runs to be performed. This many runs, each with 10
-iterations, will be performed via MPLNClust and values from the run with
-highest log-likelihood will be used as initialization values. Default is 2.}
-
 \item{normalize}{A string with options "Yes" or "No" specifying
 if normalization should be performed. Currently, normalization factors
 are calculated using TMM method of edgeR package. Default is "Yes".}
+
+\item{membership}{A numeric vector of length nrow(dataset) containing the
+cluster membership of each observation. If not available,
+leave as "none".}
 }
 \value{
 Returns an S3 object of class mixMPLNFA with results.
@@ -46,7 +48,6 @@ for input dataset.
 run.
 \item gmax - Maximum number of components/clusters considered in the clustering
 run.
-\item initalizationMethod - Method used for initialization.
 \item allResults - A list with all results.
 \item logLikelihood - A vector with value of final log-likelihoods for
 each component/cluster size.
@@ -57,12 +58,6 @@ component/cluster size.
 \item BICresults - A list with all BIC model selection results.
 \item AICresults - A list with all AIC model selection results.
 \item AIC3results - A list with all AIC3 model selection results.
-\item slopeHeuristics - If more than 10 models are considered, slope heuristic
-results as obtained via capushe::capushe().
-\item DjumpModelSelected - If more than 10 models are considered, slope heuristic
-results as obtained via capushe::capushe().
-\item DDSEModelSelected - If more than 10 models are considered, slope heuristic
-results as obtained via capushe::capushe().
 \item totalTime - Total time used for clustering and model selection.
 }
 }
