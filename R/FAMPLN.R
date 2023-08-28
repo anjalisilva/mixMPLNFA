@@ -138,8 +138,10 @@ PMPLNFAind <- function(dataset,
     start <- GX <- dGX <- zS <- list()
 
     # Normalization factors
-    normFactors <- edgeR::calcNormFactors(t(dataset), method = "TMM")
-    libMat <- matrix(normFactors, nrow = N, ncol = d, byrow = F)
+    # normFactors <- edgeR::calcNormFactors(t(dataset), method = "TMM")
+    # libMatFull <- libMat <- matrix(normFactors, nrow = N, ncol = d, byrow = F)
+    libMatFull <- libMat <- matrix(1, nrow = N, ncol = d, byrow = T)
+
 
     kmeansOut <- stats::kmeans(log(dataset + 1),
                                centers = clustersize,
@@ -315,16 +317,18 @@ PMPLNFAind <- function(dataset,
       Ffunction <- matrix(NA, ncol = clustersize, nrow = N)
 
       for (g in 1:clustersize) {
-        two <- rowSums(exp(m[[g]] + log(libMat) + 0.5 *
+        two <- rowSums(exp(m[[g]] + log(libMatFull) + 0.5 *
                              matrix(unlist(lapply(S[[g]], diag)), ncol = d, byrow = TRUE)))
         five <- 0.5 * unlist(lapply(S[[g]], funFive))
-        six <- 0.5 * log(unlist(lapply(S[[g]], det)))
+        six <- 0.5 * log(unlist(lapply(S[[g]], det)) + 0.000000001)
         Ffunction[, g] <- piG[g] * exp(rowSums(m[[g]] * dataset) - two -
                                   rowSums(lfactorial(dataset)) +
-                                  rowSums(log(libMat) * dataset) -
+                                  rowSums(log(libMatFull) * dataset) -
                                   0.5 * mahalanobis(m[[g]], center = mu[[g]], cov = isigma[[g]], inverted = TRUE) -
                                   five + six - 0.5 * log(det(sigmaVar[[g]])) - d / 2)
       }
+
+      pi_g[g]*exp(rowSums(m[[g]]*Y)-two-rowSums(lfactorial(Y))+rowSums(log(lib_mat_full)*Y)-0.5*mahalanobis(m[[g]],center=mu[[g]],cov=isigma[[g]], inverted = TRUE)-five+six-0.5*log(det(sigma.var[[g]]))-d/2)
 
 
       loglik[it] <- sum(log(rowSums(Ffunction)))
