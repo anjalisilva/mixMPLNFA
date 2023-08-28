@@ -10,8 +10,7 @@ PMPLNFA(
   gmax = 2,
   pmin = 1,
   pmax = 2,
-  modelName = "CCC",
-  trueLabels,
+  modelNames = "CCC",
   normalize = "Yes"
 )
 }
@@ -28,6 +27,10 @@ to be considered in the clustering run.}
 
 \item{gmax}{A positive integer, >= gmin, specifying the maximum number of
 components to be considered in the clustering run.}
+
+\item{modelNames}{A character vector indicating the model names to be
+tested. Default is "CCC". Options are "UUU", "UUC", "UCU", "UCC",
+"CUU", "CUC", "CCU", and "CCC".}
 
 \item{normalize}{A string with options "Yes" or "No" specifying
 if normalization should be performed. Currently, normalization factors

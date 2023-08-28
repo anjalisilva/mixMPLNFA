@@ -21,6 +21,9 @@
 #'    to be considered in the clustering run.
 #' @param gmax A positive integer, >= gmin, specifying the maximum number of
 #'    components to be considered in the clustering run.
+#' @param modelNames A character vector indicating the model names to be
+#'     tested. Default is "CCC". Options are "UUU", "UUC", "UCU", "UCC",
+#'     "CUU", "CUC", "CCU", and "CCC".
 #' @param normalize A string with options "Yes" or "No" specifying
 #'     if normalization should be performed. Currently, normalization factors
 #'     are calculated using TMM method of edgeR package. Default is "Yes".
@@ -101,8 +104,7 @@ PMPLNFA <- function(dataset,
                     gmax = 2,
                     pmin = 1,
                     pmax = 2,
-                    modelName = "CCC",
-                    trueLabels,
+                    modelNames = "CCC",
                     normalize = "Yes") {
 
   # Keeping track of time
@@ -173,8 +175,8 @@ PMPLNFA <- function(dataset,
 
   # Calculating normalization factors
   if(normalize == "Yes") {
-    normFactors <- log(as.vector(edgeR::calcNormFactors(as.matrix(dataset),
-                                                        method = "TMM")))
+    normFactors <- as.vector(edgeR::calcNormFactors(as.matrix(dataset),
+                                                        method = "TMM"))
     normFactors <- matrix(normFactors, nrow = nObservations,
                           ncol = dimensionality, byrow = T)
   } else if(normalize == "No") {
@@ -187,6 +189,7 @@ PMPLNFA <- function(dataset,
   clusterResults <- list() # to save cluster output
   for (gmodel in seq_along(1:(gmax - gmin + 1))) {
     for (pmodel in seq_along(1:(pmax - pmin + 1))) {
+      for (famodel in seq_along(1:length(modelNames))) {
 
       if(length(1:(gmax - gmin + 1)) == gmax) {
         clustersize <- gmodel
@@ -194,26 +197,32 @@ PMPLNFA <- function(dataset,
         clustersize <- seq(gmin, gmax, 1)[gmodel]
       }
 
-      # iterating through q
-      clusterResults[[gmodel]] < - list()
+      # iterating through p
+      clusterResults[[gmodel]] <- list()
       if(length(1:(pmax - pmin + 1)) == pmax) {
         pSize <- pmodel
       } else if(length(1:(pmax - pmin + 1)) < pmax) {
         pSize <- seq(pmin, pmax, 1)[pmodel]
       }
 
+      # iterating through model
+      clusterResults[[gmodel]][[pSize]] <- list()
 
-      cat("\n Running for g =", clustersize, "and q = ", pSize)
-      clusterResults[[gmodel]][[pSize]] <- PMPLNFAind(dataset = dataset,
+      cat("\n Running for g =", clustersize, "q = ", pSize, " and model = ", modelNames[famodel])
+      clusterResults[[gmodel]][[pSize]][[famodel]] <-
+                                             PMPLNFAind(
+                                             dataset = dataset,
                                              clustersize = clustersize,
                                              pSize = pSize,
-                                             modelName = modelName,
+                                             modelNames = modelNames,
                                              normFactors = normFactors)
 
     }
-
+   }
   }
-    names(clusterResults) <- paste0(rep("G=", length(seq(gmin, gmax, 1))), seq(gmin, gmax, 1))
+
+  names(clusterResults) <- paste0(rep("G=", length(seq(gmin, gmax, 1))),
+                                  seq(gmin, gmax, 1))
 
 
 
@@ -242,25 +251,25 @@ PMPLNFA <- function(dataset,
 PMPLNFAind <- function(dataset,
                        clustersize,
                        pSize,
-                       modelName,
+                       modelNames,
                        normFactors) {
 
 
   # Initialize variables
-    d <- ncol(dataset)
+    dimensionality <- ncol(dataset)
     N <- nrow(dataset)
 
     mu <- psi<- lambda <- sigmaVar <- isigma <- list()
     m <- S <- P <- Q <- lambdanew <- list()
 
     # Other intermediate terms
-    Sk <- array(0, c(d, d, clustersize))
+    Sk <- array(0, c(dimensionality, dimensionality, clustersize))
     start <- GX <- dGX <- zS <- list()
 
     # Normalization factors
     # normFactors <- edgeR::calcNormFactors(t(dataset), method = "TMM")
-    # libMatFull <- libMat <- matrix(normFactors, nrow = N, ncol = d, byrow = F)
-    # libMatFull <- libMat <- matrix(1, nrow = N, ncol = d, byrow = T)
+    # libMatFull <- libMat <- matrix(normFactors, nrow = N, ncol = dimensionality, byrow = F)
+    # libMatFull <- libMat <- matrix(1, nrow = N, ncol = dimensionality, byrow = T)
     libMatFull <- libMat <- normFactors
 
     kmeansOut <- stats::kmeans(x = log(dataset + 1),
@@ -278,8 +287,8 @@ PMPLNFAind <- function(dataset,
 
       obs <- which(z[, g] == 1)
         if(length(obs) > 1) {
-          mu[[g]] <- colMeans(log(dataset[obs, ] + 1 / d))
-          sigmaVar[[g]] <- var(log(dataset[obs, ] + 1 / d))
+          mu[[g]] <- colMeans(log(dataset[obs, ] + 1 / dimensionality))
+          sigmaVar[[g]] <- var(log(dataset[obs, ] + 1 / dimensionality))
 
           # solve issue anticipation
           # isigma[[g]]<-solve(sigma.var[[g]])
@@ -291,7 +300,7 @@ PMPLNFAind <- function(dataset,
           }
 
         } else if (length(obs) == 1) { # if only one observation in a cluster
-          mu[[g]] <- log(dataset[obs, ] + 1 / d)
+          mu[[g]] <- log(dataset[obs, ] + 1 / dimensionality)
           sigmaVar[[g]] <- diag(ncol(dataset))
 
           # solve issue anticipation
@@ -303,13 +312,13 @@ PMPLNFAind <- function(dataset,
 
 
       temp <- eigen(sigmaVar[[g]])
-      lambda[[g]] <- matrix(NA, ncol = pSize, nrow = d)
+      lambda[[g]] <- matrix(NA, ncol = pSize, nrow = dimensionality)
       for (q in 1:pSize) {
         lambda[[g]][, q] <- temp$vectors[, q] * sqrt(temp$values[q])
       }
       psi[[g]] <- diag(sigmaVar[[g]] -
                                    lambda[[g]] %*%
-                                   t(lambda[[g]])) * diag(d)
+                                   t(lambda[[g]])) * diag(dimensionality)
     }
 
     for (g in 1:clustersize) {
@@ -317,7 +326,7 @@ PMPLNFAind <- function(dataset,
       m[[g]] <- log(dataset + 1)
       S[[g]] <- list()
       for (i in 1:N) {
-        S[[g]][[i]] <- diag(d) * 0.000000001
+        S[[g]][[i]] <- diag(dimensionality) * 0.000000001
       }
     }
 
@@ -328,7 +337,7 @@ PMPLNFAind <- function(dataset,
 
     # Begin clusterig
     while (checks == 0) {
-      print(it)
+      # cat("\n it = ", it)
 
       for (g in 1:clustersize) {
         GX[[g]] <- dGX[[g]] <- zS[[g]] <- list()
@@ -336,7 +345,7 @@ PMPLNFAind <- function(dataset,
         for (i in 1:N) {
           #print(i)
           dGX[[g]][[i]] <- diag(exp(log(libMat[i, ]) + start[[g]][i, ] +
-                                      0.5 * diag(S[[g]][[i]])), d) + isigma[[g]]
+                                      0.5 * diag(S[[g]][[i]])), dimensionality) + isigma[[g]]
 
           # solve issue anticipation
           # S[[g]][[i]] <- solve(dGX[[g]][[i]])
@@ -362,7 +371,8 @@ PMPLNFAind <- function(dataset,
         # Updating Sample covariance
         muMatrix <- matrix(rep(mu[[g]], N), nrow = N, byrow = TRUE)
         res <- m[[g]] - muMatrix
-        temp <- stats::cov.wt(x = res, wt = z[, g],
+        temp <- stats::cov.wt(x = res,
+                              wt = z[, g],
                               center = FALSE,
                               method = "ML")
         Sk[,,g] <- temp$cov
@@ -376,10 +386,10 @@ PMPLNFAind <- function(dataset,
       }
 
       for (rep in 1:repmax) {
-        cat("rep = ", rep, "\n")
+        # cat("rep = ", rep, "\n")
         lambdaOld <- lambda
         psiOld <- psi
-        updates <- modelUpdates(modelName = modelName,
+        updates <- modelUpdates(modelNames = modelNames,
                                 zS = zS,
                                 ng = ng,
                                 z = z,
@@ -389,7 +399,7 @@ PMPLNFAind <- function(dataset,
                                 pmaxVar = pSize,
                                 Sk = Sk,
                                 psi = psi,
-                                d = d,
+                                d = dimensionality,
                                 N = N)
 
 
@@ -428,7 +438,7 @@ PMPLNFAind <- function(dataset,
 
       piG <- colSums(z) / N
       ng <- colSums(z)
-      # libMat<-matrix(normFactors,ncol=d,nrow=N, byrow=T) ###Matrix containing normalization factor
+      # libMat<-matrix(normFactors,ncol=dimensionality,nrow=N, byrow=T) ###Matrix containing normalization factor
       ### Some useful functions
       funFive <- function(x, y, g) {
         ySpecific = y[[g]]
@@ -440,7 +450,7 @@ PMPLNFAind <- function(dataset,
 
       for (g in 1:clustersize) {
         two <- rowSums(exp(m[[g]] + log(libMatFull) + 0.5 *
-                             matrix(unlist(lapply(S[[g]], diag)), ncol = d, byrow = TRUE)))
+                             matrix(unlist(lapply(S[[g]], diag)), ncol = dimensionality, byrow = TRUE)))
         five <- 0.5 * unlist(lapply(S[[g]], funFive, y = isigma, g = g))
 
         # detecting if six gives -Inf which happens when
@@ -458,7 +468,7 @@ PMPLNFAind <- function(dataset,
                                        five +
                                        six -
                                        0.5 * log(det(sigmaVar[[g]])) -
-                                       d / 2)
+                                       dimensionality / 2)
       }
 
       loglik[it] <- sum(log(rowSums(Ffunction)))
@@ -496,9 +506,9 @@ PMPLNFAind <- function(dataset,
     }
     # plot(loglik,type="l")
 
-    # par<-G*(d*pmax-0.5*pmax*(pmax-1))+G*d
+    # par<-G*(dimensionality*pmax-0.5*pmax*(pmax-1))+G*dimensionality
     ##par from covariance only has the covariance parameters so now we need to add the parameters for the mean and pi
-    BIC <- 2 * loglik[it - 1] - (par + (clustersize - 1) + clustersize * d) * log(N)
+    BIC <- 2 * loglik[it - 1] - (par + (clustersize - 1) + clustersize * dimensionality) * log(N)
     mapz <- matrix(0, ncol = clustersize, nrow = N)
     for (g in 1:clustersize) {
       mapz[which(mclust::map(z) == g), g] <- 1
@@ -526,13 +536,13 @@ PMPLNFAind <- function(dataset,
     modelList[[8]] <- kmeansOut
     modelList[[9]] <- BIC
     modelList[[10]] <- ICL
-    modelList[[11]] <- modelName
+    modelList[[11]] <- modelNames
     modelList[[12]] <- clustersize
     modelList[[13]] <- pSize
     names(modelList) <-c("piG", "mu", "sigmaVar",
                         "lambda", "psi", "z", "loglik",
                         "kmeans", "BIC", "ICL",
-                        "modelName", "G", "p")
+                        "modelNames", "G", "p")
 
     class(modelList) <- "mixMPLNFA"
     return(modelList)
