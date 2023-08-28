@@ -132,8 +132,24 @@ PMPLNFA <- function(dataset,
     stop("Class of gmin and gmin should be numeric.")
   }
 
+  if(is.numeric(pmin) != TRUE || is.numeric(pmax) != TRUE) {
+    stop("Class of pmin and pmin should be numeric.")
+  }
+
   if (gmax < gmin) {
     stop("gmax cannot be less than gmin.")
+  }
+
+  if (pmax < pmin) {
+    stop("pmax cannot be less than pmin.")
+  }
+
+  if (pmax >= dimensionality) {
+    stop("pmax has to be less than d (dimensionality)")
+  }
+
+  if (gmax > nObservations) {
+    stop("gmax cannot be larger than nrow(dataset).")
   }
 
   if (gmax > nObservations) {
