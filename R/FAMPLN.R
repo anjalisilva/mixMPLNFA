@@ -180,7 +180,7 @@ PMPLNFA <- function(dataset,
     normFactors <- matrix(normFactors, nrow = nObservations,
                           ncol = dimensionality, byrow = T)
   } else if(normalize == "No") {
-    normFactors <- matrix(1, nrow = N, ncol = d, byrow = T)
+    normFactors <- matrix(1, nrow = nObservations, ncol = d, byrow = T)
   } else{
     stop("normalize should be 'Yes' or 'No' ")
   }
@@ -247,6 +247,33 @@ PMPLNFA <- function(dataset,
   names(clusterResults) <- paste0(rep("G=", length(seq(gmin, gmax, 1))),
                                   seq(gmin, gmax, 1))
 
+  # select best model
+  BICmodel <- seq(gmin, gmax, 1)[grep(min(BIC, na.rm = TRUE), BIC)]
+  BICmodel <- seq(gmin, gmax, 1)[grep(min(BIC, na.rm = TRUE), BIC)]
+  BICmodel <- seq(gmin, gmax, 1)[grep(min(BIC, na.rm = TRUE), BIC)]
+  BICmodel <- seq(gmin, gmax, 1)[grep(min(BIC, na.rm = TRUE), BIC)]
+
+
+
+  final <- proc.time() - ptm
+
+  RESULTS <- list(dataset = dataset,
+                  dimensionality = dimensionality,
+                  normalizationFactors = normFactors,
+                  gmin = gmin,
+                  gmax = gmax,
+                  pmin = pmin,
+                  pmax = pmax,
+                  initalizationMethod = "kmeans",
+                  allResults = clusterResults,
+                  logLikelihood = logLikelihood,
+                  numbParameters = nParameters,
+                  trueLabels = membership,
+                  ICLresults = ICL,
+                  BICresults = BIC,
+                  AICresults = AIC,
+                  AIC3results = AIC3,
+                  totalTime = final)
 
 
     return(invisible(NULL))
@@ -265,7 +292,7 @@ PMPLNFAind <- function(dataset,
 
   # Initialize variables
     dimensionality <- ncol(dataset)
-    N <- nrow(dataset)
+    nObservations <- nrow(dataset)
 
     mu <- psi<- lambda <- sigmaVar <- isigma <- list()
     m <- S <- P <- Q <- lambdanew <- list()
@@ -276,8 +303,8 @@ PMPLNFAind <- function(dataset,
 
     # Normalization factors
     # normFactors <- edgeR::calcNormFactors(t(dataset), method = "TMM")
-    # libMatFull <- libMat <- matrix(normFactors, nrow = N, ncol = dimensionality, byrow = F)
-    # libMatFull <- libMat <- matrix(1, nrow = N, ncol = dimensionality, byrow = T)
+    # libMatFull <- libMat <- matrix(normFactors, nrow = nObservations, ncol = dimensionality, byrow = F)
+    # libMatFull <- libMat <- matrix(1, nrow = nObservations, ncol = dimensionality, byrow = T)
     libMatFull <- libMat <- normFactors
 
     kmeansOut <- stats::kmeans(x = log(dataset + 1),
@@ -287,7 +314,7 @@ PMPLNFAind <- function(dataset,
     # Initialize z
     z <- mclust::unmap(classification = kmeansOut)
     # View(z)
-    piG <- colSums(z) / N
+    piG <- colSums(z) / nObservations
     ng <- colSums(z)
 
     # Initialize parameters
@@ -333,7 +360,7 @@ PMPLNFAind <- function(dataset,
       start[[g]] <- log(dataset + 1) ###Starting value for M
       m[[g]] <- log(dataset + 1)
       S[[g]] <- list()
-      for (i in 1:N) {
+      for (i in 1:nObservations) {
         S[[g]][[i]] <- diag(dimensionality) * 0.000000001
       }
     }
@@ -350,7 +377,7 @@ PMPLNFAind <- function(dataset,
       for (g in 1:clustersize) {
         GX[[g]] <- dGX[[g]] <- zS[[g]] <- list()
         z[is.nan(z)] <- 0
-        for (i in 1:N) {
+        for (i in 1:nObservations) {
           #print(i)
           dGX[[g]][[i]] <- diag(exp(log(libMat[i, ]) + start[[g]][i, ] +
                                       0.5 * diag(S[[g]][[i]])), dimensionality) + isigma[[g]]
@@ -377,7 +404,7 @@ PMPLNFAind <- function(dataset,
         mu[[g]] <- colSums(z[, g] * m[[g]]) / sum(z[, g])
 
         # Updating Sample covariance
-        muMatrix <- matrix(rep(mu[[g]], N), nrow = N, byrow = TRUE)
+        muMatrix <- matrix(rep(mu[[g]], nObservations), nrow = nObservations, byrow = TRUE)
         res <- m[[g]] - muMatrix
         temp <- stats::cov.wt(x = res,
                               wt = z[, g],
@@ -408,7 +435,7 @@ PMPLNFAind <- function(dataset,
                                 Sk = Sk,
                                 psi = psi,
                                 d = dimensionality,
-                                N = N)
+                                nObservations = nObservations)
 
 
         sigmaVar <- updates$sigmaVar
@@ -444,9 +471,9 @@ PMPLNFAind <- function(dataset,
       }
 
 
-      piG <- colSums(z) / N
+      piG <- colSums(z) / nObservations
       ng <- colSums(z)
-      # libMat<-matrix(normFactors,ncol=dimensionality,nrow=N, byrow=T) ###Matrix containing normalization factor
+      # libMat<-matrix(normFactors,ncol=dimensionality,nrow=nObservations, byrow=T) ###Matrix containing normalization factor
       ### Some useful functions
       funFive <- function(x, y, g) {
         ySpecific = y[[g]]
@@ -454,7 +481,7 @@ PMPLNFAind <- function(dataset,
         return(funFiveReturn)
       }
 
-      Ffunction <- matrix(NA, ncol = clustersize, nrow = N)
+      Ffunction <- matrix(NA, ncol = clustersize, nrow = nObservations)
 
       for (g in 1:clustersize) {
         two <- rowSums(exp(m[[g]] + log(libMatFull) + 0.5 *
@@ -522,8 +549,8 @@ PMPLNFAind <- function(dataset,
     # Inf criteria
     AIC <- 2 * loglik[it - 1] - (2 * kTotal)
     AIC3 <- 2 * loglik[it - 1] - (3 * kTotal)
-    BIC <- 2 * loglik[it - 1] - (kTotal * log(N))
-    mapz <- matrix(0, ncol = clustersize, nrow = N)
+    BIC <- 2 * loglik[it - 1] - (kTotal * log(nObservations))
+    mapz <- matrix(0, ncol = clustersize, nrow = nObservations)
     for (g in 1:clustersize) {
       mapz[which(mclust::map(z) == g), g] <- 1
     }

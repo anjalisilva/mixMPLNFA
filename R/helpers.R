@@ -53,18 +53,18 @@ funpsiUUC <- function(g, Sk, lambdanew, betaVar, zS, ng) {
   return(calcValue)
 }
 
-funpsiUCU <- function(g, N, ng, Sk, lambdanew, betaVar, zS) {
-  calcValue <- ng[g] / N * diag(Sk[,,g] - lambdanew[[g]] %*%
+funpsiUCU <- function(g, nObservations, ng, Sk, lambdanew, betaVar, zS) {
+  calcValue <- ng[g] / nObservations * diag(Sk[,,g] - lambdanew[[g]] %*%
   betaVar[[g]] %*% Sk[,,g]) +
-  diag(Reduce("+", zS[[g]]) / N)
+  diag(Reduce("+", zS[[g]]) / nObservations)
   return(calcValue)
 }
 
-funPsiUCC <- function(g, ng, d, N, Sk, lambdanew, zS, betaVar) {
-  calcValue <- (1 / d) * (ng[g] / N) *
+funPsiUCC <- function(g, ng, d, nObservations, Sk, lambdanew, zS, betaVar) {
+  calcValue <- (1 / d) * (ng[g] / nObservations) *
     sum(diag(Sk[,,g] - lambdanew[[g]] %*%
     betaVar[[g]] %*% Sk[,,g])) +
-    sum(diag(Reduce("+", zS[[g]]))) / (N * d)
+    sum(diag(Reduce("+", zS[[g]]))) / (nObservations * d)
   return(calcValue)
 }
 
@@ -85,22 +85,22 @@ funpsiCUC <- function(g, Sk, lambdanew, betaVar, bigTheta, zS, ng) {
   return(calcValue)
 }
 
-funpsiCCU <- function(Sgav, lambdanew, betaVar, zS, N) {
+funpsiCCU <- function(Sgav, lambdanew, betaVar, zS, nObservations) {
   calcValue <- diag(Sgav - lambdanew[[1]] %*%
     betaVar[[1]] %*% Sgav) +
-    diag(Reduce("+", zS[[1]]) / N)
+    diag(Reduce("+", zS[[1]]) / nObservations)
   return(calcValue)
 }
 
-funpsiCCC <- function(Sgav, lambdanew, betaVar, zS, N, d) {
+funpsiCCC <- function(Sgav, lambdanew, betaVar, zS, nObservations, d) {
   calcValue <- mean(diag(Sgav - lambdanew[[1]] %*%
     betaVar[[1]] %*% Sgav)) +
-    sum(diag(Reduce("+", zS[[1]])))/(N * d)
+    sum(diag(Reduce("+", zS[[1]])))/(nObservations * d)
   return(calcValue)
 }
 
-funSgav <- function(g, ng, N, Sk) {
-  calcValue <- ng[g] / N * Sk[,,g]
+funSgav <- function(g, ng, nObservations, Sk) {
+  calcValue <- ng[g] / nObservations * Sk[,,g]
   return(calcValue)
 }
 
@@ -115,7 +115,7 @@ modelUpdates <- function(modelName,
                          Sk,
                          psi,
                          d,
-                         N) {
+                         nObservations) {
 
   betaVar <- bigTheta <- sigmaVar <-
     lambdanew <- psinew <- list()
@@ -214,7 +214,7 @@ modelUpdates <- function(modelName,
 
     # lambdanew <<- lambdanew
     psinew[[1]] <- rowSums(sapply(1:clustersize, funpsiUCU,
-                                  N = N, ng = ng, Sk = Sk,
+                                  nObservations = nObservations, ng = ng, Sk = Sk,
                                   lambdanew = lambdanew,
                                   betaVar = betaVar,
                                   zS = zS)) * diag(d)
@@ -246,7 +246,7 @@ modelUpdates <- function(modelName,
 
     # lambdanew <<- lambdanew
     psinew[[1]] <- sum(sapply(1:clustersize, funPsiUCC,
-                              ng = ng, d = d, N = N, Sk = Sk,
+                              ng = ng, d = d, nObservations = nObservations, Sk = Sk,
                               lambdanew = lambdanew, zS = zS, betaVar = betaVar),
                        na.rm = TRUE) * diag(d)
 
@@ -411,7 +411,7 @@ modelUpdates <- function(modelName,
   if (substr(modelName, 1, 3) == "CCU") {
     betaVar[[1]] <- t(lambda[[1]]) %*% isigma[[1]]
     Sgav <- matrix(data = rowSums(sapply(1:clustersize, funSgav,
-                                         ng = ng, N = N, Sk = Sk)),
+                                         ng = ng, nObservations = nObservations, Sk = Sk)),
                    nrow = d,
                    ncol = d)
     bigTheta[[1]] <- diag(pmaxVar) - betaVar[[1]] %*% lambda[[1]] +
@@ -428,7 +428,7 @@ modelUpdates <- function(modelName,
                              lambdanew = lambdanew,
                              betaVar = betaVar,
                              zS = zS,
-                             N = N) * diag(d)
+                             nObservations = nObservations) * diag(d)
     bigthetaOld <- bigTheta[[1]]
     for (g in 1:clustersize) {
       sigmaVar[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
@@ -443,7 +443,7 @@ modelUpdates <- function(modelName,
   if (substr(modelName, 1, 3) == "CCC") {
     betaVar[[1]] <- t(lambda[[1]]) %*% isigma[[1]]
     Sgav <- matrix(data = rowSums(sapply(1:clustersize, funSgav,
-                                         ng = ng, N = N, Sk = Sk)),
+                                         ng = ng, nObservations = nObservations, Sk = Sk)),
                    nrow = d,
                    ncol = d)
     bigTheta[[1]] <- diag(pmaxVar) - betaVar[[1]] %*% lambda[[1]] +
@@ -460,7 +460,7 @@ modelUpdates <- function(modelName,
                              lambdanew = lambdanew,
                              betaVar = betaVar,
                              zS = zS,
-                             N = N,
+                             nObservations = nObservations,
                              d = d) * diag(d)
     bigthetaOld <- bigTheta[[1]]
     for (g in 1:clustersize) {
