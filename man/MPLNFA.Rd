@@ -52,7 +52,12 @@ for input dataset.
 run.
 \item gmax - Maximum number of components/clusters considered in the clustering
 run.
-\item allResults - A list with all results.
+\item pmin - Minimum number of latent factors (p) considered in the clustering
+run.
+\item pmax - Maximum number of latent factors (p) considered in the clustering
+run.
+\item allResults - A list with all results. To access results use the format of
+[\link{g}][\link{p}][\link{model}]
 \item logLikelihood - A vector with value of final log-likelihoods for
 each component/cluster size.
 \item numbParameters - A vector with number of parameters for each
