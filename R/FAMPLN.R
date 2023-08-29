@@ -218,7 +218,10 @@ PMPLNFA <- function(dataset,
       # iterating through model
       clusterResults[[gmodel]][[pSize]] <- list()
 
-      cat("\n Running for g =", clustersize, "q =", pSize, "and model =", modelNames[famodel])
+      # print statement to user
+      cat("\n Running for g =", clustersize, "q =",
+          pSize, "and model =", modelNames[famodel])
+
       clusterResults[[gmodel]][[pSize]][[famodel]] <-
                                              PMPLNFAind(
                                              dataset = dataset,
@@ -232,9 +235,9 @@ PMPLNFA <- function(dataset,
       ICL[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$ICL
       AIC[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$AIC
       AIC3[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$AIC3
-      BIC[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$BIC
-      BIC[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$BIC
-
+      logLikelihood[inserNum] <- unlist(tail(
+        clusterResults[[gmodel]][[pSize]][[famodel]]$loglik, n = 1))
+      nParameters[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$kTotal
       }
     }
     names(clusterResults[[gmodel]]) <- paste0(rep("p=", length(seq(pmin, pmax, 1))),
@@ -511,11 +514,15 @@ PMPLNFAind <- function(dataset,
     }
     # plot(loglik,type="l")
 
-    # par<-G*(dimensionality*pmax-0.5*pmax*(pmax-1))+G*dimensionality
-    ##par from covariance only has the covariance parameters so now we need to add the parameters for the mean and pi
-    AIC <- 2 * loglik[it - 1] - (2 * (par + (clustersize - 1) + clustersize * dimensionality))
-    AIC3 <- 2 * loglik[it - 1] - (3 * (par + (clustersize - 1) + clustersize * dimensionality))
-    BIC <- 2 * loglik[it - 1] - (par + (clustersize - 1) + clustersize * dimensionality) * log(N)
+
+    # par from covariance only has the covariance parameters so now we need
+    # to add the parameters for the mean and pi
+    kTotal <- par + (clustersize - 1) + (clustersize * dimensionality)
+
+    # Inf criteria
+    AIC <- 2 * loglik[it - 1] - (2 * kTotal)
+    AIC3 <- 2 * loglik[it - 1] - (3 * kTotal)
+    BIC <- 2 * loglik[it - 1] - (kTotal * log(N))
     mapz <- matrix(0, ncol = clustersize, nrow = N)
     for (g in 1:clustersize) {
       mapz[which(mclust::map(z) == g), g] <- 1
@@ -547,7 +554,8 @@ PMPLNFAind <- function(dataset,
       AIC3 = AIC3,
       modelName = modelName,
       clustersize = clustersize,
-      pSize = pSize)
+      pSize = pSize,
+      kTotal = kTotal)
 
     class(modelList) <- "mixMPLNFA"
     return(modelList)
