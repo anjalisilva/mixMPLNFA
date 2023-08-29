@@ -99,7 +99,7 @@
 #'
 
 
-PMPLNFA <- function(dataset,
+MPLNFA <- function(dataset,
                     membership = "none",
                     gmin = 1,
                     gmax = 3,
@@ -130,6 +130,22 @@ PMPLNFA <- function(dataset,
 
   dimensionality <- ncol(dataset)
   nObservations <- nrow(dataset)
+
+  if(all(membership != "none") && is.numeric(membership) != TRUE) {
+    stop("membership should be a numeric vector containing the
+      cluster membership. Otherwise, leave as 'none'.")
+  }
+
+  if(all(membership != "none") &&
+     all((diff(sort(unique(membership))) == 1) != TRUE) ) {
+    stop("Cluster memberships in the membership vector
+      are missing a cluster, e.g. 1, 3, 4, 5, 6 is missing cluster 2.")
+  }
+
+  if(all(membership != "none") && length(membership) != nObservations) {
+    stop("membership should be a numeric vector, where length(membership)
+      should equal the number of observations. Otherwise, leave as 'none'.")
+  }
 
   if(is.numeric(gmin) != TRUE || is.numeric(gmax) != TRUE) {
     stop("Class of gmin and gmin should be numeric.")
@@ -189,7 +205,7 @@ PMPLNFA <- function(dataset,
   # to save cluster output
   clusterResults <- list()
   BIC <- ICL <- AIC <- AIC3 <-
-    nParameters <- logLikelihood <- vector()
+    nParameters <- logLikelihood <- nameVector <- vector()
 
   # for saving model selection values
   numberVec <- c(1:((gmax - gmin + 1) * (pmax - pmin + 1) * length(modelNames)))
@@ -202,56 +218,64 @@ PMPLNFA <- function(dataset,
     for (pmodel in seq_along(1:(pmax - pmin + 1))) {
       for (famodel in seq_along(1:length(modelNames))) {
 
-      if(length(1:(gmax - gmin + 1)) == gmax) {
-        clustersize <- gmodel
-      } else if(length(1:(gmax - gmin + 1)) < gmax) {
-        clustersize <- seq(gmin, gmax, 1)[gmodel]
-      }
+        if(length(1:(gmax - gmin + 1)) == gmax) {
+          clustersize <- gmodel
+        } else if(length(1:(gmax - gmin + 1)) < gmax) {
+          clustersize <- seq(gmin, gmax, 1)[gmodel]
+        }
 
-      # iterating through p
-      clusterResults[[gmodel]] <- list()
-      if(length(1:(pmax - pmin + 1)) == pmax) {
-        pSize <- pmodel
-      } else if(length(1:(pmax - pmin + 1)) < pmax) {
-        pSize <- seq(pmin, pmax, 1)[pmodel]
-      }
+        # iterating through p
+        clusterResults[[gmodel]] <- list()
+        if(length(1:(pmax - pmin + 1)) == pmax) {
+          pSize <- pmodel
+        } else if(length(1:(pmax - pmin + 1)) < pmax) {
+          pSize <- seq(pmin, pmax, 1)[pmodel]
+        }
 
-      # iterating through model
-      clusterResults[[gmodel]][[pSize]] <- list()
+        # iterating through model
+        clusterResults[[gmodel]][[pSize]] <- list()
 
-      # print statement to user
-      cat("\n Running for g =", clustersize, "q =",
-          pSize, "and model =", modelNames[famodel])
+        # print statement to user
+        cat("\n Running for g =", clustersize, "q =",
+            pSize, "and model =", modelNames[famodel])
 
-      clusterResults[[gmodel]][[pSize]][[famodel]] <-
-                                             PMPLNFAind(
-                                             dataset = dataset,
-                                             clustersize = clustersize,
-                                             pSize = pSize,
-                                             modelName = modelNames[famodel],
-                                             normFactors = normFactors)
+        clusterResults[[gmodel]][[pSize]][[famodel]] <-
+                                               PMPLNFAind(
+                                               dataset = dataset,
+                                               clustersize = clustersize,
+                                               pSize = pSize,
+                                               modelName = modelNames[famodel],
+                                               normFactors = normFactors)
 
-      inserNum <- numberArray[gmodel, pmodel, famodel]
-      BIC[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$BIC
-      ICL[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$ICL
-      AIC[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$AIC
-      AIC3[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$AIC3
-      logLikelihood[inserNum] <- unlist(tail(
-        clusterResults[[gmodel]][[pSize]][[famodel]]$loglik, n = 1))
-      nParameters[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$kTotal
+        inserNum <- numberArray[gmodel, pmodel, famodel]
+        BIC[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$BIC
+        ICL[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$ICL
+        AIC[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$AIC
+        AIC3[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$AIC3
+        logLikelihood[inserNum] <- unlist(tail(
+          clusterResults[[gmodel]][[pSize]][[famodel]]$loglik, n = 1))
+        nParameters[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$kTotal
+        nameVector[inserNum] <- paste0("G=", gmodel,",p=", pmodel, ",model=", modelNames[famodel])
       }
     }
     names(clusterResults[[gmodel]]) <- paste0(rep("p=", length(seq(pmin, pmax, 1))),
                                               seq(pmin, pmax, 1))
   }
 
+
+
   # Add g level names to clusterResults
   names(clusterResults) <- paste0(rep("G=", length(seq(gmin, gmax, 1))),
                                   seq(gmin, gmax, 1))
 
+  names(logLikelihood) <- names(nParameters) <- names(BIC) <-
+    names(ICL) <- names(AIC) <- names(AIC3) <- nameVector
+
   # select best model
   BICbest <- which(numberArray == grep(max(BIC, na.rm = TRUE), BIC), arr.ind=TRUE)
   BICbestmodel <- paste0("G=", BICbest[1], ",p=", BICbest[2], ",model=", modelNames[BICbest[3]])
+  # Another method
+  # names(BIC[grep(max(BIC, na.rm = TRUE), BIC)])
   BICmodel <- list(allBICvalues = BIC,
                    BICmodelselected = BICbestmodel,
                    BICmodelSelectedLabels = clusterResults[[BICbest[1]]][[BICbest[2]]][[BICbest[3]]]$clusterlabels)
