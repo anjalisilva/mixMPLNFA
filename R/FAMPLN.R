@@ -100,6 +100,7 @@
 
 
 PMPLNFA <- function(dataset,
+                    membership = "none",
                     gmin = 1,
                     gmax = 3,
                     pmin = 1,
@@ -244,6 +245,7 @@ PMPLNFA <- function(dataset,
                                               seq(pmin, pmax, 1))
   }
 
+  # Add g level names to clusterResults
   names(clusterResults) <- paste0(rep("G=", length(seq(gmin, gmax, 1))),
                                   seq(gmin, gmax, 1))
 
@@ -308,7 +310,7 @@ PMPLNFAind <- function(dataset,
                        normFactors) {
 
 
-  # Initialize variables
+    # Initialize variables
     dimensionality <- ncol(dataset)
     nObservations <- nrow(dataset)
 
@@ -388,7 +390,7 @@ PMPLNFAind <- function(dataset,
     checks <- aloglik[c(1, 2, 3)] <- 0
     itMax <- 100
 
-    # Begin clusterig
+    # Begin clustering
     while (checks == 0) {
       # cat("\n it = ", it)
 

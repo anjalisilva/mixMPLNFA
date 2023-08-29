@@ -6,6 +6,7 @@
 \usage{
 PMPLNFA(
   dataset,
+  membership = "none",
   gmin = 1,
   gmax = 3,
   pmin = 1,
@@ -22,6 +23,10 @@ observations and d is the dimensionality. The program will cluster
 n observations into gmin:gmax groups. If rowSums are zero,
 these rows should be removed first.}
 
+\item{membership}{A numeric vector of length nrow(dataset) containing the
+cluster membership of each observation. If not available,
+leave as "none".}
+
 \item{gmin}{A positive integer specifying the minimum number of components
 to be considered in the clustering run.}
 
@@ -35,10 +40,6 @@ tested. Default is only "CCC". Options are "UUU", "UUC", "UCU", "UCC",
 \item{normalize}{A string with options "Yes" or "No" specifying
 if normalization should be performed. Currently, normalization factors
 are calculated using TMM method of edgeR package. Default is "Yes".}
-
-\item{membership}{A numeric vector of length nrow(dataset) containing the
-cluster membership of each observation. If not available,
-leave as "none".}
 }
 \value{
 Returns an S3 object of class mixMPLNFA with results.
