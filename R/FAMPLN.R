@@ -214,7 +214,7 @@ PMPLNFA <- function(dataset,
                                              dataset = dataset,
                                              clustersize = clustersize,
                                              pSize = pSize,
-                                             modelNames = modelNames,
+                                             modelName = modelNames[famodel],
                                              normFactors = normFactors)
 
     }
@@ -251,7 +251,7 @@ PMPLNFA <- function(dataset,
 PMPLNFAind <- function(dataset,
                        clustersize,
                        pSize,
-                       modelNames,
+                       modelName,
                        normFactors) {
 
 
@@ -389,7 +389,7 @@ PMPLNFAind <- function(dataset,
         # cat("rep = ", rep, "\n")
         lambdaOld <- lambda
         psiOld <- psi
-        updates <- modelUpdates(modelNames = modelNames,
+        updates <- modelUpdates(modelName = modelName,
                                 zS = zS,
                                 ng = ng,
                                 z = z,
@@ -498,7 +498,7 @@ PMPLNFAind <- function(dataset,
       }
 
 
-      print(it)
+      # print(it)
       it <- it + 1
       if (it == itMax) {
         checks <- 1
@@ -508,6 +508,8 @@ PMPLNFAind <- function(dataset,
 
     # par<-G*(dimensionality*pmax-0.5*pmax*(pmax-1))+G*dimensionality
     ##par from covariance only has the covariance parameters so now we need to add the parameters for the mean and pi
+    AIC <- 2 * loglik[it - 1] - (2 * (par + (clustersize - 1) + clustersize * dimensionality))
+    AIC3 <- 2 * loglik[it - 1] - (3 * (par + (clustersize - 1) + clustersize * dimensionality))
     BIC <- 2 * loglik[it - 1] - (par + (clustersize - 1) + clustersize * dimensionality) * log(N)
     mapz <- matrix(0, ncol = clustersize, nrow = N)
     for (g in 1:clustersize) {
@@ -536,13 +538,15 @@ PMPLNFAind <- function(dataset,
     modelList[[8]] <- kmeansOut
     modelList[[9]] <- BIC
     modelList[[10]] <- ICL
-    modelList[[11]] <- modelNames
-    modelList[[12]] <- clustersize
-    modelList[[13]] <- pSize
+    modelList[[11]] <- AIC
+    modelList[[12]] <- AIC3
+    modelList[[13]] <- modelName
+    modelList[[14]] <- clustersize
+    modelList[[15]] <- pSize
     names(modelList) <-c("piG", "mu", "sigmaVar",
                         "lambda", "psi", "z", "loglik",
-                        "kmeans", "BIC", "ICL",
-                        "modelNames", "G", "p")
+                        "kmeans", "BIC", "ICL", "AIC", "AIC3",
+                        "modelName", "G", "p")
 
     class(modelList) <- "mixMPLNFA"
     return(modelList)
