@@ -248,10 +248,15 @@ PMPLNFA <- function(dataset,
                                   seq(gmin, gmax, 1))
 
   # select best model
-  BICmodel <- seq(gmin, gmax, 1)[grep(min(BIC, na.rm = TRUE), BIC)]
-  BICmodel <- seq(gmin, gmax, 1)[grep(min(BIC, na.rm = TRUE), BIC)]
-  BICmodel <- seq(gmin, gmax, 1)[grep(min(BIC, na.rm = TRUE), BIC)]
-  BICmodel <- seq(gmin, gmax, 1)[grep(min(BIC, na.rm = TRUE), BIC)]
+  BICbest <- which(numberArray == grep(max(BIC, na.rm = TRUE), BIC), arr.ind=TRUE)
+  BICbestmodel <- paste0("G=", BICbest[1], ",p=", BICbest[2], ",model=", modelNames[BICbest[3]])
+  BICmodel <- list(allBICvalues = BIC,
+                   BICmodelselected = BICbestmodel,
+                   BICmodelSelectedLabels = clusterResults[[gmodel]][[pSize]][[famodel]]$clusterlabels)
+
+  ICLmodel <- seq(gmin, gmax, 1)[grep(min(ICL, na.rm = TRUE), ICL)]
+  AICmodel <- seq(gmin, gmax, 1)[grep(min(AIC, na.rm = TRUE), AIC)]
+  AIC3model <- seq(gmin, gmax, 1)[grep(min(AIC3, na.rm = TRUE), AIC3)]
 
 
 
@@ -282,7 +287,8 @@ PMPLNFA <- function(dataset,
 
 
 
-
+#' @importFrom mclust unmap
+#' @importFrom mclust map
 PMPLNFAind <- function(dataset,
                        clustersize,
                        pSize,
@@ -582,7 +588,8 @@ PMPLNFAind <- function(dataset,
       modelName = modelName,
       clustersize = clustersize,
       pSize = pSize,
-      kTotal = kTotal)
+      kTotal = kTotal,
+      clusterlabels = mclust::map(z))
 
     class(modelList) <- "mixMPLNFA"
     return(modelList)
