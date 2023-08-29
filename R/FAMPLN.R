@@ -216,9 +216,10 @@ PMPLNFA <- function(dataset,
                                              pSize = pSize,
                                              modelName = modelNames[famodel],
                                              normFactors = normFactors)
-
+      }
     }
-   }
+    names(clusterResults[[gmodel]]) <- paste0(rep("p=", length(seq(pmin, pmax, 1))),
+                                              seq(pmin, pmax, 1))
   }
 
   names(clusterResults) <- paste0(rep("G=", length(seq(gmin, gmax, 1))),
@@ -226,11 +227,11 @@ PMPLNFA <- function(dataset,
 
 
 
-    BIC <- ICL <- AIC <- AIC3 <- Djump <- DDSE <- nParameters <- logLikelihood <- vector()
+    BIC <- ICL <- AIC <- AIC3 <- nParameters <- logLikelihood <- vector()
 
     for(g in seq_along(1:(gmax - gmin + 1))) {
       # save the final log-likelihood
-      logLikelihood[g] <- unlist(tail(parallelRun[[g]]$allResults$logLikelihood,
+      logLikelihood[g] <- unlist(tail(clusterResults[[g]]$allResults$logLikelihood,
                                       n = 1))
 
       if(length(1:(gmax - gmin + 1)) == gmax) {
@@ -527,26 +528,22 @@ PMPLNFAind <- function(dataset,
                          mapz = mapz, z = z))
     true <- NA
 
-    modelList <- list()
-    modelList[[1]] <- piG
-    modelList[[2]] <- mu
-    modelList[[3]] <- sigmaVar
-    modelList[[4]] <- lambda
-    modelList[[5]] <- psi
-    modelList[[6]] <- z
-    modelList[[7]] <- loglik
-    modelList[[8]] <- kmeansOut
-    modelList[[9]] <- BIC
-    modelList[[10]] <- ICL
-    modelList[[11]] <- AIC
-    modelList[[12]] <- AIC3
-    modelList[[13]] <- modelName
-    modelList[[14]] <- clustersize
-    modelList[[15]] <- pSize
-    names(modelList) <-c("piG", "mu", "sigmaVar",
-                        "lambda", "psi", "z", "loglik",
-                        "kmeans", "BIC", "ICL", "AIC", "AIC3",
-                        "modelName", "G", "p")
+    modelList <- list(
+      piG = piG,
+      mu = mu,
+      sigmaVar = sigmaVar,
+      lambda = lambda,
+      psi = psi,
+      z = z,
+      loglik = loglik,
+      kmeansOut = kmeansOut,
+      BIC = BIC,
+      ICL = ICL,
+      AIC = AIC,
+      AIC3 = AIC3,
+      modelName = modelName,
+      clustersize = clustersize,
+      pSize = pSize)
 
     class(modelList) <- "mixMPLNFA"
     return(modelList)
