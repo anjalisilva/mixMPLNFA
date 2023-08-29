@@ -146,16 +146,16 @@ browseVignettes("mixMPLNFA")
 citation("mixMPLNFA")
 ```
 
-Finite Mixtures of Multivariate Poisson-Log Normal Factor Analyzers for
-Clustering Count Data. (2023) *Unpublished*.
+Payne, A., A. Silva, S. J. Rothstein, P. D. McNicholas, and S. Subedi
+(2023) Finite Mixtures of Multivariate Poisson-Log Normal Factor
+Analyzers for Clustering Count Data. *Unpublished*.
 
 ``` r
 A BibTeX entry for LaTeX users is
 
-  @Article{,
-    title = {Finite Mixtures of Multivariate Poisson-Log Normal
-Factor Analyzers for Clustering Count Data},
-    year = {2023}
+  @unpublished{,
+  authors = A. Payne and A. Silva and S. J. Rothstein and P. D. McNicholas and S. Subedi,
+  title  = Finite Mixtures of Multivariate Poisson-Log Normal Factor Analyzers for Clustering Count Data
   }
 ```
 
