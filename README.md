@@ -165,6 +165,11 @@ A BibTeX entry for LaTeX users is
   normal distribution.
   *Biometrika.*](https://www.jstor.org/stable/2336624?seq=1)
 
+- [Bouveyron, C. and C. Brunet (2014). Model-based clustering of
+  high-dimensional data: A review. *Computational Statistics and Data
+  Analysis.* 71,
+  52–78.](https://www.sciencedirect.com/science/article/abs/pii/S0167947312004422)
+
 - [Silva, A., S. J. Rothstein, P. D. McNicholas, and S. Subedi (2019). A
   multivariate Poisson-log normal mixture model for clustering
   transcriptome sequencing data. *BMC
@@ -178,11 +183,6 @@ A BibTeX entry for LaTeX users is
 - [McNicholas, P. D., and T. B. Murphy (2008). Parsimonious Gaussian
   mixture models. *Statistics and Computing.* 18,
   285–296.](https://link.springer.com/article/10.1007/s11222-008-9056-0)
-
-- [Bouveyron, C. and C. Brunet (2014). Model-based clustering of
-  high-dimensional data: A review. *Computational Statistics and Data
-  Analysis.* 71,
-  52–78.](https://www.sciencedirect.com/science/article/abs/pii/S0167947312004422)
 
 ## Authors
 
