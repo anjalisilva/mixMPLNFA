@@ -121,14 +121,14 @@ test_that("Data clustering error upon invalid user input", {
                                             modelName = c("UUU"),
                                             normalize = NA))
 
-  # Incorrect input type for normalize
-  testthat::expect_error(mvplnVGAclus(
-    dataset = simulatedMVdata$dataset,
-    membership = "trueMembership",
-    gmin = 1,
-    gmax = 2,
-    initMethod = "other",
-    nInitIterations = 2,
-    normalize = "other"))
+  # Incorrect input type for membership
+  testthat::expect_error(mixMPLNFA::PMPLNFA(dataset = testData1,
+                                            membership = "",
+                                            gmin = 1,
+                                            gmax = 2,
+                                            pmin = 1,
+                                            pmax = 2,
+                                            modelName = c("UUU"),
+                                            normalize = NA))
 })
 # [END]
