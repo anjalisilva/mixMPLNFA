@@ -21,7 +21,7 @@ Mixtures of Multivariate Poisson-Log Normal Factor Analyzers for Clustering Coun
 <!-- badges: end -->
 
 ## Description
-`mixMPLNFA` is an R package for performing clustering using parsimonious mixtures of multivariate Poisson-log normal factor analyzers family (PMPLNFA) via variational Gaussian approximations. It was developed for count data, with clustering of RNA sequencing data as a motivation. However, the clustering method may be applied to other types of count data. The package provides functions for functions for parameter estimation via a variational Gaussian approximation with Expectation-Maximization (EM) algorithm. Information criteria (AIC, BIC, AIC3 and ICL) are offered for model selection. 
+`mixMPLNFA` is an R package for performing clustering using parsimonious mixtures of multivariate Poisson-log normal factor analyzers family (PMPLNFA) via variational Gaussian approximations. It was developed for count data, with clustering of RNA sequencing data as a motivation. However, the clustering method may be applied to other types of count data. The package provides functions for parameter estimation via a variational Gaussian approximation with Expectation-Maximization (EM) algorithm. Information criteria (AIC, BIC, AIC3 and ICL) utilized for model selection. 
 
 ## Installation
 
@@ -33,14 +33,14 @@ devtools::install_github("anjalisilva/mixMPLNFA", build_vignettes = TRUE)
 library("mixMPLNFA")
 ```
 
-To run the Shiny app:
+To run the Shiny app (under construction):
 ``` r
 mixMPLNFA::runMixMPLNFA()
 ```
 
 ## Overview
 
-To list all functions available in the package (under construction): 
+To list all functions available in the package: 
 
 ``` r
 ls("package:mixMPLNFA")
@@ -50,11 +50,7 @@ ls("package:mixMPLNFA")
 
 1. __*PMPLNFAClust*__ for carrying out clustering of count data using mixtures of MPLN via variational expectation-maximization
 2. __*mplnVisualizeLine*__ for visualizing clustering results as line plots
-3. __*AICFunction*__ for model selection 
-4. __*AIC3Function*__ for model selection 
-5. __*BICFunction*__ for model selection 
-6. __*ICLFunction*__ for model selection 
-7. __*runMixMPLNFA*__ is the shiny implementation of *PMPLNFAClust* 
+3. __*runMixMPLNFA*__ is the shiny implementation of *PMPLNFAClust* (under construction)
 
 
 ## Details
@@ -76,7 +72,7 @@ measurements by [Silva et al., 2019](https://pubmed.ncbi.nlm.nih.gov/31311497/).
 Four model selection criteria are offered, which include the Akaike information criterion (AIC; Akaike, 1973), the Bayesian information
 criterion (BIC; Schwarz, 1978), a variation of the AIC used by Bozdogan (1994) called AIC3, and the integrated completed likelihood (ICL; Biernacki et al., 2000).
 
-Starting values (argument: *initMethod*) and the number of iterations for each chain (argument: *nInitIterations*) play an important role to the successful operation of this algorithm. There maybe issues with singularity, in which case altering starting values or initialization method may help.
+Starting values (argument: *initMethod*) play an important role to the successful operation of this algorithm. There maybe issues with singularity, in which case altering initialization method may help.
 
 ## Shiny App
 

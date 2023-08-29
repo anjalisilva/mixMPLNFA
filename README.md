@@ -19,10 +19,10 @@ mixtures of multivariate Poisson-log normal factor analyzers family
 (PMPLNFA) via variational Gaussian approximations. It was developed for
 count data, with clustering of RNA sequencing data as a motivation.
 However, the clustering method may be applied to other types of count
-data. The package provides functions for functions for parameter
-estimation via a variational Gaussian approximation with
-Expectation-Maximization (EM) algorithm. Information criteria (AIC, BIC,
-AIC3 and ICL) are offered for model selection.
+data. The package provides functions for parameter estimation via a
+variational Gaussian approximation with Expectation-Maximization (EM)
+algorithm. Information criteria (AIC, BIC, AIC3 and ICL) utilized for
+model selection.
 
 ## Installation
 
@@ -34,7 +34,7 @@ devtools::install_github("anjalisilva/mixMPLNFA", build_vignettes = TRUE)
 library("mixMPLNFA")
 ```
 
-To run the Shiny app:
+To run the Shiny app (under construction):
 
 ``` r
 mixMPLNFA::runMixMPLNFA()
@@ -42,7 +42,7 @@ mixMPLNFA::runMixMPLNFA()
 
 ## Overview
 
-To list all functions available in the package (under construction):
+To list all functions available in the package:
 
 ``` r
 ls("package:mixMPLNFA")
@@ -54,11 +54,8 @@ ls("package:mixMPLNFA")
     mixtures of MPLN via variational expectation-maximization
 2.  ***mplnVisualizeLine*** for visualizing clustering results as line
     plots
-3.  ***AICFunction*** for model selection
-4.  ***AIC3Function*** for model selection
-5.  ***BICFunction*** for model selection
-6.  ***ICLFunction*** for model selection
-7.  ***runMixMPLNFA*** is the shiny implementation of *PMPLNFAClust*
+3.  ***runMixMPLNFA*** is the shiny implementation of *PMPLNFAClust*
+    (under construction)
 
 ## Details
 
@@ -104,11 +101,9 @@ criterion (BIC; Schwarz, 1978), a variation of the AIC used by Bozdogan
 (1994) called AIC3, and the integrated completed likelihood (ICL;
 Biernacki et al., 2000).
 
-Starting values (argument: *initMethod*) and the number of iterations
-for each chain (argument: *nInitIterations*) play an important role to
-the successful operation of this algorithm. There maybe issues with
-singularity, in which case altering starting values or initialization
-method may help.
+Starting values (argument: *initMethod*) play an important role to the
+successful operation of this algorithm. There maybe issues with
+singularity, in which case altering initialization method may help.
 
 ## Shiny App
 
