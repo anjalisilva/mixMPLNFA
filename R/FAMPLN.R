@@ -185,8 +185,18 @@ PMPLNFA <- function(dataset,
     stop("normalize should be 'Yes' or 'No' ")
   }
 
+  # to save cluster output
+  clusterResults <- list()
+  BIC <- ICL <- AIC <- AIC3 <-
+    nParameters <- logLikelihood <- vector()
 
-  clusterResults <- list() # to save cluster output
+  # for saving model selection values
+  numberVec <- c(1: ((gmax - gmin + 1) * (pmax - pmin + 1) * length(modelNames)))
+  numberArray <- array(numberVec,
+                  dim = c((gmax - gmin + 1), (pmax - pmin + 1), length(modelNames)))
+  rownames(numberArray) <- paste0(rep("G=", length(seq(gmin, gmax, 1))), seq(gmin, gmax, 1))
+  colnames(numberArray) <- paste0(rep("p=", length(seq(pmin, pmax, 1))), seq(pmin, pmax, 1))
+
   for (gmodel in seq_along(1:(gmax - gmin + 1))) {
     for (pmodel in seq_along(1:(pmax - pmin + 1))) {
       for (famodel in seq_along(1:length(modelNames))) {
@@ -216,6 +226,15 @@ PMPLNFA <- function(dataset,
                                              pSize = pSize,
                                              modelName = modelNames[famodel],
                                              normFactors = normFactors)
+
+      inserNum <- numberArray[gmodel, pmodel, famodel]
+      BIC[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$BIC
+      ICL[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$ICL
+      AIC[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$AIC
+      AIC3[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$AIC3
+      BIC[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$BIC
+      BIC[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$BIC
+
       }
     }
     names(clusterResults[[gmodel]]) <- paste0(rep("p=", length(seq(pmin, pmax, 1))),
@@ -226,21 +245,6 @@ PMPLNFA <- function(dataset,
                                   seq(gmin, gmax, 1))
 
 
-
-    BIC <- ICL <- AIC <- AIC3 <- nParameters <- logLikelihood <- vector()
-
-    for(g in seq_along(1:(gmax - gmin + 1))) {
-      # save the final log-likelihood
-      logLikelihood[g] <- unlist(tail(clusterResults[[g]]$allResults$logLikelihood,
-                                      n = 1))
-
-      if(length(1:(gmax - gmin + 1)) == gmax) {
-        clustersize <- g
-      } else if(length(1:(gmax - gmin + 1)) < gmax) {
-        clustersize <- seq(gmin, gmax, 1)[g]
-      }
-
-    }
 
     return(invisible(NULL))
   }
