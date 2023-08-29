@@ -252,13 +252,25 @@ PMPLNFA <- function(dataset,
   BICbestmodel <- paste0("G=", BICbest[1], ",p=", BICbest[2], ",model=", modelNames[BICbest[3]])
   BICmodel <- list(allBICvalues = BIC,
                    BICmodelselected = BICbestmodel,
-                   BICmodelSelectedLabels = clusterResults[[gmodel]][[pSize]][[famodel]]$clusterlabels)
+                   BICmodelSelectedLabels = clusterResults[[BICbest[1]]][[BICbest[2]]][[BICbest[3]]]$clusterlabels)
 
-  ICLmodel <- seq(gmin, gmax, 1)[grep(min(ICL, na.rm = TRUE), ICL)]
-  AICmodel <- seq(gmin, gmax, 1)[grep(min(AIC, na.rm = TRUE), AIC)]
-  AIC3model <- seq(gmin, gmax, 1)[grep(min(AIC3, na.rm = TRUE), AIC3)]
+  ICLbest <- which(numberArray == grep(max(ICL, na.rm = TRUE), ICL), arr.ind=TRUE)
+  ICLbestmodel <- paste0("G=", ICLbest[1], ",p=", ICLbest[2], ",model=", modelNames[ICLbest[3]])
+  ICLmodel <- list(allICLvalues = ICL,
+                   ICLmodelselected = ICLbestmodel,
+                   ICLmodelSelectedLabels = clusterResults[[ICLbest[1]]][[ICLbest[2]]][[ICLbest[3]]]$clusterlabels)
 
+  AICbest <- which(numberArray == grep(max(AIC, na.rm = TRUE), AIC), arr.ind=TRUE)
+  AICbestmodel <- paste0("G=", AICbest[1], ",p=", AICbest[2], ",model=", modelNames[AICbest[3]])
+  AICmodel <- list(allAICvalues = AIC,
+                   AICmodelselected = AICbestmodel,
+                   AICmodelSelectedLabels = clusterResults[[AICbest[1]]][[AICbest[2]]][[AICbest[3]]]$clusterlabels)
 
+  AIC3best <- which(numberArray == grep(max(AIC3, na.rm = TRUE), AIC3), arr.ind=TRUE)
+  AIC3bestmodel <- paste0("G=", AIC3best[1], ",p=", AIC3best[2], ",model=", modelNames[AIC3best[3]])
+  AIC3model <- list(allAIC3values = AIC3,
+                   AIC3modelselected = AIC3bestmodel,
+                   AIC3modelSelectedLabels = clusterResults[[AIC3best[1]]][[AIC3best[2]]][[AIC3best[3]]]$clusterlabels)
 
   final <- proc.time() - ptm
 
@@ -274,14 +286,14 @@ PMPLNFA <- function(dataset,
                   logLikelihood = logLikelihood,
                   numbParameters = nParameters,
                   trueLabels = membership,
-                  ICLresults = ICL,
-                  BICresults = BIC,
-                  AICresults = AIC,
-                  AIC3results = AIC3,
+                  ICLresults = ICLmodel,
+                  BICresults = BICmodel,
+                  AICresults = AICmodel,
+                  AIC3results = AIC3model,
                   totalTime = final)
 
-
-    return(invisible(NULL))
+    class(RESULTS) <- "PMPLNFA"
+    return(RESULTS)
   }
 
 
