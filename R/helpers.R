@@ -104,7 +104,7 @@ funSgav <- function(g, ng, N, Sk) {
   return(calcValue)
 }
 
-modelUpdates <- function(modelName,
+modelUpdates <- function(modelNames,
                          zS,
                          ng,
                          z,

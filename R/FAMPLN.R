@@ -22,7 +22,7 @@
 #' @param gmax A positive integer, >= gmin, specifying the maximum number of
 #'    components to be considered in the clustering run.
 #' @param modelNames A character vector indicating the model names to be
-#'     tested. Default is "CCC". Options are "UUU", "UUC", "UCU", "UCC",
+#'     tested. Default is only "CCC". Options are "UUU", "UUC", "UCU", "UCC",
 #'     "CUU", "CUC", "CCU", and "CCC".
 #' @param normalize A string with options "Yes" or "No" specifying
 #'     if normalization should be performed. Currently, normalization factors
@@ -101,7 +101,7 @@
 
 PMPLNFA <- function(dataset,
                     gmin = 1,
-                    gmax = 2,
+                    gmax = 3,
                     pmin = 1,
                     pmax = 2,
                     modelNames = "CCC",
@@ -208,7 +208,7 @@ PMPLNFA <- function(dataset,
       # iterating through model
       clusterResults[[gmodel]][[pSize]] <- list()
 
-      cat("\n Running for g =", clustersize, "q = ", pSize, " and model = ", modelNames[famodel])
+      cat("\n Running for g =", clustersize, "q =", pSize, "and model =", modelNames[famodel])
       clusterResults[[gmodel]][[pSize]][[famodel]] <-
                                              PMPLNFAind(
                                              dataset = dataset,
