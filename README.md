@@ -72,7 +72,10 @@ package is illustrated below:
 
 <div style="text-align:left">
 <div style="text-align:left">
-&#10;
+
+``` r
+```
+
 ## Details
 
 Mixture model-based clustering methods can be over-parameterized in
@@ -170,14 +173,44 @@ A BibTeX entry for LaTeX users is
   normal distribution.
   *Biometrika.*](https://www.jstor.org/stable/2336624?seq=1)
 
+- [Akaike, H. (1973). Information theory and an extension of the maximum
+  likelihood principle. In *Second International Symposium on
+  Information Theory*, New York, NY, USA, pp. 267–281. Springer
+  Verlag.](https://link.springer.com/chapter/10.1007/978-1-4612-1694-0_15)
+
+- [Biernacki, C., G. Celeux, and G. Govaert (2000). Assessing a mixture
+  model for clustering with the integrated classification likelihood.
+  *IEEE Transactions on Pattern Analysis and Machine Intelligence*
+  22.](https://hal.inria.fr/inria-00073163/document)
+
 - [Bouveyron, C. and C. Brunet (2014). Model-based clustering of
   high-dimensional data: A review. *Computational Statistics and Data
   Analysis.* 71,
   52–78.](https://www.sciencedirect.com/science/article/abs/pii/S0167947312004422)
 
+- [Bozdogan, H. (1994). Mixture-model cluster analysis using model
+  selection criteria and a new informational measure of complexity. In
+  *Proceedings of the First US/Japan Conference on the Frontiers of
+  Statistical Modeling: An Informational Approach: Volume 2 Multivariate
+  Statistical Modeling*, pp. 69–113. Dordrecht: Springer
+  Netherlands.](https://link.springer.com/chapter/10.1007/978-94-011-0800-3_3)
+
+- [Ghahramani, Z. and Beal, M. (1999). Variational inference for
+  bayesian mixtures of factor analysers. *Advances in neural information
+  processing systems*
+  12.](https://cse.buffalo.edu/faculty/mbeal/papers/nips99.pdf)
+
 - [McNicholas, P. D., and T. B. Murphy (2008). Parsimonious Gaussian
   mixture models. *Statistics and Computing.* 18,
   285–296.](https://link.springer.com/article/10.1007/s11222-008-9056-0)
+
+- [Robinson, M.D., and Oshlack, A. (2010). A scaling normalization
+  method for differential expression analysis of RNA-seq data. *Genome
+  Biology* 11,
+  R25.](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25)
+
+- [Schwarz, G. (1978). Estimating the dimension of a model. *The Annals
+  of Statistics* 6.](https://www.jstor.org/stable/2958889?seq=1)
 
 - [Silva, A., S. J. Rothstein, P. D. McNicholas, and S. Subedi (2019). A
   multivariate Poisson-log normal mixture model for clustering
