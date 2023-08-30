@@ -186,6 +186,7 @@ library("ggplot2")
 library("tidyverse")
 library("reshape")
 
+# Log-likelihood
 MPLNFAResults$logLikelihood %>%
   data.frame() %>%
   dplyr::rename(logL = ".") %>%
@@ -200,7 +201,7 @@ MPLNFAResults$logLikelihood %>%
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
         panel.border = element_rect(colour = "black", fill = NA, linewidth = 1))
 
-               
+# Information criteria value at each run               
 ICvalues <- data.frame(
               BIC = MPLNFAResults$BICresults$allBICvalues,   
               ICL = MPLNFAResults$ICLresults$allICLvalues,
