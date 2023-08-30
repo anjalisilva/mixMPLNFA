@@ -1,4 +1,4 @@
-context("Checking Variational Gaussian Approximations Approach")
+# "Checking Variational Gaussian Approximations Approach")
 library(mixMPLNFA)
 
 test_that("Checking clustering results", {
@@ -45,7 +45,7 @@ test_that("Checking clustering results", {
   expect_identical(clusResultsUUU$BICresults$BICmodelselected, "G=2,p=1,model=UUU")
 })
 
-context("Checking for invalid user input")
+#"Checking for invalid user input"
 test_that("Data clustering error upon invalid user input", {
 
   # dataset provided as character
