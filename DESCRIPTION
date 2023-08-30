@@ -18,7 +18,8 @@ biocViews: Software, StatisticalMethod
 Imports: 
     edgeR,
     mclust,
-    mvtnorm
+    mvtnorm,
+    RColorBrewer
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.2
 Suggests: 
