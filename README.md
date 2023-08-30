@@ -8,6 +8,11 @@ Clustering Count Data
 
 <!-- badges: start -->
 
+[![GitHub
+issues](https://img.shields.io/github/issues/anjalisilva/mixMPLNFA)](https://github.com/anjalisilva/mixMPLNFA/issues)
+[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+![GitHub language
+count](https://img.shields.io/github/languages/count/anjalisilva/mixMPLNFA)
 ![GitHub commit activity
 (branch)](https://img.shields.io/github/commit-activity/y/anjalisilva/MPLNClust/master)
 <!-- badges: end -->
@@ -170,6 +175,10 @@ A BibTeX entry for LaTeX users is
   Analysis.* 71,
   52–78.](https://www.sciencedirect.com/science/article/abs/pii/S0167947312004422)
 
+- [McNicholas, P. D., and T. B. Murphy (2008). Parsimonious Gaussian
+  mixture models. *Statistics and Computing.* 18,
+  285–296.](https://link.springer.com/article/10.1007/s11222-008-9056-0)
+
 - [Silva, A., S. J. Rothstein, P. D. McNicholas, and S. Subedi (2019). A
   multivariate Poisson-log normal mixture model for clustering
   transcriptome sequencing data. *BMC
@@ -179,10 +188,6 @@ A BibTeX entry for LaTeX users is
   multivariate Poisson-lognormal distributions for clustering
   multivariate count data. *Stat.*
   9:e310.](https://doi.org/10.1002/sta4.310)
-
-- [McNicholas, P. D., and T. B. Murphy (2008). Parsimonious Gaussian
-  mixture models. *Statistics and Computing.* 18,
-  285–296.](https://link.springer.com/article/10.1007/s11222-008-9056-0)
 
 ## Authors
 

@@ -4,8 +4,8 @@ Title: Mixtures of Multivariate Poisson-Log Normal Factor Analyzers for Clusteri
 Version: 0.1.0
 Authors@R: c(
     person("Anjali", "Silva", email = "anjali@alumni.uoguelph.ca", role = c("aut", "cre")),
-    person("Andrea", "Payne", email = "andreapayne@cmail.carleton.ca", role = "aut"),
-    person("Sanjeena", "Dang", email = "andreapayne@cmail.carleton.ca", ", role = "aut")
+    person("Sanjeena", "Dang", role = "aut"),
+    person("Andrea", "Payne", role = "aut")
     )
 Maintainer: Anjali Silva <anjali@alumni.uoguelph.ca>
 Description: Performs clustering using mixtures of multivariate Poisson-log normal factor 
@@ -13,35 +13,20 @@ Description: Performs clustering using mixtures of multivariate Poisson-log norm
     clustering results.
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.4.0),
-         Rcpp (>= 0.12.0)
+Depends: R (>= 3.4.0)
 biocViews: Software, StatisticalMethod
 Imports: 
-    alluvial,
-    cluster,
-    clusterGeneration,
-    dplyr,
     edgeR,
-    gplots,
-    ggplot2,
-    grDevices,
-    MASS,
     mclust,
-    mvtnorm,
-    randomcoloR,
-    RColorBrewer,
-    reshape, 
-    parallel,
-    pheatmap,
-    shiny
+    mvtnorm
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.2
 Suggests: 
-    testthat,
+    testthat (>= 3.0.0),
     knitr,
     rmarkdown,
-    MBCluster.Seq,
-    Biostrings
+    MPLNClust
 License: MIT + file LICENSE
 VignetteBuilder: knitr
 URL: https://github.com/anjalisilva/mixMPLNFA
+Config/testthat/edition: 3

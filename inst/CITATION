@@ -1,11 +1,11 @@
 citHeader("To cite mixMPLNFA in publications use:")
 
-citEntry(
-  entry    = "Unpublished",
-  title    = "Finite Mixtures of Multivariate Poisson-Log Normal Factor Analyzers for Clustering Count Data",
-  author   = "A. Payne and A. Silva and S. J. Rothstein and P. D. McNicholas and S. Subedi",
-  year     = "2023",
+citEntry(entry = "Unpublished",
+  title        = "Finite Mixtures of Multivariate Poisson-Log Normal Factor Analyzers for Clustering Count Data",
+  author       = "A. Payne and A. Silva and S. J. Rothstein and P. D. McNicholas and S. Subedi",
+  note         = "Unpublished",
+  year         = "2023",
 
-  textVersion = paste("Payne, A., A. Silva, S. J. Rothstein, P. D. McNicholas, and S. Subedi (2023). Finite Mixtures of Multivariate Poisson-Log Normal Factor Analyzers for Clustering Count Data. *Unpublished*."
-  )
+  textVersion  =
+  paste("Payne, A., A. Silva, S. J. Rothstein, P. D. McNicholas, and S. Subedi (2023) Finite Mixtures of Multivariate Poisson-Log Normal Factor Analyzers for Clustering Count Data. Unpublished. URL https://github.com/anjalisilva/mixMPLNFA.")
 )

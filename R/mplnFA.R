@@ -21,6 +21,10 @@
 #'    to be considered in the clustering run.
 #' @param gmax A positive integer, >= gmin, specifying the maximum number of
 #'    components to be considered in the clustering run.
+#' @param pmin A positive integer specifying the minimum number of latent
+#'    factors to be considered in the clustering run.
+#' @param pmax A positive integer, >= pmin, specifying the maximum number of
+#'    latent factors to be considered in the clustering run.
 #' @param modelNames A character vector indicating the model names to be
 #'     tested. Default is only "CCC". Options are "UUU", "UUC", "UCU", "UCC",
 #'     "CUU", "CUC", "CCU", and "CCC".
@@ -42,8 +46,8 @@
 #'      run.
 #'   \item pmax - Maximum number of latent factors (p) considered in the clustering
 #'      run.
-#'   \item allResults - A list with all results. To access results use the format of
-#'      [[g]][[p]][[model]]
+#'   \item allResults - A list with all results. To access results use the format
+#'      of 'g, p, model', respectively. See examples.
 #'   \item logLikelihood - A vector with value of final log-likelihoods for
 #'      each component/cluster size.
 #'   \item numbParameters - A vector with number of parameters for each
@@ -102,8 +106,50 @@
 #' @importFrom mvtnorm rmvnorm
 #' @importFrom utils tail
 #'
-
-
+#' @examples
+#' # Example 1
+#' trueMu1 <- c(6.5, 6, 6, 6, 6, 6, 6, 6, 6)
+#' trueMu2 <- c(2, 2.5, 2, 2, 2, 2, 2, 2, 2)
+#'
+#' trueSigma1 <- diag(length(trueMu1)) * 2
+#' trueSigma2 <- diag(length(trueMu1))
+#'
+#' # Generating simulated data with 2 clusters
+#' sampleData <- MPLNClust::mplnDataGenerator(nObservations = 2000,
+#'                      dimensionality = length(trueMu1),
+#'                      mixingProportions = c(0.79, 0.21),
+#'                      mu = rbind(trueMu1, trueMu2),
+#'                      sigma = rbind(trueSigma1, trueSigma2),
+#'                      produceImage = "No")
+#'
+#'  dim(sampleData$dataset) # a dataset of size 2000 by 9
+#'
+#' # Clustering
+#' MPLNFAResults <- mixMPLNFA::MPLNFA(
+#'                      dataset = sampleData$dataset,
+#'                      membership = sampleData$trueMembership,
+#'                      gmin = 1,
+#'                      gmax = 3,
+#'                      pmin = 1,
+#'                      pmax = 2,
+#'                      modelNames = c("CCU", "UUU"),
+#'                      normalize = "Yes")
+#'
+#' names(MPLNFAResults) # see all names of outputs
+#'
+#' # To see BIC results
+#' MPLNFAResults$BICresults
+#' MPLNFAResults$BICresults$BICmodelselected
+#'
+#' # Compare with true labels
+#' table(MPLNFAResults$BICresults$BICmodelSelectedLabels,
+#'       sampleData$trueMembership)
+#'
+#' # Access all results for g = 2, p = 1, model = "UUU"
+#' # UUU is mentioned in second placed for input string c("CCU", "UUU")
+#' MPLNFAResults$
+#'
+#'
 MPLNFA <- function(dataset,
                     membership = "none",
                     gmin = 1,
@@ -208,7 +254,7 @@ MPLNFA <- function(dataset,
   }
 
   # to save cluster output
-  clusterResults <- list()
+  clusterResults <- cluslabels <- list()
   BIC <- ICL <- AIC <- AIC3 <-
     nParameters <- logLikelihood <- nameVector <- vector()
 
@@ -244,7 +290,7 @@ MPLNFA <- function(dataset,
         cat("\n Running for g =", clustersize, "q =",
             pSize, "and model =", modelNames[famodel])
 
-        clusterResults[[gmodel]][[pSize]][[famodel]] <-
+        clusterResults[[gmodel]][[pmodel]][[famodel]] <-
                                                PMPLNFAind(
                                                dataset = dataset,
                                                clustersize = clustersize,
@@ -254,6 +300,7 @@ MPLNFA <- function(dataset,
 
         inserNum <- numberArray[gmodel, pmodel, famodel]
         BIC[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$BIC
+        cluslabels[[inserNum]] <- clusterResults[[gmodel]][[pSize]][[famodel]]$clusterlabels
         ICL[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$ICL
         AIC[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$AIC
         AIC3[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$AIC3
@@ -263,18 +310,19 @@ MPLNFA <- function(dataset,
         nameVector[inserNum] <- paste0("G=", gmodel,",p=", pmodel, ",model=", modelNames[famodel])
       }
     }
-    names(clusterResults[[gmodel]]) <- paste0(rep("p=", length(seq(pmin, pmax, 1))),
-                                              seq(pmin, pmax, 1))
+    # names(clusterResults[[gmodel]]) <- paste0(rep("p=", length(seq(pmin, pmax, 1))),
+    #                                          seq(pmin, pmax, 1))
   }
 
 
 
   # Add g level names to clusterResults
-  names(clusterResults) <- paste0(rep("G=", length(seq(gmin, gmax, 1))),
-                                  seq(gmin, gmax, 1))
+  # names(clusterResults) <- paste0(rep("G=", length(seq(gmin, gmax, 1))),
+  #                                 seq(gmin, gmax, 1))
 
   names(logLikelihood) <- names(nParameters) <- names(BIC) <-
-    names(ICL) <- names(AIC) <- names(AIC3) <- nameVector
+    names(ICL) <- names(AIC) <- names(AIC3) <-
+    names(cluslabels) <- nameVector
 
   # select best model
   BICbest <- which(numberArray == grep(max(BIC, na.rm = TRUE), BIC), arr.ind=TRUE)
@@ -283,25 +331,25 @@ MPLNFA <- function(dataset,
   # names(BIC[grep(max(BIC, na.rm = TRUE), BIC)])
   BICmodel <- list(allBICvalues = BIC,
                    BICmodelselected = BICbestmodel,
-                   BICmodelSelectedLabels = clusterResults[[BICbest[1]]][[BICbest[2]]][[BICbest[3]]]$clusterlabels)
+                   BICmodelSelectedLabels = cluslabels[[grep(max(BIC, na.rm = TRUE), BIC)]])
 
   ICLbest <- which(numberArray == grep(max(ICL, na.rm = TRUE), ICL), arr.ind=TRUE)
   ICLbestmodel <- paste0("G=", ICLbest[1], ",p=", ICLbest[2], ",model=", modelNames[ICLbest[3]])
   ICLmodel <- list(allICLvalues = ICL,
                    ICLmodelselected = ICLbestmodel,
-                   ICLmodelSelectedLabels = clusterResults[[ICLbest[1]]][[ICLbest[2]]][[ICLbest[3]]]$clusterlabels)
+                   ICLmodelSelectedLabels = cluslabels[[grep(max(ICL, na.rm = TRUE), ICL)]])
 
   AICbest <- which(numberArray == grep(max(AIC, na.rm = TRUE), AIC), arr.ind=TRUE)
   AICbestmodel <- paste0("G=", AICbest[1], ",p=", AICbest[2], ",model=", modelNames[AICbest[3]])
   AICmodel <- list(allAICvalues = AIC,
                    AICmodelselected = AICbestmodel,
-                   AICmodelSelectedLabels = clusterResults[[AICbest[1]]][[AICbest[2]]][[AICbest[3]]]$clusterlabels)
+                   AICmodelSelectedLabels = cluslabels[[grep(max(AIC, na.rm = TRUE), AIC)]])
 
   AIC3best <- which(numberArray == grep(max(AIC3, na.rm = TRUE), AIC3), arr.ind=TRUE)
   AIC3bestmodel <- paste0("G=", AIC3best[1], ",p=", AIC3best[2], ",model=", modelNames[AIC3best[3]])
   AIC3model <- list(allAIC3values = AIC3,
                    AIC3modelselected = AIC3bestmodel,
-                   AIC3modelSelectedLabels = clusterResults[[AIC3best[1]]][[AIC3best[2]]][[AIC3best[3]]]$clusterlabels)
+                   AIC3modelSelectedLabels = cluslabels[[grep(max(AIC3, na.rm = TRUE), AIC3)]])
 
   final <- proc.time() - ptm
 
@@ -372,7 +420,7 @@ PMPLNFAind <- function(dataset,
       obs <- which(z[, g] == 1)
         if(length(obs) > 1) {
           mu[[g]] <- colMeans(log(dataset[obs, ] + 1 / dimensionality))
-          sigmaVar[[g]] <- var(log(dataset[obs, ] + 1 / dimensionality))
+          sigmaVar[[g]] <- stats::var(log(dataset[obs, ] + 1 / dimensionality))
 
           # solve issue anticipation
           # isigma[[g]]<-solve(sigma.var[[g]])
@@ -541,14 +589,14 @@ PMPLNFAind <- function(dataset,
         # dimensionality is large, e.g., 500
         six <- 0.5 * log(unlist(lapply(S[[g]], det)))
         if(any(is.infinite(six)) == TRUE) { # detect if -Inf
-          six <- 0.5 * log(unlist(lapply(testing, det)) + 1e-10)
+          six <- 0.5 * log(unlist(lapply(S[[g]], det)) + 1e-10)
         }
 
         Ffunction[, g] <- piG[g] * exp(rowSums(m[[g]] * dataset) -
                                        two -
                                        rowSums(lfactorial(dataset)) +
                                        rowSums(log(libMatFull) * dataset) -
-                                       0.5 * mahalanobis(m[[g]], center = mu[[g]], cov = isigma[[g]], inverted = TRUE) -
+                                       0.5 * stats::mahalanobis(m[[g]], center = mu[[g]], cov = isigma[[g]], inverted = TRUE) -
                                        five +
                                        six -
                                        0.5 * log(det(sigmaVar[[g]])) -
