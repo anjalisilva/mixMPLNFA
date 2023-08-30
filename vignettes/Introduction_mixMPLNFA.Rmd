@@ -181,46 +181,46 @@ The above plot illustrates, for each cluster, its expression pattern with counts
 
 Log-likelihood and information criteria value at each run can be plotted as follows.
 ``` r
-install.packages("ggplot2")
-library("ggplot2")
-library("tidyverse")
-library("reshape")
+# install.packages("ggplot2")
+# library("ggplot2")
+# library("tidyverse")
+# library("reshape")
 
 # Log-likelihood
-MPLNFAResults$logLikelihood %>%
-  data.frame() %>%
-  dplyr::rename(logL = ".") %>%
-  tibble::rownames_to_column('models') %>%
-  data.frame() %>%
-  ggplot2::ggplot(mapping = aes(x = models, y = logL, group=1)) +
-  geom_line(linetype = "dashed") +
-  geom_point() +
-  ggtitle("Final logL of each model") +
-  theme_minimal() +
-  theme(legend.position = "top",
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
-        panel.border = element_rect(colour = "black", fill = NA, linewidth = 1))
+# MPLNFAResults$logLikelihood %>%
+#   data.frame() %>%
+#   dplyr::rename(logL = ".") %>%
+#   tibble::rownames_to_column('models') %>%
+#   data.frame() %>%
+#   ggplot2::ggplot(mapping = aes(x = models, y = logL, group=1)) +
+#   geom_line(linetype = "dashed") +
+#   geom_point() +
+#   ggtitle("Final logL of each model") +
+#   theme_minimal() +
+#   theme(legend.position = "top",
+#         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+#         panel.border = element_rect(colour = "black", fill = NA, linewidth = 1))
 
 # Information criteria value at each run               
-ICvalues <- data.frame(
-              BIC = MPLNFAResults$BICresults$allBICvalues,   
-              ICL = MPLNFAResults$ICLresults$allICLvalues,
-              AIC = MPLNFAResults$AICresults$allAICvalues,
-              AIC3= MPLNFAResults$AIC3results$allAIC3values)
+# ICvalues <- data.frame(
+#               BIC = MPLNFAResults$BICresults$allBICvalues,   
+#               ICL = MPLNFAResults$ICLresults$allICLvalues,
+#               AIC = MPLNFAResults$AICresults$allAICvalues,
+#               AIC3= MPLNFAResults$AIC3results$allAIC3values)
               
-ICvalues %>%
-  tibble::rownames_to_column('models') %>%
-  reshape::melt() %>%
-  ggplot2::ggplot(mapping = aes(x = models, y = value, col=variable)) +
-  geom_line(linetype = "dashed") +
-  geom_point() +
-  ggtitle("Information criterion value vs model") +
-  ylab("Information criterion value") +
-  theme_minimal() +
-  theme(legend.position = "top",
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
-        panel.border = element_rect(colour = "black", fill = NA, linewidth = 1)) +
-        facet_grid(cols = vars(variable))
+# ICvalues %>%
+#   tibble::rownames_to_column('models') %>%
+#   reshape::melt() %>%
+#   ggplot2::ggplot(mapping = aes(x = models, y = value, col=variable)) +
+#   geom_line(linetype = "dashed") +
+#   geom_point() +
+#   ggtitle("Information criterion value vs model") +
+#   ylab("Information criterion value") +
+#   theme_minimal() +
+#   theme(legend.position = "top",
+#         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+#         panel.border = element_rect(colour = "black", fill = NA, linewidth = 1)) +
+#         facet_grid(cols = vars(variable))
 
 ```
 <img src="finalLogL.png" alt="finalLogL" width="450"/>

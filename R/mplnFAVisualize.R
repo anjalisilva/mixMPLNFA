@@ -91,7 +91,7 @@
 #'  dim(sampleData2$dataset) # a dataset of size 2000 by 9
 #'
 #' # Clustering
-#' MPLNFAResults <- mixMPLNFA::MPLNFA(
+#' MPLNFAResults2 <- mixMPLNFA::MPLNFA(
 #'                      dataset = sampleData2$dataset,
 #'                      membership = sampleData2$trueMembership,
 #'                      gmin = 1,
@@ -103,9 +103,9 @@
 #'
 #'  # Visualize data using line plot with multicolours
 #'  # Use navigation buttons to see previous plots
-#'  MPLNLineColor <- mixMPLNFA::mplnFAVisLine(dataset = simulatedCounts$dataset,
+#'  MPLNLineColor <- mixMPLNFA::mplnFAVisLine(dataset = sampleData2$dataset,
 #'                                          clusterMembershipVector =
-#'                                          MPLNClustResults$allResults$`G=2`$clusterlabels,
+#'                                          MPLNFAResults2$BICresults$BICmodelSelectedLabels,
 #'                                          fileName = 'TwoClusterModel',
 #'                                          LinePlotColours = "multicolour",
 #'                                          printPlot = FALSE)

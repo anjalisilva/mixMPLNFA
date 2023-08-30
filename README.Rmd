@@ -114,8 +114,10 @@ Factor Analyzers for Clustering Count Data. *Unpublished*.
 A BibTeX entry for LaTeX users is
 
   @unpublished{,
-  authors = A. Payne and A. Silva and S. J. Rothstein and P. D. McNicholas and S. Subedi,
-  title  = Finite Mixtures of Multivariate Poisson-Log Normal Factor Analyzers for Clustering Count Data
+  title        = "Finite Mixtures of Multivariate Poisson-Log Normal Factor Analyzers for Clustering Count Data",
+  author       = "A. Payne and A. Silva and S. J. Rothstein and P. D. McNicholas and S. Subedi",
+  note         = "Unpublished",
+  year         = "2023",
   }
 ```
 
