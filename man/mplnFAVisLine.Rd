@@ -49,16 +49,18 @@ yellow line shows the mean value (log counts) for each cluster.
 # Example 1
 trueMu1 <- c(6.5, 6, 6, 6, 6, 6, 6, 6, 6)
 trueMu2 <- c(2, 2.5, 2, 2, 2, 2, 2, 2, 2)
+trueMu3 <- c(1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 trueSigma1 <- diag(length(trueMu1)) * 2
-trueSigma2 <- diag(length(trueMu1))
+trueSigma2 <- diag(length(trueMu1)) * 0.05
+trueSigma3 <- diag(length(trueMu1)) * 0.01
 
-# Generating simulated data with 2 clusters
+# Generating simulated data with 3 clusters
 sampleData <- MPLNClust::mplnDataGenerator(nObservations = 2000,
                      dimensionality = length(trueMu1),
-                     mixingProportions = c(0.79, 0.21),
-                     mu = rbind(trueMu1, trueMu2),
-                     sigma = rbind(trueSigma1, trueSigma2),
+                     mixingProportions = c(0.2, 0.3, 0.5),
+                     mu = rbind(trueMu1, trueMu2, trueMu3),
+                     sigma = rbind(trueSigma1, trueSigma2, trueSigma3),
                      produceImage = "No")
 
  dim(sampleData$dataset) # a dataset of size 2000 by 9
@@ -68,19 +70,57 @@ MPLNFAResults <- mixMPLNFA::MPLNFA(
                      dataset = sampleData$dataset,
                      membership = sampleData$trueMembership,
                      gmin = 1,
-                     gmax = 3,
+                     gmax = 4,
                      pmin = 1,
-                     pmax = 2,
+                     pmax = 1,
                      modelNames = c("CCU", "UUU"),
                      normalize = "Yes")
 
  # Visualize data using line plot
- MPLNFABlack <- mixMPLNFA::mplnFAVisLine(dataset = MPLNFAResults$dataset,
+ # Use navigation buttons to see previous plots
+ MPLNFABlack <- mixMPLNFA::mplnFAVisLine(dataset = sampleData$dataset,
                                          clusterMembershipVector =
-                                         MPLNFAResults$allResults$`G=2`$clusterlabels,
-                                         fileName = 'TwoClusterModel',
-                                         printPlot = FALSE,
-                                         format = 'png')
+                                         MPLNFAResults$BICresults$BICmodelSelectedLabels,
+                                         fileName = 'Example1',
+                                         printPlot = FALSE)
+
+
+ # Visualize data using line plot with multicolours
+ # Use navigation buttons to see previous plots
+ MPLNLineColor <- mixMPLNFA::mplnFAVisLine(dataset = sampleData$dataset,
+                                         clusterMembershipVector =
+                                         MPLNFAResults$BICresults$BICmodelSelectedLabels,
+                                         fileName = 'Example1MultiColor',
+                                         LinePlotColours = "multicolour",
+                                         printPlot = FALSE)
+
+ # Example 2
+trueMu1 <- c(6.5, 6, 6, 6, 6, 6, 6, 6, 6)
+trueMu2 <- c(1, 2.5, 2, 2, 2, 2, 1, 1, 1)
+
+trueSigma1 <- diag(length(trueMu1)) * 2.5
+trueSigma2 <- diag(length(trueMu1)) * 0.5
+
+# Generating simulated data with 2 clusters
+sampleData2 <- MPLNClust::mplnDataGenerator(nObservations = 2000,
+                     dimensionality = length(trueMu1),
+                     mixingProportions = c(0.6, 0.4),
+                     mu = rbind(trueMu1, trueMu2),
+                     sigma = rbind(trueSigma1, trueSigma2),
+                     produceImage = "No")
+
+ dim(sampleData2$dataset) # a dataset of size 2000 by 9
+
+# Clustering
+MPLNFAResults <- mixMPLNFA::MPLNFA(
+                     dataset = sampleData2$dataset,
+                     membership = sampleData2$trueMembership,
+                     gmin = 1,
+                     gmax = 3,
+                     pmin = 1,
+                     pmax = 2,
+                     modelNames = c("CCU"),
+                     normalize = "Yes")
 
  # Visualize data using line plot with multicolours
  # Use navigation buttons to see previous plots
@@ -89,20 +129,8 @@ MPLNFAResults <- mixMPLNFA::MPLNFA(
                                          MPLNClustResults$allResults$`G=2`$clusterlabels,
                                          fileName = 'TwoClusterModel',
                                          LinePlotColours = "multicolour",
-                                         printPlot = FALSE,
-                                         format = 'png')
+                                         printPlot = FALSE)
 
- # Example 2
- # Carry out K-means clustering for same dataset as above
- # Use navigation buttons to see previous plots
- set.seed(1234)
- KmeansLineColor <- mixMPLNFA::mplnFAVisLine(dataset = simulatedCounts$dataset,
-                                         clusterMembershipVector =
-                                         kmeans(simulatedCounts$dataset, 3)$cluster,
-                                         fileName = 'ThreeClusterKmeansModel',
-                                         LinePlotColours = "multicolour",
-                                         printPlot = FALSE,
-                                         format = 'png')
 
 }
 \author{

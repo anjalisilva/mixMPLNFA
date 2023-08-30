@@ -28,16 +28,18 @@
 #' # Example 1
 #' trueMu1 <- c(6.5, 6, 6, 6, 6, 6, 6, 6, 6)
 #' trueMu2 <- c(2, 2.5, 2, 2, 2, 2, 2, 2, 2)
+#' trueMu3 <- c(1, 1, 1, 1, 1, 1, 1, 1, 1)
 #'
 #' trueSigma1 <- diag(length(trueMu1)) * 2
-#' trueSigma2 <- diag(length(trueMu1))
+#' trueSigma2 <- diag(length(trueMu1)) * 0.05
+#' trueSigma3 <- diag(length(trueMu1)) * 0.01
 #'
-#' # Generating simulated data with 2 clusters
+#' # Generating simulated data with 3 clusters
 #' sampleData <- MPLNClust::mplnDataGenerator(nObservations = 2000,
 #'                      dimensionality = length(trueMu1),
-#'                      mixingProportions = c(0.79, 0.21),
-#'                      mu = rbind(trueMu1, trueMu2),
-#'                      sigma = rbind(trueSigma1, trueSigma2),
+#'                      mixingProportions = c(0.2, 0.3, 0.5),
+#'                      mu = rbind(trueMu1, trueMu2, trueMu3),
+#'                      sigma = rbind(trueSigma1, trueSigma2, trueSigma3),
 #'                      produceImage = "No")
 #'
 #'  dim(sampleData$dataset) # a dataset of size 2000 by 9
@@ -47,18 +49,20 @@
 #'                      dataset = sampleData$dataset,
 #'                      membership = sampleData$trueMembership,
 #'                      gmin = 1,
-#'                      gmax = 3,
+#'                      gmax = 4,
 #'                      pmin = 1,
-#'                      pmax = 2,
+#'                      pmax = 1,
 #'                      modelNames = c("CCU", "UUU"),
 #'                      normalize = "Yes")
 #'
 #'  # Visualize data using line plot
+#'  # Use navigation buttons to see previous plots
 #'  MPLNFABlack <- mixMPLNFA::mplnFAVisLine(dataset = sampleData$dataset,
 #'                                          clusterMembershipVector =
 #'                                          MPLNFAResults$BICresults$BICmodelSelectedLabels,
 #'                                          fileName = 'Example1',
 #'                                          printPlot = FALSE)
+#'
 #'
 #'  # Visualize data using line plot with multicolours
 #'  # Use navigation buttons to see previous plots
@@ -94,7 +98,7 @@
 #'                      gmax = 3,
 #'                      pmin = 1,
 #'                      pmax = 2,
-#'                      modelNames = c("CCU", "UUU"),
+#'                      modelNames = c("CCU"),
 #'                      normalize = "Yes")
 #'
 #'  # Visualize data using line plot with multicolours
