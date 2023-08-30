@@ -1,4 +1,4 @@
-# "Checking Variational Gaussian Approximations Approach")
+# "Checking Variational Gaussian Approximations Approach"
 library(mixMPLNFA)
 
 test_that("Checking clustering results", {
@@ -19,8 +19,7 @@ test_that("Checking clustering results", {
                                              ImageName = "TwoComponents")
 
 
-  # Clustering simulated matrix variate count data
-  # "UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", and "CCC".
+  # Clustering simulated count data
   clusResultsUUU <- mixMPLNFA::MPLNFA(dataset = sampleData$dataset,
                                   gmin = 1,
                                   gmax = 3,
@@ -35,6 +34,7 @@ test_that("Checking clustering results", {
   expect_identical(clusResultsUUU$gmin, 1)
   expect_identical(clusResultsUUU$gmax, 3)
   expect_identical(clusResultsUUU$pmin, 1)
+  expect_identical(clusResultsUUU$pmax, 2)
   expect_named(clusResultsUUU, c("dataset", "dimensionality", "normalizationFactors",
                                  "gmin",  "gmax", "pmin",
                                  "pmax", "initalizationMethod", "allResults",
@@ -45,7 +45,7 @@ test_that("Checking clustering results", {
   expect_identical(clusResultsUUU$BICresults$BICmodelselected, "G=2,p=1,model=UUU")
 })
 
-#"Checking for invalid user input"
+# "Checking for invalid user input"
 test_that("Data clustering error upon invalid user input", {
 
   # dataset provided as character
