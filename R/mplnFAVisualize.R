@@ -45,7 +45,7 @@
 #'  dim(sampleData$dataset) # a dataset of size 2000 by 9
 #'
 #' # Clustering
-#' MPLNFAResults <- mixMPLNFA::MPLNFA(
+#' MPLNFAResults <- mixMPLNFA::MPLNFAClust(
 #'                      dataset = sampleData$dataset,
 #'                      membership = sampleData$trueMembership,
 #'                      gmin = 1,
@@ -91,7 +91,7 @@
 #'  dim(sampleData2$dataset) # a dataset of size 2000 by 9
 #'
 #' # Clustering
-#' MPLNFAResults2 <- mixMPLNFA::MPLNFA(
+#' MPLNFAResults2 <- mixMPLNFA::MPLNFAClust(
 #'                      dataset = sampleData2$dataset,
 #'                      membership = sampleData2$trueMembership,
 #'                      gmin = 1,
