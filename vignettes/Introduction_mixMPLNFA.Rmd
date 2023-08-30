@@ -7,7 +7,7 @@ output:
     toc: true
     number_sections: false
 vignette: >
-  %\VignetteIndexEntry{A Tour of mixMVPLN: Parameter Estimation via VGA}
+  %\VignetteIndexEntry{A Tour of mixMPLNFA}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
