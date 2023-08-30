@@ -65,7 +65,7 @@ library("mixMPLNFA")
 ```
 
 <br>
-
+<div style="text-align:left">
 
 ## Data Simulation
 
@@ -127,9 +127,17 @@ MPLNFAResults <- mixMPLNFA::MPLNFA(
                       
 # To see output saved                      
 names(MPLNFAResults) 
+# [1] "dataset"              "dimensionality"       "normalizationFactors"
+# [4] "gmin"                 "gmax"                 "pmin"                
+# [7] "pmax"                 "modelNames"           "initalizationMethod" 
+# [10] "allResults"           "logLikelihood"        "numbParameters"      
+# [13] "trueLabels"           "ICLresults"           "BICresults"          
+# [16] "AICresults"           "AIC3results"          "totalTime"       
 
 # To see total time
 MPLNFAResults$totalTime
+#    user  system elapsed 
+# 306.731   4.535 312.929 
                       
 ```
 
@@ -154,7 +162,7 @@ Clustering results can be viewed as a barplot of probabilities. For this, select
 
 ``` r
 #  Visualizing probabilities for 2 components 
-                    
+par(mfrow = c(1, 3))                    
 MPLNLineColor <- mixMPLNFA::mplnFAVisLine(
                     dataset = sampleData$dataset,
                     clusterMembershipVector = MPLNFAResults$BICresults$BICmodelSelectedLabels,
@@ -163,7 +171,7 @@ MPLNLineColor <- mixMPLNFA::mplnFAVisLine(
                     printPlot = FALSE)
 ```
 
-<img src="barplotProbabilityMVPLN.png" alt="barplot" width="500"/>
+<img src="linePlot3Clust.png" alt="linePlot3Clust" width="500"/>
 
 <div style="text-align:left">
 
@@ -173,33 +181,49 @@ The above plot illustrates, for each cluster, its expression pattern with counts
 
 Log-likelihood and information criteria value at each run can be plotted as follows.
 ``` r
-par(mfrow = c(1, 2))
-graphics::matplot(MPLNFAResults$logLikelihood, xlab = "Run",
-                  ylab = "logL", type = c("b"), pch = 1, lty = 2, xaxt = "n") 
-                  
-numberVec <- c(1:((MPLNFAResults$gmax - MPLNFAResults$gmin + 1) * (MPLNFAResults$pmax - MPLNFAResults$pmin + 1) * length(MPLNFAResults$   )))
+install.packages("ggplot2")
+library("ggplot2")
+library("tidyverse")
+library("reshape")
 
-                  
-graphics::axis(1, xaxp = c(min(MPLNFAResults$BICresults$BICmodelSelectedLabels), 
-               max(MPLNFAResults$BICresults$BICmodelSelectedLabels), 1), 
-               las = 2)
+MPLNFAResults$logLikelihood %>%
+  data.frame() %>%
+  dplyr::rename(logL = ".") %>%
+  tibble::rownames_to_column('models') %>%
+  data.frame() %>%
+  ggplot2::ggplot(mapping = aes(x = models, y = logL, group=1)) +
+  geom_line(linetype = "dashed") +
+  geom_point() +
+  ggtitle("Final logL of each model") +
+  theme_minimal() +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+        panel.border = element_rect(colour = "black", fill = NA, linewidth = 1))
+
                
-ICvalues <- matrix(c(MPLNFAResults$BICresults$allBICvalues,   
-              MPLNFAResults$ICLresults$allICLvalues,
-              MPLNFAResults$AICresults$allAICvalues,
-              MPLNFAResults$AIC3results$allAIC3values),
-              ncol=4) 
-graphics::matplot(ICvalues, xlab = "Run", ylab = "Information criteria value", 
-                  type = c("b"), pch = 1, col = 1:4, xaxt="n") 
-graphics::axis(1, xaxp = c(min(MPLNFAResults$BICresults$allBICvalues)-10000, 
-               max(MPLNFAResults$BICresults$allBICvalues) +10000, 1), 
-               las=2)
-graphics::legend("top", inset = c(- 0.4, 0), 
-                 legend = c("BIC", "ICL", "AIC", "AIC3"), 
-                 col = 1:4, pch = 1, horiz = TRUE, bty = "n")
-```
+ICvalues <- data.frame(
+              BIC = MPLNFAResults$BICresults$allBICvalues,   
+              ICL = MPLNFAResults$ICLresults$allICLvalues,
+              AIC = MPLNFAResults$AICresults$allAICvalues,
+              AIC3= MPLNFAResults$AIC3results$allAIC3values)
+              
+ICvalues %>%
+  tibble::rownames_to_column('models') %>%
+  reshape::melt() %>%
+  ggplot2::ggplot(mapping = aes(x = models, y = value, col=variable)) +
+  geom_line(linetype = "dashed") +
+  geom_point() +
+  ggtitle("Information criterion value vs model") +
+  ylab("Information criterion value") +
+  theme_minimal() +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+        panel.border = element_rect(colour = "black", fill = NA, linewidth = 1)) +
+        facet_grid(cols = vars(variable))
 
-<img src="LinePlotMVPLN.png" alt="LinePlotMVPLN" width="800"/>
+```
+<img src="finalLogL.png" alt="finalLogL" width="450"/>
+<img src="ICValue.png" alt="ICValue" width="450"/>
 
 <br>
 
