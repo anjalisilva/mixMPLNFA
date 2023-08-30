@@ -57,7 +57,7 @@
 #'
 #'  # Visualize data using line plot
 #'  # Use navigation buttons to see previous plots
-#'  MPLNFABlack <- mixMPLNFA::mplnFAVisLine(dataset = sampleData$dataset,
+#'  MPLNFABlack <- mixMPLNFA::mplnVisualizeLine(dataset = sampleData$dataset,
 #'                                          clusterMembershipVector =
 #'                                          MPLNFAResults$BICresults$BICmodelSelectedLabels,
 #'                                          fileName = 'Example1',
@@ -66,7 +66,7 @@
 #'
 #'  # Visualize data using line plot with multicolours
 #'  # Use navigation buttons to see previous plots
-#'  MPLNLineColor <- mixMPLNFA::mplnFAVisLine(dataset = sampleData$dataset,
+#'  MPLNLineColor <- mixMPLNFA::mplnVisualizeLine(dataset = sampleData$dataset,
 #'                                          clusterMembershipVector =
 #'                                          MPLNFAResults$BICresults$BICmodelSelectedLabels,
 #'                                          fileName = 'Example1MultiColor',
@@ -103,7 +103,7 @@
 #'
 #'  # Visualize data using line plot with multicolours
 #'  # Use navigation buttons to see previous plots
-#'  MPLNLineColor <- mixMPLNFA::mplnFAVisLine(dataset = sampleData2$dataset,
+#'  MPLNLineColor <- mixMPLNFA::mplnVisualizeLine(dataset = sampleData2$dataset,
 #'                                          clusterMembershipVector =
 #'                                          MPLNFAResults2$BICresults$BICmodelSelectedLabels,
 #'                                          fileName = 'TwoClusterModel',
@@ -120,7 +120,7 @@
 #' @importFrom grDevices dev.off
 #' @importFrom RColorBrewer brewer.pal.info
 #' @importFrom RColorBrewer brewer.pal
-mplnFAVisLine <- function(dataset,
+mplnVisualizeLine <- function(dataset,
                               clusterMembershipVector = NA,
                               fileName = paste0('Plot_',date()),
                               LinePlotColours = "black",

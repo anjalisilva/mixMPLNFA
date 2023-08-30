@@ -109,13 +109,13 @@ dim(sampleData$dataset) # 2000 x 9
 
 ## Clustering
 <div style="text-align:left">
-Once the count data is available, clustering can be performed using the *mixMPLNFA::MPLNFA* function. See *?mixMPLNFA::MPLNFA* for more information, including examples and references. Here, clustering will be performed using the above generated dataset. 
+Once the count data is available, clustering can be performed using the *mixMPLNFA::MPLNFAClust* function. See *?mixMPLNFA::MPLNFAClust* for more information, including examples and references. Here, clustering will be performed using the above generated dataset. 
 
 Below, clustering of *sampleData$dataset* is performed for g = 1:3 with latent factors from p = 1:3 with model tested including CCU and UUU. 
 
 ``` r
 set.seed(1234) # for reproducibility, setting seed
-MPLNFAResults <- mixMPLNFA::MPLNFA(
+MPLNFAResults <- mixMPLNFA::MPLNFAClust(
                       dataset = sampleData$dataset,
                       membership = sampleData$trueMembership,
                       gmin = 1,
