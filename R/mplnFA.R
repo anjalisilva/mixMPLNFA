@@ -147,7 +147,7 @@
 #'
 #' # Access all results for g = 2, p = 1, model = "UUU"
 #' # UUU is mentioned in second placed for input string c("CCU", "UUU")
-#' MPLNFAResults$
+#' MPLNFAResults$allResults[[2]][[1]][[2]]
 #'
 #'
 MPLNFA <- function(dataset,
