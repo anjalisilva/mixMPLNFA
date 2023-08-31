@@ -25,6 +25,8 @@
 #'    factors to be considered in the clustering run.
 #' @param pmax A positive integer, >= pmin, specifying the maximum number of
 #'    latent factors to be considered in the clustering run.
+#' @param initMethod A character vector indicating the initialization method
+#'    to be used. Default is "kmeans". Options are currently "kmeans" only.
 #' @param modelNames A character vector indicating the model names to be
 #'     tested. Default is only "CCC". Options are "UUU", "UUC", "UCU", "UCC",
 #'     "CUU", "CUC", "CCU", and "CCC".
@@ -156,6 +158,7 @@ MPLNFAClust <- function(dataset,
                     gmax = 3,
                     pmin = 1,
                     pmax = 2,
+                    initMethod = "kmeans",
                     modelNames = "CCC",
                     normalize = "Yes") {
 
