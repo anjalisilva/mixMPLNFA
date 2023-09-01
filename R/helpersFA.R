@@ -127,7 +127,7 @@ modelUpdates <- function(modelName,
   # lambda <<- lambda
 
   if (substr(modelName, 1, 3) == "UUU") {
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       betaVar[[g]] <- t(lambda[[g]]) %*% isigma[[g]]
       bigTheta[[g]] <- diag(pmaxVar) - betaVar[[g]] %*%
         lambda[[g]] + betaVar[[g]] %*% Sk[, , g] %*%
@@ -135,7 +135,7 @@ modelUpdates <- function(modelName,
     }
     # betaVar <<- betaVar
     bigTheta <<- bigTheta
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       lambdanew[[g]] <- funLambdag(g = g,
                                    Sk = Sk,
                                    betaVar = betaVar,
@@ -143,7 +143,7 @@ modelUpdates <- function(modelName,
     }
 
     # lambdanew <<- lambdanew
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       psinew[[g]] <- funpsiUUU(g = g,
                                Sk = Sk,
                                lambdanew = lambdanew,
@@ -152,17 +152,17 @@ modelUpdates <- function(modelName,
                                dimensionality = dimensionality,
                                zS = zS)
     }
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       sigmaVar[[g]] <- (lambdanew[[g]] %*% t(lambdanew[[g]]) +
                           psinew[[g]])
       lambda[[g]] <- lambdanew[[g]]
       psi[[g]] <- psinew[[g]]
     }
-    par <- clustersize *
+    paras <- clustersize *
       (dimensionality * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) + clustersize * dimensionality
   }
   if (substr(modelName, 1, 3) == "UUC") {
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       betaVar[[g]] <- t(lambda[[g]]) %*% isigma[[g]]
       bigTheta[[g]] <- diag(pmaxVar) - betaVar[[g]] %*%
         lambda[[g]] + betaVar[[g]] %*% Sk[, , g] %*%
@@ -171,7 +171,7 @@ modelUpdates <- function(modelName,
 
     # betaVar <<- betaVar
     # bigTheta <<- bigTheta
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       lambdanew[[g]] <- funLambdag(g = g,
                                    Sk = Sk,
                                    betaVar = betaVar,
@@ -179,7 +179,7 @@ modelUpdates <- function(modelName,
     }
 
     # lambdanew <<- lambdanew
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       psinew[[g]] <- funpsiUUC(g = g,
                                Sk = Sk,
                                lambdanew = lambdanew,
@@ -188,16 +188,16 @@ modelUpdates <- function(modelName,
                                ng = ng) * diag(dimensionality)
     }
     psi <- psinew
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       sigmaVar[[g]] <- (lambdanew[[g]] %*% t(lambdanew[[g]]) +
                           psinew[[g]])
       lambda[[g]] <- lambdanew[[g]]
     }
-    par <- clustersize *
+    paras <- clustersize *
       (dimensionality * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) + clustersize
   }
   if (substr(modelName, 1, 3) == "UCU") {
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       betaVar[[g]] <- t(lambda[[g]]) %*% isigma[[g]]
       bigTheta[[g]] <- diag(pmaxVar) - betaVar[[g]] %*%
         lambda[[g]] + betaVar[[g]] %*% Sk[, , g] %*%
@@ -205,7 +205,7 @@ modelUpdates <- function(modelName,
     }
     # betaVar <<- betaVar
     # bigTheta <<- bigTheta
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       lambdanew[[g]] <- funLambdag(g = g,
                                    Sk = Sk,
                                    betaVar = betaVar,
@@ -218,17 +218,17 @@ modelUpdates <- function(modelName,
                                   lambdanew = lambdanew,
                                   betaVar = betaVar,
                                   zS = zS)) * diag(dimensionality)
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       sigmaVar[[g]] <- (lambdanew[[g]] %*% t(lambdanew[[g]]) +
                           psinew[[1]])
       lambda[[g]] <- lambdanew[[g]]
       psi[[g]] <- psinew[[1]]
     }
-    par <- clustersize *
+    paras <- clustersize *
       (dimensionality * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) + dimensionality
   }
   if (substr(modelName, 1, 3) == "UCC") {
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       betaVar[[g]] <- t(lambda[[g]]) %*% isigma[[g]]
       bigTheta[[g]] <- diag(pmaxVar) - betaVar[[g]] %*%
         lambda[[g]] + betaVar[[g]] %*% Sk[, , g] %*%
@@ -237,7 +237,7 @@ modelUpdates <- function(modelName,
 
     # betaVar <<- betaVar
     # bigTheta <<- bigTheta
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       lambdanew[[g]] <- funLambdag(g = g,
                                    Sk = Sk,
                                    betaVar = betaVar,
@@ -250,18 +250,18 @@ modelUpdates <- function(modelName,
                               lambdanew = lambdanew, zS = zS, betaVar = betaVar),
                        na.rm = TRUE) * diag(dimensionality)
 
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       sigmaVar[[g]] <- (lambdanew[[g]] %*% t(lambdanew[[g]]) +
                           psinew[[1]])
       lambda[[g]] <- lambdanew[[g]]
       psi[[g]] <- psinew[[1]]
     }
-    par <- clustersize *
+    paras <- clustersize *
       (dimensionality * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) + 1
   }
 
   if (substr(modelName, 1, 3) == "CUU") {
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       betaVar[[g]] <- t(lambda[[1]]) %*% isigma[[g]]
       bigTheta[[g]] <- diag(pmaxVar) - betaVar[[g]] %*%
         lambda[[1]] + betaVar[[g]] %*% Sk[, , g] %*%
@@ -275,7 +275,7 @@ modelUpdates <- function(modelName,
                                        ng = ng, psi = psi, Sk = Sk, betaVar = betaVar)),
                       nrow = dimensionality, ncol = pmaxVar)
     forLam2 <- list()
-    for (k in seq_along(1:dimensionality)) {
+    for (k in 1:dimensionality) {
       # cat("k = ", k, "\n")
       # k <<- k
       if (pmaxVar > 1) {
@@ -312,12 +312,12 @@ modelUpdates <- function(modelName,
     }
 
     lambdanew[[1]] <- matrix(NA, dimensionality, pmaxVar)
-    for (k in seq_along(1:dimensionality)) {
+    for (k in 1:dimensionality) {
       lambdanew[[1]][k, ] <- forLam1[k, ] %*% forLam2[[k]]
     }
 
     # lambdanew <<- lambdanew
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       psinew[[g]] <- funpsiCUU(g = g,
                                Sk = Sk,
                                zS = zS,
@@ -332,11 +332,11 @@ modelUpdates <- function(modelName,
     }
 
     psi <- psinew
-    par <- (dimensionality * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) +
+    paras <- (dimensionality * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) +
       clustersize * dimensionality
   }
   if (substr(modelName, 1, 3) == "CUC") {
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       betaVar[[g]] <- t(lambda[[1]]) %*% isigma[[g]]
       bigTheta[[g]] <- diag(pmaxVar) - betaVar[[g]] %*%
         lambda[[1]] + betaVar[[g]] %*% Sk[, , g] %*%
@@ -405,7 +405,7 @@ modelUpdates <- function(modelName,
       lambda[[g]] <- lambdanew[[1]]
       psi[[g]] <- psinew[[g]]
     }
-    par <- (dimensionality * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) +
+    paras <- (dimensionality * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) +
       clustersize
   }
   if (substr(modelName, 1, 3) == "CCU") {
@@ -430,7 +430,7 @@ modelUpdates <- function(modelName,
                              zS = zS,
                              nObservations = nObservations) * diag(dimensionality)
     bigthetaOld <- bigTheta[[1]]
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       sigmaVar[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
                           psinew[[1]])
       lambda[[g]] <- lambdanew[[1]]
@@ -438,7 +438,7 @@ modelUpdates <- function(modelName,
       bigTheta[[g]] <- bigthetaOld
     }
     # bigTheta <<- bigTheta
-    par <- (dimensionality * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) + dimensionality
+    paras <- (dimensionality * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) + dimensionality
   }
   if (substr(modelName, 1, 3) == "CCC") {
     betaVar[[1]] <- t(lambda[[1]]) %*% isigma[[1]]
@@ -463,7 +463,7 @@ modelUpdates <- function(modelName,
                              nObservations = nObservations,
                              dimensionality = dimensionality) * diag(dimensionality)
     bigthetaOld <- bigTheta[[1]]
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       sigmaVar[[g]] <- (lambdanew[[1]] %*% t(lambdanew[[1]]) +
                           psinew[[1]])
       lambda[[g]] <- lambdanew[[1]]
@@ -471,14 +471,14 @@ modelUpdates <- function(modelName,
       bigTheta[[g]] <- bigthetaOld
     }
     # bigTheta <<- bigTheta
-    par <- (dimensionality * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) +
+    paras <- (dimensionality * pmaxVar - 0.5 * pmaxVar * (pmaxVar - 1)) +
       1
   }
 
   returnVals <- list(sigmaVar = sigmaVar,
                      psi = psi,
                      lambda = lambda,
-                     par = par,
+                     paras = paras,
                      isigma = isigma,
                      bigTheta = bigTheta)
   class(returnVals) <- "modelUpdates"

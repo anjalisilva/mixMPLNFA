@@ -11,6 +11,7 @@ MPLNFAClust(
   gmax = 3,
   pmin = 1,
   pmax = 2,
+  initMethod = "kmeans",
   modelNames = "CCC",
   normalize = "Yes"
 )
@@ -38,6 +39,9 @@ factors to be considered in the clustering run.}
 
 \item{pmax}{A positive integer, >= pmin, specifying the maximum number of
 latent factors to be considered in the clustering run.}
+
+\item{initMethod}{A character vector indicating the initialization method
+to be used. Default is "kmeans". Options are currently "kmeans" only.}
 
 \item{modelNames}{A character vector indicating the model names to be
 tested. Default is only "CCC". Options are "UUU", "UUC", "UCU", "UCC",

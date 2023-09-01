@@ -1,5 +1,5 @@
 # "Checking Variational Gaussian Approximations Approach"
-library(mixMPLNFA)
+# library(mixMPLNFA)
 
 test_that("Checking clustering results", {
 
@@ -25,7 +25,7 @@ test_that("Checking clustering results", {
                                   gmax = 3,
                                   pmin = 1,
                                   pmax = 2,
-                                  modelName = c("UUU"),
+                                  modelName = "UUU",
                                   normalize = "Yes")
 
   expect_type(clusResultsUUU, "list")
@@ -54,7 +54,7 @@ test_that("Data clustering error upon invalid user input", {
                                             gmax = 3,
                                             pmin = 1,
                                             pmax = 2,
-                                            modelName = c("UUU"),
+                                            modelName = "UUU",
                                             normalize = "Yes"))
 
   # dataset provided as logical
@@ -63,7 +63,7 @@ test_that("Data clustering error upon invalid user input", {
                                             gmax = 3,
                                             pmin = 1,
                                             pmax = 2,
-                                            modelName = c("UUU"),
+                                            modelName = "UUU",
                                             normalize = "Yes"))
 
   # Incorrect size for p as has to be p < d
@@ -72,7 +72,7 @@ test_that("Data clustering error upon invalid user input", {
                                             gmax = 3,
                                             pmin = 1,
                                             pmax = ncol(sampleData$dataset) + 1,
-                                            modelName = c("UUU"),
+                                            modelName = "UUU",
                                             normalize = "Yes"))
 
   # Incorrect g as gmax cannot be larger than d
@@ -81,7 +81,7 @@ test_that("Data clustering error upon invalid user input", {
                                             gmax = nrow(sampleData$dataset) + 1,
                                             pmin = 1,
                                             pmax = 2,
-                                            modelName = c("UUU"),
+                                            modelName = "UUU",
                                             normalize = "Yes"))
 
 
@@ -91,7 +91,7 @@ test_that("Data clustering error upon invalid user input", {
                                             gmax = 3,
                                             pmin = 1,
                                             pmax = 2,
-                                            modelName = c("UUU"),
+                                            modelName = "UUU",
                                             normalize = "Yes"))
 
 
@@ -101,7 +101,7 @@ test_that("Data clustering error upon invalid user input", {
                                             gmax = 2,
                                             pmin = 1,
                                             pmax = 2,
-                                            modelName = c("UUU"),
+                                            modelName = "UUU",
                                             normalize = "Yes"))
 
   # Incorrect input for pmin and pmax
@@ -110,7 +110,7 @@ test_that("Data clustering error upon invalid user input", {
                                             gmax = 2,
                                             pmin = 3,
                                             pmax = 1,
-                                            modelName = c("UUU"),
+                                            modelName = "UUU",
                                             normalize = "Yes"))
 
   # Incorrect input type for normalize
@@ -119,7 +119,7 @@ test_that("Data clustering error upon invalid user input", {
                                             gmax = 2,
                                             pmin = 3,
                                             pmax = 1,
-                                            modelName = c("UUU"),
+                                            modelName = "UUU",
                                             normalize = NA))
 
 
@@ -129,7 +129,7 @@ test_that("Data clustering error upon invalid user input", {
                                             gmax = 2,
                                             pmin = 3,
                                             pmax = 1,
-                                            modelName = c("UUU"),
+                                            modelName = "UUU",
                                             normalize = NA))
 
   # Incorrect input type for membership
@@ -139,7 +139,7 @@ test_that("Data clustering error upon invalid user input", {
                                             gmax = 2,
                                             pmin = 1,
                                             pmax = 2,
-                                            modelName = c("UUU"),
+                                            modelName = "UUU",
                                             normalize = NA))
 })
 # [END]

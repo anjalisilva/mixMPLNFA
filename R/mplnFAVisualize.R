@@ -157,23 +157,27 @@ mplnVisualizeLine <- function(dataset,
   # Divide observations into each cluster based on membership
   for (i in 1:max(clusterMembershipVector)) {
     ordervector[[i]] <- which(DataPlusLabs[,
-                                           ncol(dataset) + 1] == i)
+                                           seq_len(ncol(dataset)) + 1] == i)
     # divide observations as an integer based on cluster membership
     anothervector[[i]] <- rep(i,
                               length(which(DataPlusLabs[,
-                                                        ncol(dataset) + 1] == i)))
+                              seq_len(ncol(dataset)) + 1] == i)))
   }
 
   # Setting the colours
   if(max(clusterMembershipVector) > 17) {
-    qualColPals <- RColorBrewer::brewer.pal.info[brewer.pal.info$category == 'qual', ]
+    qualColPals <- RColorBrewer::brewer.pal.info[
+      brewer.pal.info$category == 'qual', ]
     coloursBarPlot <- unlist(mapply(RColorBrewer::brewer.pal,
                                     qualColPals$maxcolors,
                                     rownames(qualColPals)))
   } else {
-    coloursBarPlot <- c('#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6',
-                        '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324',
-                        '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1',
+    coloursBarPlot <- c('#4363d8', '#f58231', '#911eb4',
+                        '#46f0f0', '#f032e6',
+                        '#bcf60c', '#fabebe', '#008080',
+                        '#e6beff', '#9a6324',
+                        '#fffac8', '#800000', '#aaffc3',
+                        '#808000', '#ffd8b1',
                         '#000075', '#808080')
   }
 
@@ -188,15 +192,16 @@ mplnVisualizeLine <- function(dataset,
 
       # Save how many observations below to each cluster size,
       # given by 'cluster'
-      if (length(which(DataPlusLabs[, ncol(dataset) + 1] == cluster)) == 1) {
+      if (length(which(DataPlusLabs[,
+                      seq_len(ncol(dataset)) + 1] == cluster)) == 1) {
         toPlot2 <- as.matrix(DataPlusLabs[which(DataPlusLabs[,
-                                                             ncol(dataset) + 1] == cluster), c(1:ncol(dataset))],
-                             ncol = ncol(dataset))
-        rownames(toPlot2) <- names(which(DataPlusLabs[, ncol(dataset) + 1] == cluster))
-      } else if (length(which(DataPlusLabs[, ncol(dataset) + 1] == cluster)) > 1) {
+                      seq_len(ncol(dataset)) + 1] == cluster), c(1:ncol(dataset))],
+                      ncol = seq_len(ncol(dataset)))
+        rownames(toPlot2) <- names(which(DataPlusLabs[, seq_len(ncol(dataset)) + 1] == cluster))
+      } else if (length(which(DataPlusLabs[, seq_len(ncol(dataset)) + 1] == cluster)) > 1) {
         toPlot2 <- as.matrix(DataPlusLabs[which(DataPlusLabs[,
-                                                             ncol(dataset) + 1] == cluster), c(1:ncol(dataset))],
-                             ncol = ncol(dataset))
+                      seq_len(ncol(dataset)) + 1] == cluster), c(1:seq_len(ncol(dataset)))],
+                      ncol = seq_len(ncol(dataset)))
       }
 
       # Save column mean in last row
@@ -235,15 +240,15 @@ mplnVisualizeLine <- function(dataset,
 
       # Save how many observations below to each cluster size,
       # given by 'cluster'
-      if (length(which(DataPlusLabs[, ncol(dataset) + 1] == cluster)) == 1) {
+      if (length(which(DataPlusLabs[, seq_len(ncol(dataset)) + 1] == cluster)) == 1) {
         toPlot2 <- t(as.matrix(DataPlusLabs[which(DataPlusLabs[,
-                                                               ncol(dataset) + 1] == cluster), c(1:ncol(dataset))],
-                               ncol = ncol(dataset)))
-        rownames(toPlot2) <- names(which(DataPlusLabs[, ncol(dataset) + 1] == cluster))
-      } else if (length(which(DataPlusLabs[, ncol(dataset) + 1] == cluster)) > 1) {
+                     seq_len(ncol(dataset)) + 1] == cluster), c(1:seq_len(ncol(dataset)))],
+                     ncol = seq_len(ncol(dataset))))
+        rownames(toPlot2) <- names(which(DataPlusLabs[, seq_len(ncol(dataset)) + 1] == cluster))
+      } else if (length(which(DataPlusLabs[, seq_len(ncol(dataset)) + 1] == cluster)) > 1) {
         toPlot2 <- as.matrix(DataPlusLabs[which(DataPlusLabs[,
-                                                             ncol(dataset) + 1] == cluster), c(1:ncol(dataset))],
-                             ncol = ncol(dataset))
+                      seq_len(ncol(dataset)) + 1] == cluster), c(1:seq_len(ncol(dataset)))],
+                      ncol = seq_len(ncol(dataset)))
       }
 
       # Save column mean in last row
@@ -288,7 +293,8 @@ linePlotMultiCol <- function(dataset,
                                         lwd = c(rep(3, nrow(toPlot2)), 4),
                                         xaxt = "n", xlim = c(1, ncol(toplot1)),
                                         main = paste("Cluster ", cluster))
-  linePlotMultiCol <- linePlotMultiCol + axis(1, at = c(1:ncol(dataset)), labels = colnames(dataset))
+  linePlotMultiCol <- linePlotMultiCol + axis(1, at = c(1:seq_len(ncol(dataset))),
+                                              labels = colnames(dataset))
   return(linePlotMultiCol)
 }
 
@@ -304,7 +310,8 @@ linePlotMonoCol <- function(dataset,
                                        lwd = c(rep(3, nrow(toPlot2)), 4),
                                        xaxt = "n", xlim = c(1, ncol(toplot1)),
                                        main = paste("Cluster ", cluster))
-  linePlotMonoCol <- linePlotMonoCol + axis(1, at = c(1:ncol(dataset)), labels = colnames(dataset))
+  linePlotMonoCol <- linePlotMonoCol + axis(1, at = c(1:seq_len(ncol(dataset))),
+                                            labels = colnames(dataset))
   return(linePlotMonoCol)
 }
 

@@ -262,15 +262,15 @@ MPLNFAClust <- function(dataset,
     nParameters <- logLikelihood <- nameVector <- vector()
 
   # for saving model selection values
-  numberVec <- c(1:((gmax - gmin + 1) * (pmax - pmin + 1) * length(modelNames)))
+  numberVec <- (1:((gmax - gmin + 1) * (pmax - pmin + 1) * length(modelNames)))
   numberArray <- array(numberVec,
                   dim = c((gmax - gmin + 1), (pmax - pmin + 1), length(modelNames)))
   rownames(numberArray) <- paste0(rep("G=", length(seq(gmin, gmax, 1))), seq(gmin, gmax, 1))
   colnames(numberArray) <- paste0(rep("p=", length(seq(pmin, pmax, 1))), seq(pmin, pmax, 1))
 
-  for (gmodel in seq_along(1:(gmax - gmin + 1))) {
-    for (pmodel in seq_along(1:(pmax - pmin + 1))) {
-      for (famodel in seq_along(1:length(modelNames))) {
+  for (gmodel in 1:(gmax - gmin + 1)) {
+    for (pmodel in 1:(pmax - pmin + 1)) {
+      for (famodel in seq_along(modelNames)) {
 
         if(length(1:(gmax - gmin + 1)) == gmax) {
           clustersize <- gmodel
@@ -419,7 +419,7 @@ PMPLNFAind <- function(dataset,
     ng <- colSums(z)
 
     # Initialize parameters
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
 
       obs <- which(z[, g] == 1)
         if(length(obs) > 1) {
@@ -449,7 +449,7 @@ PMPLNFAind <- function(dataset,
 
       temp <- eigen(sigmaVar[[g]])
       lambda[[g]] <- matrix(NA, ncol = pSize, nrow = dimensionality)
-      for (q in seq_along(1:pSize)) {
+      for (q in 1:pSize) {
         lambda[[g]][, q] <- temp$vectors[, q] * sqrt(temp$values[q])
       }
       psi[[g]] <- diag(sigmaVar[[g]] -
@@ -457,11 +457,11 @@ PMPLNFAind <- function(dataset,
                                    t(lambda[[g]])) * diag(dimensionality)
     }
 
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       start[[g]] <- log(dataset + 1) ###Starting value for M
       m[[g]] <- log(dataset + 1)
       S[[g]] <- list()
-      for (i in seq_along(1:nObservations)) {
+      for (i in 1:nObservations) {
         S[[g]][[i]] <- diag(dimensionality) * 0.000000001
       }
     }
@@ -475,10 +475,10 @@ PMPLNFAind <- function(dataset,
     while (checks == 0) {
       # cat("\n it = ", it)
 
-      for (g in seq_along(1:clustersize)) {
+      for (g in 1:clustersize) {
         GX[[g]] <- dGX[[g]] <- zS[[g]] <- list()
         z[is.nan(z)] <- 0
-        for (i in seq_along(1:nObservations)) {
+        for (i in 1:nObservations) {
           #print(i)
           dGX[[g]][[i]] <- diag(exp(log(libMat[i, ]) + start[[g]][i, ] +
                                       0.5 * diag(S[[g]][[i]])), dimensionality) + isigma[[g]]
@@ -521,7 +521,7 @@ PMPLNFAind <- function(dataset,
         repmax <- 1
       }
 
-      for (rep in seq_along(1:repmax)) {
+      for (rep in 1:repmax) {
         # cat("rep = ", rep, "\n")
         lambdaOld <- lambda
         psiOld <- psi
@@ -542,12 +542,12 @@ PMPLNFAind <- function(dataset,
         sigmaVar <- updates$sigmaVar
         psi <- updates$psi
         lambda <- updates$lambda
-        par <- updates$par
+        paras <- updates$paras
         bigTheta <- updates$bigTheta
         isigma <- updates$isigma
 
 
-        for (g in seq_along(1:clustersize)) {
+        for (g in 1:clustersize) {
 
           # solve issue anticipation
           # isigma[[g]] <- solve(psi[[g]]) -
@@ -584,7 +584,7 @@ PMPLNFAind <- function(dataset,
 
       Ffunction <- matrix(NA, ncol = clustersize, nrow = nObservations)
 
-      for (g in seq_along(1:clustersize)) {
+      for (g in 1:clustersize) {
         two <- rowSums(exp(m[[g]] + log(libMatFull) + 0.5 *
                              matrix(unlist(lapply(S[[g]], diag)), ncol = dimensionality, byrow = TRUE)))
         five <- 0.5 * unlist(lapply(S[[g]], funFive, y = isigma, g = g))
@@ -643,16 +643,16 @@ PMPLNFAind <- function(dataset,
     # plot(loglik,type="l")
 
 
-    # par from covariance only has the covariance parameters so now we need
+    # paras from covariance only has the covariance parameters so now we need
     # to add the parameters for the mean and pi
-    kTotal <- par + (clustersize - 1) + (clustersize * dimensionality)
+    kTotal <- paras + (clustersize - 1) + (clustersize * dimensionality)
 
     # Inf criteria
     AIC <- 2 * loglik[it - 1] - (2 * kTotal)
     AIC3 <- 2 * loglik[it - 1] - (3 * kTotal)
     BIC <- 2 * loglik[it - 1] - (kTotal * log(nObservations))
     mapz <- matrix(0, ncol = clustersize, nrow = nObservations)
-    for (g in seq_along(1:clustersize)) {
+    for (g in 1:clustersize) {
       mapz[which(mclust::map(z) == g), g] <- 1
     }
     forICL <- function(g, mapz, z) {
