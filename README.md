@@ -14,7 +14,8 @@ issues](https://img.shields.io/github/issues/anjalisilva/mixMPLNFA)](https://git
 ![GitHub language
 count](https://img.shields.io/github/languages/count/anjalisilva/mixMPLNFA)
 ![GitHub commit activity
-(branch)](https://img.shields.io/github/commit-activity/y/anjalisilva/MPLNClust/master)
+(branch)](https://img.shields.io/github/commit-activity/y/anjalisilva/mixMPLNFA/master)
+
 <!-- badges: end -->
 
 ## Description
