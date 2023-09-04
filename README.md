@@ -69,7 +69,7 @@ package is illustrated below:
 
 <div style="text-align:center">
 
-<img src="inst/extdata/OverviewmixMPLNFA.png" width="800" height="450"/>
+<img src="inst/extdata/OverviewmixMPLNFA.png" width="700" height="450"/>
 
 <div style="text-align:left">
 <div style="text-align:left">
