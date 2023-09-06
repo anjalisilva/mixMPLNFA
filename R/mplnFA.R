@@ -36,7 +36,7 @@
 #'    latent factors to be considered in the clustering run.
 #' @param initMethod A character vector indicating the initialization method
 #'    to be used. Default is "kmeans". Options are currently "kmeans" only.
-#' @param modelNames A character string indicating the model name to generate
+#' @param modelNames A character string indicating the model names to test for
 #'     covariance matrix, Sigma. Since the largest contribution of free parameters
 #'     is through the covariance matrices, it is the focus for introduction
 #'     of parsimony. The constraints can be imposed on Lambda (loading matrix)
@@ -45,7 +45,7 @@
 #'     goes as loading matrix (Lambda), error variance (Psi) and isotropic (Psi),
 #'     respectively. Example, if the loading matrix (Lambda), error variance (Psi)
 #'     and isotropic are all constrained, then select 'CCC'. Options are "CCC",
-#'     "UUU", or "UCC".
+#'     "UUU", and "UCC".
 #' @param normalize A string with options "Yes" or "No" specifying
 #'     if normalization should be performed. Currently, normalization factors
 #'     are calculated using TMM method of edgeR package. Default is "Yes".

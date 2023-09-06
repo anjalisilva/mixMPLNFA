@@ -43,7 +43,7 @@ latent factors to be considered in the clustering run.}
 \item{initMethod}{A character vector indicating the initialization method
 to be used. Default is "kmeans". Options are currently "kmeans" only.}
 
-\item{modelNames}{A character string indicating the model name to generate
+\item{modelNames}{A character string indicating the model names to test for
 covariance matrix, Sigma. Since the largest contribution of free parameters
 is through the covariance matrices, it is the focus for introduction
 of parsimony. The constraints can be imposed on Lambda (loading matrix)
@@ -52,7 +52,7 @@ The 'C' stands for constrained and 'U' stands for unconstrained. The order
 goes as loading matrix (Lambda), error variance (Psi) and isotropic (Psi),
 respectively. Example, if the loading matrix (Lambda), error variance (Psi)
 and isotropic are all constrained, then select 'CCC'. Options are "CCC",
-"UUU", or "UCC".}
+"UUU", and "UCC".}
 
 \item{normalize}{A string with options "Yes" or "No" specifying
 if normalization should be performed. Currently, normalization factors
