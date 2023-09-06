@@ -9,12 +9,13 @@
 #' matrices, it is the focus for introduction of parsimony.
 #'
 #' @param nObservations A positive integer indicating the number
-#'    of observations for the dataset.
-#' @param dimensionality A positive integer indicating the dimensionality for the
-#'    dataset.
-#' @param mixingProportions A numeric vector that length equal to the number of total
-#'    components, indicating the proportion of each component. Vector content should
-#'    sum to 1.
+#'    of observations for the dataset. Or the sample size.
+#' @param dimensionality A positive integer indicating the
+#'    dimensionality for the dataset.
+#' @param mixingProportions A numeric vector such that the length
+#'    equal to the number of total components or clusters (i.e. value of
+#'    trueClusters argument). The vector values should represent the
+#'    proportion of each component. Vector content should sum to 1.
 #' @param mu A matrix of size (dimensionality x number of components), indicating
 #'    the mean for each component. See example.
 #' @param sigma A matrix of size ((dimensionality * number of components) x
@@ -50,15 +51,15 @@
 #' dimensionality <- 10 # dimensionality of observed data
 #' G <- 2 # number of groups/clusters
 #' nObservations <- 1000 ### sample size or number of observations
-#' totData <- 100 # total number of datasets
+#' numDatasets <- 100 # total number of datasets
 #'
 #' lambda_2 <- lambda_1 <- matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality)
 #' psi_2 <- psi_1 <- diag(dimensionality) * runif(1)
 #' sigma_1<-lambda_1%*%t(lambda_1)+psi_1
 #' sigma_2<-lambda_2%*%t(lambda_2)+psi_2
 #'
-#' mu1 <- c(6, 3, 3, 6 ,3)
-#' mu2 <- c(5, 3, 5, 3, 5)
+#' mu1 <- c(6, 3, 3, 6, 3, 6, 3, 3, 6 ,3)
+#' mu2 <- c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5)
 #' mixingProportions <- c(0.32, 0.68)
 #'
 #'
@@ -99,25 +100,111 @@
 mplnFADataGenerator <- function(nObservations = 1000,
                                 dimensionality = 10,
                                 mixingProportions = c(0.32, 0.68),
-                                mu = list(c(6, 3, 3, 6 ,3),
-                                          c(5, 3, 5, 3, 5)),
-                                Lambda = list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-                                              matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality)),
-                                Psi = list(diag(dimensionality) * runif(1),
-                                           diag(dimensionality) * runif(1)),
+                                mu = list(c(6, 3, 3, 6, 3, 6, 3, 3, 6 ,3),
+                                          c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5)),
+                                Lambda = list(matrix(runif(3 * 10, -1, 1), nrow = 10),
+                                              matrix(runif(3 * 10, -1, 1), nrow = 10)),
+                                Psi = list(diag(10) * runif(1),
+                                           diag(10) * runif(1)),
                                 trueClusters = 2,
                                 pfactors = 3,
+                                numDatasets = 10,
                                 modelName = "CCC") {
-  for (run in 1:totData) {
+
+  # Checking user input
+  if(is.numeric(nObservations) != TRUE) {
+    stop("nObservations should be of class numeric.")
+  }
+
+  if(is.numeric(dimensionality) != TRUE) {
+    stop("dimensionality should be of class numeric.")
+  }
+
+  if(is.numeric(pfactors) != TRUE) {
+    stop("pfactors should be of class numeric.")
+  }
+
+  if(is.numeric(trueClusters) != TRUE) {
+    stop("trueClusters should be of class numeric.")
+  }
+
+  if(is.numeric(numDatasets) != TRUE) {
+    stop("numDatasets should be of class numeric.")
+  }
+
+  if(is.numeric(mixingProportions) != TRUE) {
+    stop("mixingProportions should be a vector of class numeric.")
+  }
+
+  if (sum(mixingProportions) != 1) {
+    stop("mixingProportions should be a vector that sum to 1.")
+  }
+
+  if (length(mixingProportions) != trueClusters) {
+    stop("mixingProportions should be a vector that has the length trueClusters.")
+  }
+
+  if (is.character(modelName) != TRUE) {
+    stop("modelName should be a vector of class character.")
+  }
+
+  if (length(mu[[1]]) != dimensionality) {
+    stop("mu should be a list of length equalling the value provided to
+         'trueClusters' with dimension equalling value provided to
+         dimensionality.")
+  }
+
+  if (length(mu) != trueClusters) {
+    stop("mu should be a list of length equalling the value provided to
+         'trueClusters'.")
+  }
+
+  if (ncol(Lambda[[1]]) != pfactors) {
+    stop("Lambda should be a list of length 'trueClusters' with each
+          list element having a matrix with rows equal to value provided to
+          'dimensionality' argument and columns equal to value provided to
+          'pfactors' argument.")
+  }
+
+  if (nrow(Lambda[[1]]) != dimensionality) {
+    stop("Lambda should be a list of length 'trueClusters' with each
+          list element having a matrix with rows equal to value provided to
+          'dimensionality' argument and columns equal to value provided to
+          'pfactors' argument.")  }
+
+  if (length(Lambda) != trueClusters) {
+    stop("Lambda should be a list of length 'trueClusters'.")  }
+
+  if (ncol(Psi[[1]]) != dimensionality) {
+    stop("Lambda should be a list of length 'trueClusters' with each
+          list element having a matrix with rows equal to value provided to
+          'dimensionality' argument and columns equal to value provided to
+          'dimensionality' argument.")
+  }
+
+  if (nrow(Psi[[1]]) != dimensionality) {
+    stop("Lambda should be a list of length 'trueClusters' with each
+          list element having a matrix with rows equal to value provided to
+          'dimensionality' argument and columns equal to value provided to
+          'dimensionality' argument.")  }
+
+  if (length(Psi) != trueClusters) {
+    stop("Psi should be a list of length 'trueClusters'.")  }
+
+
+
+  # Stores information about all runs
+  dat <- list()
+
+  for (run in 1:numDatasets) {
 
     if(modelName == "CCC") {
-      dat<-list() # Stores information about all run
       Ymatrix <- Xmatrix <- matrix(0, ncol = dimensionality, nrow = nObservations)
       Umatrix <- rmvnorm(nObservations, mean = rep(0, pfactors), sigma = diag(pfactors))
       zmatrix <- t(rmultinom(n = nObservations, size = 1, prob = mixingProportions))
 
       for (i in 1:nObservations) {
-        grp <- which(zmatrix[i,] == 1)
+        grp <- which(zmatrix[i, ] == 1)
         Xmatrix[i,] <- rmvnorm(1, mean = mu[[grp]] + Lambda[[grp]] %*% Umatrix[i,],
                             sigma = Psi[[grp]])
         for (j in 1:dimensionality) {
@@ -139,16 +226,24 @@ mplnFADataGenerator <- function(nObservations = 1000,
     # sigma_2 <- lambda_2%*%t(lambda_2)+psi_2
 
     dat[[run]] <- list()
-    dat[[run]][[1]] <- list(mu,
-                            sigma,
-                            Lambda,
-                            Psi)
+    dat[[run]][[1]] <- list(mu = mu,
+                            Lambda = Lambda,
+                            Psi = Psi,
+                            trueClusters = trueClusters,
+                            pfactors = pfactors,
+                            nObservations = nObservations,
+                            dimensionality= dimensionality,
+                            mixingProportions = mixingProportions)
     dat[[run]][[2]] <- Ymatrix
     dat[[run]][[3]] <- Xmatrix
     dat[[run]][[4]] <- zmatrix
     dat[[run]][[5]] <- Umatrix
-
+    names(dat[[run]]) <- c("input", "dataset", "Xmatrix", "zmatrix", "Umatrix")
   }
+  names(dat) <- paste0(rep("dataset=", length(seq(1, numDatasets, 1))), seq(1, numDatasets, 1))
+
   class(dat) <- "mplnFADataGenerator"
   return(dat)
 }
+
+# [END]

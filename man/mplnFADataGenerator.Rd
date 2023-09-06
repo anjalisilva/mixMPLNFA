@@ -8,25 +8,27 @@ mplnFADataGenerator(
   nObservations = 1000,
   dimensionality = 10,
   mixingProportions = c(0.32, 0.68),
-  mu = list(c(6, 3, 3, 6, 3), c(5, 3, 5, 3, 5)),
-  Lambda = list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-    matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality)),
-  Psi = list(diag(dimensionality) * runif(1), diag(dimensionality) * runif(1)),
+  mu = list(c(6, 3, 3, 6, 3, 6, 3, 3, 6, 3), c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5)),
+  Lambda = list(matrix(runif(3 * 10, -1, 1), nrow = 10), matrix(runif(3 * 10, -1, 1),
+    nrow = 10)),
+  Psi = list(diag(10) * runif(1), diag(10) * runif(1)),
   trueClusters = 2,
   pfactors = 3,
+  numDatasets = 10,
   modelName = "CCC"
 )
 }
 \arguments{
 \item{nObservations}{A positive integer indicating the number
-of observations for the dataset.}
+of observations for the dataset. Or the sample size.}
 
-\item{dimensionality}{A positive integer indicating the dimensionality for the
-dataset.}
+\item{dimensionality}{A positive integer indicating the
+dimensionality for the dataset.}
 
-\item{mixingProportions}{A numeric vector that length equal to the number of total
-components, indicating the proportion of each component. Vector content should
-sum to 1.}
+\item{mixingProportions}{A numeric vector such that the length
+equal to the number of total components or clusters (i.e. value of
+trueClusters argument). The vector values should represent the
+proportion of each component. Vector content should sum to 1.}
 
 \item{mu}{A matrix of size (dimensionality x number of components), indicating
 the mean for each component. See example.}
@@ -76,15 +78,15 @@ pfactors <- 3 # number of true latent factors
 dimensionality <- 10 # dimensionality of observed data
 G <- 2 # number of groups/clusters
 nObservations <- 1000 ### sample size or number of observations
-totData <- 100 # total number of datasets
+numDatasets <- 100 # total number of datasets
 
 lambda_2 <- lambda_1 <- matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality)
 psi_2 <- psi_1 <- diag(dimensionality) * runif(1)
 sigma_1<-lambda_1\%*\%t(lambda_1)+psi_1
 sigma_2<-lambda_2\%*\%t(lambda_2)+psi_2
 
-mu1 <- c(6, 3, 3, 6 ,3)
-mu2 <- c(5, 3, 5, 3, 5)
+mu1 <- c(6, 3, 3, 6, 3, 6, 3, 3, 6 ,3)
+mu2 <- c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5)
 mixingProportions <- c(0.32, 0.68)
 
 
