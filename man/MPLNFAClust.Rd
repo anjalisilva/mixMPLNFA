@@ -81,8 +81,9 @@ component/cluster size.
 }
 }
 \description{
-Performs clustering using parsimonious mixtures of multivariate
-Poisson-log normal factor analyzers family (PMPLNFA) via
+Performs simultaneous clustering and factor analysis using
+parsimonious mixtures of multivariate Poisson-log
+normal factor analyzers family (PMPLNFA) via
 variational Gaussian approximations. Model selection can
 be done using AIC, AIC3, BIC and ICL. In the PMPLNFA framework
 restrictions are introduced to the model parameters with the
