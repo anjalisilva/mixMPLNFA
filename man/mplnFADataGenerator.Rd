@@ -5,30 +5,35 @@
 \title{Generating Data Using Mixture of MPLN Factor Analyzers}
 \usage{
 mplnFADataGenerator(
+  numDatasets = 10,
   nObservations = 1000,
   dimensionality = 10,
   mixingProportions = c(0.32, 0.68),
+  trueClusters = 2,
+  pfactors = 3,
+  modelName = "CCC",
   mu = list(c(6, 3, 3, 6, 3, 6, 3, 3, 6, 3), c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5)),
   Lambda = list(matrix(runif(3 * 10, -1, 1), nrow = 10), matrix(runif(3 * 10, -1, 1),
     nrow = 10)),
-  Psi = list(diag(10) * runif(1), diag(10) * runif(1)),
-  trueClusters = 2,
-  pfactors = 3,
-  numDatasets = 10,
-  modelName = "CCC"
+  Psi = list(diag(10) * runif(1), diag(10) * runif(1))
 )
 }
 \arguments{
+\item{numDatasets}{A positive integer indicating the number
+of datasets to be generated. Default value is 10.}
+
 \item{nObservations}{A positive integer indicating the number
-of observations for the dataset. Or the sample size.}
+of observations for the dataset. Or the sample size. Default
+value is 1000.}
 
 \item{dimensionality}{A positive integer indicating the
-dimensionality for the dataset.}
+dimensionality for the dataset. Default value is 10.}
 
-\item{mixingProportions}{A numeric vector such that the length
-equal to the number of total components or clusters (i.e. value of
-trueClusters argument). The vector values should represent the
-proportion of each component. Vector content should sum to 1.}
+\item{trueClusters}{A positive integer indicating the number
+of total components or clusters. Default value is 2.}
+
+\item{pfactors}{A positive integer indicating the number
+of total latent factors. Default value is 3.}
 
 \item{mu}{A matrix of size (dimensionality x number of components), indicating
 the mean for each component. See example.}
