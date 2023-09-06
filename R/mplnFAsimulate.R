@@ -8,14 +8,19 @@
 #' largest contribution of free parameters is through the covariance
 #' matrices, it is the focus for introduction of parsimony.
 #'
+#' @param numDatasets A positive integer indicating the number
+#'    of datasets to be generated. Default value is 10.
 #' @param nObservations A positive integer indicating the number
-#'    of observations for the dataset. Or the sample size.
+#'    of observations for the dataset. Or the sample size. Default
+#'    value is 1000.
 #' @param dimensionality A positive integer indicating the
-#'    dimensionality for the dataset.
-#' @param mixingProportions A numeric vector such that the length
-#'    equal to the number of total components or clusters (i.e. value of
-#'    trueClusters argument). The vector values should represent the
-#'    proportion of each component. Vector content should sum to 1.
+#'    dimensionality for the dataset. Default value is 10.
+#' @param dimensionality A positive integer indicating the
+#'    dimensionality for the dataset. Default value is 10.
+#' @param trueClusters A positive integer indicating the number
+#'    of total components or clusters. Default value is 2.
+#' @param pfactors A positive integer indicating the number
+#'    of total latent factors. Default value is 3.
 #' @param mu A matrix of size (dimensionality x number of components), indicating
 #'    the mean for each component. See example.
 #' @param sigma A matrix of size ((dimensionality * number of components) x
@@ -97,19 +102,19 @@
 #'
 #'
 
-mplnFADataGenerator <- function(nObservations = 1000,
+mplnFADataGenerator <- function(numDatasets = 10,
+                                nObservations = 1000,
                                 dimensionality = 10,
                                 mixingProportions = c(0.32, 0.68),
+                                trueClusters = 2,
+                                pfactors = 3,
+                                modelName = "CCC",
                                 mu = list(c(6, 3, 3, 6, 3, 6, 3, 3, 6 ,3),
                                           c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5)),
                                 Lambda = list(matrix(runif(3 * 10, -1, 1), nrow = 10),
                                               matrix(runif(3 * 10, -1, 1), nrow = 10)),
                                 Psi = list(diag(10) * runif(1),
-                                           diag(10) * runif(1)),
-                                trueClusters = 2,
-                                pfactors = 3,
-                                numDatasets = 10,
-                                modelName = "CCC") {
+                                           diag(10) * runif(1))) {
 
   # Checking user input
   if(is.numeric(nObservations) != TRUE) {
@@ -149,14 +154,14 @@ mplnFADataGenerator <- function(nObservations = 1000,
   }
 
   if (length(mu[[1]]) != dimensionality) {
-    stop("mu should be a list of length equalling the value provided to
-         'trueClusters' with dimension equalling value provided to
-         dimensionality.")
+    stop("mu should be a list of length equal to the value provided to
+         'trueClusters' argument and each element should have length equal
+         to the value provided to 'dimensionality' argument.")
   }
 
   if (length(mu) != trueClusters) {
-    stop("mu should be a list of length equalling the value provided to
-         'trueClusters'.")
+    stop("mu should be a list of length equal to the value provided to
+         'trueClusters' argument.")
   }
 
   if (ncol(Lambda[[1]]) != pfactors) {
@@ -176,14 +181,14 @@ mplnFADataGenerator <- function(nObservations = 1000,
     stop("Lambda should be a list of length 'trueClusters'.")  }
 
   if (ncol(Psi[[1]]) != dimensionality) {
-    stop("Lambda should be a list of length 'trueClusters' with each
+    stop("Psi should be a list of length 'trueClusters' with each
           list element having a matrix with rows equal to value provided to
           'dimensionality' argument and columns equal to value provided to
           'dimensionality' argument.")
   }
 
   if (nrow(Psi[[1]]) != dimensionality) {
-    stop("Lambda should be a list of length 'trueClusters' with each
+    stop("Psi should be a list of length 'trueClusters' with each
           list element having a matrix with rows equal to value provided to
           'dimensionality' argument and columns equal to value provided to
           'dimensionality' argument.")  }
