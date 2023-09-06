@@ -38,6 +38,17 @@ of total latent factors. Default value is 3.}
 \item{mu}{A matrix of size (dimensionality x number of components), indicating
 the mean for each component. See example.}
 
+\item{modelNames}{A character string indicating the model name to generate
+covariance matrix, Sigma. Since the largest contribution of free parameters
+is through the covariance matrices, it is the focus for introduction
+of parsimony. The constraints can be imposed on Lambda (loading matrix)
+and Psi (error variance and isotropic) which are used to generate Sigma.
+The 'C' stands for constrained and 'U' stands for unconstrained. The order
+goes as loading matrix (Lambda), error variance (Psi) and isotropic (Psi),
+respectively. Example, if the loading matrix (Lambda), error variance (Psi)
+and isotropic are all constrained, then select 'CCC'. Options are "CCC",
+"UUU", or "UCC".}
+
 \item{sigma}{A matrix of size ((dimensionality * number of components) x
 dimensionality), indicating the covariance matrix for each component.
 See example.}
