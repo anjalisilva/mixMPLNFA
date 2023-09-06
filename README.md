@@ -59,8 +59,7 @@ ls("package:mixMPLNFA")
 1.  ***MPLNFAClust*** for carrying out clustering of count data using
     parsimonious mixtures of multivariate Poisson-log normal factor
     analyzers
-2.  ***mplnVisualizeLine*** for visualizing clustering results as line
-    plots
+2.  ***mplnFAVisLine*** for visualizing clustering results as line plots
 3.  ***runMixMPLNFA*** is the shiny implementation of *MPLNFAClust*
     (under construction)
 
