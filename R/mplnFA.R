@@ -122,7 +122,7 @@
 #' # Clustering
 #' MPLNFAEx1 <- mixMPLNFA::MPLNFAClust(
 #'                      dataset = simDataCCC$`dataset=1`$dataset,
-#'                      membership = sampleData$trueMembership,
+#'                      membership = simDataCCC$`dataset=1`$trueMembership,
 #'                      gmin = 2,
 #'                      gmax = 3,
 #'                      pmin = 2,
@@ -306,6 +306,10 @@ MPLNFAClust <- function(dataset,
     for (pmodel in 1:(pmax - pmin + 1)) {
       for (famodel in seq_along(modelNames)) {
 
+        # cat("\n gmodel", gmodel)
+        # cat("\n pmodel", pmodel)
+        # cat("\n famodel", famodel)
+
         if(length(1:(gmax - gmin + 1)) == gmax) {
           clustersize <- gmodel
         } else if(length(1:(gmax - gmin + 1)) < gmax) {
@@ -321,7 +325,7 @@ MPLNFAClust <- function(dataset,
         }
 
         # iterating through model
-        clusterResults[[gmodel]][[pSize]] <- list()
+        clusterResults[[gmodel]][[pmodel]] <- list()
 
         # print statement to user
         cat("\n Running for g =", clustersize, "q =",
@@ -336,14 +340,14 @@ MPLNFAClust <- function(dataset,
                                                normFactors = normFactors)
 
         inserNum <- numberArray[gmodel, pmodel, famodel]
-        BIC[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$BIC
-        cluslabels[[inserNum]] <- clusterResults[[gmodel]][[pSize]][[famodel]]$clusterlabels
-        ICL[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$ICL
-        AIC[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$AIC
-        AIC3[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$AIC3
+        BIC[inserNum] <- clusterResults[[gmodel]][[pmodel]][[famodel]]$BIC
+        cluslabels[[inserNum]] <- clusterResults[[gmodel]][[pmodel]][[famodel]]$clusterlabels
+        ICL[inserNum] <- clusterResults[[gmodel]][[pmodel]][[famodel]]$ICL
+        AIC[inserNum] <- clusterResults[[gmodel]][[pmodel]][[famodel]]$AIC
+        AIC3[inserNum] <- clusterResults[[gmodel]][[pmodel]][[famodel]]$AIC3
         logLikelihood[inserNum] <- unlist(tail(
-          clusterResults[[gmodel]][[pSize]][[famodel]]$loglik, n = 1))
-        nParameters[inserNum] <- clusterResults[[gmodel]][[pSize]][[famodel]]$kTotal
+          clusterResults[[gmodel]][[pmodel]][[famodel]]$loglik, n = 1))
+        nParameters[inserNum] <- clusterResults[[gmodel]][[pmodel]][[famodel]]$kTotal
         nameVector[inserNum] <- paste0("G=", gmodel,",p=", pmodel, ",model=", modelNames[famodel])
       }
     }

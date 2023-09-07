@@ -149,7 +149,7 @@ dim(simDataCCC$`dataset=1`$dataset) # a dataset of size 1000 by 10
 # Clustering
 MPLNFAEx1 <- mixMPLNFA::MPLNFAClust(
                      dataset = simDataCCC$`dataset=1`$dataset,
-                     membership = sampleData$trueMembership,
+                     membership = simDataCCC$`dataset=1`$trueMembership,
                      gmin = 2,
                      gmax = 3,
                      pmin = 2,
