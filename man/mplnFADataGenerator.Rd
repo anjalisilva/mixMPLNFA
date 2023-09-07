@@ -90,35 +90,40 @@ matrices, it is the focus for introduction of parsimony.
 }
 \examples{
 set.seed(100)
+numDatasets <- 10 # total number of datasets to be generated
 pfactors <- 3 # number of true latent factors
 dimensionality <- 10 # dimensionality of observed data
 G <- 2 # number of groups/clusters
+mixingProportions = c(0.32, 0.68)
 nObservations <- 1000 ### sample size or number of observations
-numDatasets <- 100 # total number of datasets
 
-lambda_2 <- lambda_1 <- matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality)
-psi_2 <- psi_1 <- diag(dimensionality) * runif(1)
-sigma_1<-lambda_1\%*\%t(lambda_1)+psi_1
-sigma_2<-lambda_2\%*\%t(lambda_2)+psi_2
+mu <- list(c(6, 3, 3, 6, 3, 6, 3, 3, 6 ,3),
+           c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5))
 
-mu1 <- c(6, 3, 3, 6, 3, 6, 3, 3, 6 ,3)
-mu2 <- c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5)
-mixingProportions <- c(0.32, 0.68)
+Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
 
+Psi <- list(diag(dimensionality) * runif(1),
+            diag(dimensionality) * runif(1))
 
 
-par[[1]]<-NULL # for pi
-mu <- list() # for mu
-Lambda <- list() # for Lambda
-Psi <-list() # for Psi
-par[[5]]<-list() # for Sigma
-names(par)<-c("pi","mu","Lambda","Psi","Sigma")
+testing <- mplnFADataGenerator(nObservations = nObservations,
+                               dimensionality = dimensionality,
+                               mixingProportions = c(0.32, 0.68),
+                               mu = mu,
+                               Lambda = Lambda,
+                               Psi = Psi,
+                               trueClusters = 2,
+                               pfactors = 3,
+                               numDatasets = 10,
+                               modelName = "CCC")
 
+# To generate Sigma values if need
+for (gvalue in 1:length(Lambda)) {
+ sigma_1 <- lambda_1\%*\%t(lambda_1)+psi_1
+ sigma_2 <- lambda_2\%*\%t(lambda_2)+psi_2
+}
 
-mu <-list(mu_1,mu_2)
-Lambda <- list(lambda_1,lambda_2)
-Psi <- list(psi_1,psi_2)
-Sigma <- list(sigma_1,sigma_2)
 
 }
 \references{
@@ -128,7 +133,4 @@ Aitchison, J. and C. H. Ho (1989). The multivariate Poisson-log normal distribut
 Silva, A. et al. (2019). A multivariate Poisson-log normal mixture model
 for clustering transcriptome sequencing data. \emph{BMC Bioinformatics} 20.
 \href{https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2916-0}{Link}
-}
-\author{
-Anjali Silva, \email{anjali@alumni.uoguelph.ca}
 }

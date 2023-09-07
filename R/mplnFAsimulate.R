@@ -62,37 +62,40 @@
 #'
 #' @examples
 #' set.seed(100)
+#' numDatasets <- 10 # total number of datasets to be generated
 #' pfactors <- 3 # number of true latent factors
 #' dimensionality <- 10 # dimensionality of observed data
 #' G <- 2 # number of groups/clusters
+#' mixingProportions = c(0.32, 0.68)
 #' nObservations <- 1000 ### sample size or number of observations
-#' numDatasets <- 100 # total number of datasets
 #'
-#' lambda_2 <- lambda_1 <- matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality)
-#' psi_2 <- psi_1 <- diag(dimensionality) * runif(1)
-#' sigma_1<-lambda_1%*%t(lambda_1)+psi_1
-#' sigma_2<-lambda_2%*%t(lambda_2)+psi_2
+#' mu <- list(c(6, 3, 3, 6, 3, 6, 3, 3, 6 ,3),
+#'            c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5))
 #'
-#' mu1 <- c(6, 3, 3, 6, 3, 6, 3, 3, 6 ,3)
-#' mu2 <- c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5)
-#' mixingProportions <- c(0.32, 0.68)
+#' Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
 #'
+#' Psi <- list(diag(dimensionality) * runif(1),
+#'             diag(dimensionality) * runif(1))
 #'
 #'
-#' par[[1]]<-NULL # for pi
-#' mu <- list() # for mu
-#' Lambda <- list() # for Lambda
-#' Psi <-list() # for Psi
-#' par[[5]]<-list() # for Sigma
-#' names(par)<-c("pi","mu","Lambda","Psi","Sigma")
+#' testing <- mplnFADataGenerator(nObservations = nObservations,
+#'                                dimensionality = dimensionality,
+#'                                mixingProportions = c(0.32, 0.68),
+#'                                mu = mu,
+#'                                Lambda = Lambda,
+#'                                Psi = Psi,
+#'                                trueClusters = 2,
+#'                                pfactors = 3,
+#'                                numDatasets = 10,
+#'                                modelName = "CCC")
 #'
+#' # To generate Sigma values if need
+#' for (gvalue in 1:length(Lambda)) {
+#'  sigma_1 <- lambda_1%*%t(lambda_1)+psi_1
+#'  sigma_2 <- lambda_2%*%t(lambda_2)+psi_2
+#' }
 #'
-#' mu <-list(mu_1,mu_2)
-#' Lambda <- list(lambda_1,lambda_2)
-#' Psi <- list(psi_1,psi_2)
-#' Sigma <- list(sigma_1,sigma_2)
-#'
-#' @author Anjali Silva, \email{anjali@alumni.uoguelph.ca}
 #'
 #' @references
 #' Aitchison, J. and C. H. Ho (1989). The multivariate Poisson-log normal distribution.
@@ -105,13 +108,7 @@
 #' @export
 #' @import stats
 #' @importFrom mvtnorm rmvnorm
-#' @importFrom edgeR calcNormFactors
-#' @importFrom grDevices dev.off
-#' @importFrom grDevices png
-#' @importFrom graphics pairs
 #'
-#'
-
 mplnFADataGenerator <- function(numDatasets = 10,
                                 nObservations = 1000,
                                 dimensionality = 10,
@@ -189,10 +186,12 @@ mplnFADataGenerator <- function(numDatasets = 10,
     stop("Lambda should be a list of length 'trueClusters' with each
           list element having a matrix with rows equal to value provided to
           'dimensionality' argument and columns equal to value provided to
-          'pfactors' argument.")  }
+          'pfactors' argument.")
+    }
 
   if (length(Lambda) != trueClusters) {
-    stop("Lambda should be a list of length 'trueClusters'.")  }
+    stop("Lambda should be a list of length 'trueClusters'.")
+  }
 
   if (ncol(Psi[[1]]) != dimensionality) {
     stop("Psi should be a list of length 'trueClusters' with each
@@ -205,12 +204,12 @@ mplnFADataGenerator <- function(numDatasets = 10,
     stop("Psi should be a list of length 'trueClusters' with each
           list element having a matrix with rows equal to value provided to
           'dimensionality' argument and columns equal to value provided to
-          'dimensionality' argument.")  }
+          'dimensionality' argument.")
+  }
 
   if (length(Psi) != trueClusters) {
-    stop("Psi should be a list of length 'trueClusters'.")  }
-
-
+    stop("Psi should be a list of length 'trueClusters'.")
+  }
 
   # Stores information about all runs
   dat <- list()
@@ -219,15 +218,17 @@ mplnFADataGenerator <- function(numDatasets = 10,
 
     if(modelName == "CCC") {
       Ymatrix <- Xmatrix <- matrix(0, ncol = dimensionality, nrow = nObservations)
-      Umatrix <- rmvnorm(nObservations, mean = rep(0, pfactors), sigma = diag(pfactors))
-      zmatrix <- t(rmultinom(n = nObservations, size = 1, prob = mixingProportions))
+      Umatrix <- mvtnorm::rmvnorm(nObservations, mean = rep(0, pfactors),
+                                  sigma = diag(pfactors))
+      zmatrix <- t(stats::rmultinom(n = nObservations, size = 1,
+                                    prob = mixingProportions))
 
       for (i in 1:nObservations) {
         grp <- which(zmatrix[i, ] == 1)
-        Xmatrix[i,] <- rmvnorm(1, mean = mu[[grp]] + Lambda[[grp]] %*% Umatrix[i,],
+        Xmatrix[i,] <- mvtnorm::rmvnorm(1, mean = mu[[grp]] + Lambda[[grp]] %*% Umatrix[i,],
                             sigma = Psi[[grp]])
         for (j in 1:dimensionality) {
-          Ymatrix[i, j] <- rpois(1, exp(Xmatrix[i, j]))
+          Ymatrix[i, j] <- stats::rpois(1, exp(Xmatrix[i, j]))
         }
       }
 
@@ -241,8 +242,6 @@ mplnFADataGenerator <- function(numDatasets = 10,
 
     }
 
-    # sigma_1 <- lambda_1%*%t(lambda_1)+psi_1
-    # sigma_2 <- lambda_2%*%t(lambda_2)+psi_2
 
     dat[[run]] <- list()
     dat[[run]][[1]] <- list(mu = mu,
