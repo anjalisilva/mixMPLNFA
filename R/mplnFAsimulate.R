@@ -65,14 +65,16 @@
 #' # Example 1: Generate 10 datasets from CCC model
 #' # Here, Lambda (loading matrix) and Psi (error variance and
 #' # isotropic) are all constrained and hence CCC
+#'
 #' set.seed(100)
 #' numDatasets <- 10 # total number of datasets to be generated
 #' pfactors <- 3 # number of true latent factors
 #' dimensionality <- 10 # dimensionality of observed data
 #' G <- 2 # number of groups/clusters
-#' mixingProportions <- c(0.32, 0.68)
-#' nObservations <- 1000 ### sample size or number of observations
+#' mixingProportions <- c(0.32, 0.68) # mixing proportions for 2 clusters
+#' nObservations <- 1000 # sample size or number of observations
 #'
+#' # set parameter values
 #' mu <- list(c(6, 3, 3, 6, 3, 6, 3, 3, 6 ,3),
 #'            c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5))
 #'
@@ -82,6 +84,7 @@
 #' Psi <- list(diag(dimensionality) * runif(1),
 #'             diag(dimensionality) * runif(1))
 #'
+#' # generate datasets
 #' simDataCCC <- mplnFADataGenerator(numDatasets = numDatasets,
 #'                                   nObservations = nObservations,
 #'                                   dimensionality = dimensionality,
@@ -93,13 +96,13 @@
 #'                                   Lambda = Lambda,
 #'                                   Psi = Psi)
 #'
-#' # Access dataset 1
+#' # access dataset 1
 #' simDataCCC$`dataset=1`$dataset
 #'
-#' # Access input used to generate dataset 1
+#' # access input used to generate dataset 1
 #' simDataCCC$`dataset=1`$input
 #'
-#' # To generate Sigma values if need for dataset 1
+#' # to generate Sigma values if need for dataset 1
 #' Sigma <- list()
 #' for (gvalue in 1:simDataCCC$`dataset=1`$input$trueClusters) {
 #'  Lambda <- simDataCCC$`dataset=1`$input$Lambda[[gvalue]]
@@ -110,8 +113,56 @@
 #' Sigma[[1]] # Sigma for C1
 #' Sigma[[2]] # Sigma for C2
 #'
-#' # Access dataset 2
+#' # access dataset 2
 #' simDataCCC$`dataset=2`$dataset
+#'
+#'
+#' # Example 2
+#' # Here, Lambda (loading matrix) is unconstrained and Psi
+#' (error variance and isotropic) are all constrained and
+#' hence UCC model is used
+#'
+#' set.seed(100)
+#' numDatasets <- 10 # total number of datasets to be generated
+#' pfactors <- 2 # number of true latent factors
+#' dimensionality <- 8 # dimensionality of observed data
+#' G <- 4 # number of groups/clusters
+#' mixingProportions <- c(0.11, 0.43, 0.24, 0.22) # mixing proportions for 4 clusters
+#' nObservations <- 1000 # sample size or number of observations
+#'
+#' # set parameter values
+#' mu <- list(c(6, 3, 3, 6, 3, 6, 3, 3),
+#'            c(5, 3, 5, 3, 5, 3, 3, 5),
+#'            c(4, 2, 6, 4, 2, 6, 4, 4),
+#'            c(1, 3, 5, 1, 3, 5, 3, 5))
+#'
+#' Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+#'
+#' Psi <- list(diag(dimensionality) * runif(1),
+#'             diag(dimensionality) * runif(1),
+#'             diag(dimensionality) * runif(1),
+#'             diag(dimensionality) * runif(1))
+#'
+#' # generate datasets
+#' simDataUCC <- mplnFADataGenerator(numDatasets = numDatasets,
+#'                                   nObservations = nObservations,
+#'                                   dimensionality = dimensionality,
+#'                                   mixingProportions = mixingProportions,
+#'                                   trueClusters = trueClusters,
+#'                                   pfactors = pfactors,
+#'                                   modelName = "UCC",
+#'                                   mu = mu,
+#'                                   Lambda = Lambda,
+#'                                   Psi = Psi)
+#'
+#' # access dataset 1
+#' simDataCCC$`dataset=1`$dataset
+#'
+#' # access input used to generate dataset 1
+#' simDataCCC$`dataset=1`$input
 #'
 #'
 #' @references
@@ -236,17 +287,19 @@ mplnFADataGenerator <- function(numDatasets = 10,
 
     if(modelName == "CCC") {
       Ymatrix <- Xmatrix <- matrix(0, ncol = dimensionality, nrow = nObservations)
-      Umatrix <- mvtnorm::rmvnorm(nObservations, mean = rep(0, pfactors),
+      Umatrix <- mvtnorm::rmvnorm(n = nObservations,
+                                  mean = rep(0, pfactors),
                                   sigma = diag(pfactors))
       zmatrix <- t(stats::rmultinom(n = nObservations, size = 1,
                                     prob = mixingProportions))
 
       for (i in 1:nObservations) {
         grp <- which(zmatrix[i, ] == 1)
-        Xmatrix[i,] <- mvtnorm::rmvnorm(1, mean = mu[[grp]] + Lambda[[grp]] %*% Umatrix[i,],
-                            sigma = Psi[[grp]])
+        Xmatrix[i,] <- mvtnorm::rmvnorm(n = 1,
+                                        mean = mu[[grp]] + Lambda[[grp]] %*% Umatrix[i, ],
+                                        sigma = Psi[[grp]])
         for (j in 1:dimensionality) {
-          Ymatrix[i, j] <- stats::rpois(1, exp(Xmatrix[i, j]))
+          Ymatrix[i, j] <- stats::rpois(n = 1, lambda = exp(Xmatrix[i, j]))
         }
       }
 
@@ -254,6 +307,22 @@ mplnFADataGenerator <- function(numDatasets = 10,
 
     if(modelName == "UCC") {
 
+      Ymatrix <- Xmatrix <- matrix(0, ncol = dimensionality, nrow = nObservations)
+      Umatrix <- mvtnorm::rmvnorm(n = nObservations,
+                                  mean = rep(0, pfactors),
+                                  sigma = diag(pfactors))
+      zmatrix <- t(stats::rmultinom(n = nObservations, size = 1,
+                                    prob = mixingProportions))
+
+      for (i in 1:nObservations) {
+        grp <- which(zmatrix[i, ] == 1)
+        Xmatrix[i, ] <- mvtnorm::rmvnorm(n = 1,
+                                         mean = mu[[grp]] + Lambda[[grp]] %*% Umatrix[i, ],
+                                         sigma = Psi[[grp]])
+        for (j in 1:d) {
+          Ymatrix[i, j] <- stats::rpois(n = 1, lambda = exp(Xmatrix[i, j]))
+        }
+      }
     }
 
     if(modelName == "UUU") {
