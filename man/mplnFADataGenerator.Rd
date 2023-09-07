@@ -63,21 +63,19 @@ and isotropic are all constrained, then select 'CCC'. Options are one of "CCC",
 "UUU", or "UCC".}
 }
 \value{
-Returns an S3 object of class mplnDataGenerator with results.
+Returns an S3 object of class mplnFADataGenerator with results that
+equal the length of numDatasets argument. For each dataset generated, the
+following values are provided.
 \itemize{
-\item dataset - Simulated dataset.
-\item trueMembership -A numeric vector indicating the membership of
-each observation.
-\item probaPost - A matrix indicating the posterior probability that
-each observation belong to the component/cluster.
-\item truenormfactors - A numeric vector indicating the true
-normalization factors used for adjusting the library sizes.
-\item observations - Number of observations in the simulated dataset.
-\item dimensionality - Dimensionality of the simulated dataset.
-\item mixingProportions - A numeric vector indicating the mixing
-proportion of each component.
-\item mu - True mean used for the simulated dataset.
-\item sigma - True covariances used for the simulated dataset.
+\item input - User provided parameters and values used to generate the dataset.
+\item dataset - Simulated dataset of counts that has dimensions nObservations x
+dimensionality.
+\item Xmatrix - The matrix of X values that has dimensions nObservations x
+dimensionality.
+\item zmatrix - The matrix of membership indicator variables indicating which
+cluster/component each observation belongs to.
+\item Umatrix - The matrix containing latent factors for each observation. This
+has dimensions nObservations x pfactors.
 }
 }
 \description{
