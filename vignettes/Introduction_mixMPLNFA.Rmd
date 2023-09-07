@@ -72,34 +72,57 @@ Currently, no function is available to simulate data from the model of [**mixMPL
 
 ``` r
 set.seed(1234) # for reproducibility, setting seed
-# Example 1
-trueMu1 <- c(6.5, 6, 6, 6, 6, 6, 6, 6, 6)
-trueMu2 <- c(2, 2.5, 2, 2, 2, 2, 2, 2, 2)
-trueMu3 <- c(1, 1, 1, 1, 1, 1, 1, 1, 1)
+# Here, Lambda (loading matrix) is unconstrained and Psi
+(error variance and isotropic) are all unconstrained and
+hence UUU model is used
 
-trueSigma1 <- diag(length(trueMu1)) * 2
-trueSigma2 <- diag(length(trueMu1)) * 0.05
-trueSigma3 <- diag(length(trueMu1)) * 0.01
+numDatasets <- 10 # total number of datasets to be generated
+pfactors <- 4 # number of true latent factors
+dimensionality <- 10 # dimensionality of observed data
+trueClusters <- 3 # number of groups/clusters
+mixingProportions <- c(0.23, 0.44, 0.33) # mixing proportions for 4 clusters
+nObservations <- 1000 # sample size or number of observations
 
-# Generating simulated data with 3 clusters
-sampleData <- MPLNClust::mplnDataGenerator(nObservations = 2000,
-                      dimensionality = length(trueMu1),
-                      mixingProportions = c(0.2, 0.3, 0.5),
-                      mu = rbind(trueMu1, trueMu2, trueMu3),
-                      sigma = rbind(trueSigma1, trueSigma2, trueSigma3),
-                      produceImage = "No")
+# set parameter values
+mu <- list(c(4, 6, 4, 2, 2, 4, 6, 4, 6, 2),
+           c(5, 5, 3, 3, 7, 5, 3, 3, 7, 7),
+           c(2, 4, 4, 7, 2, 4, 7, 2, 7, 4))
+
+Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), 
+               nrow = dimensionality),
+               matrix(runif(pfactors * dimensionality, -1, 1), 
+               nrow = dimensionality),
+               matrix(runif(pfactors * dimensionality, -1, 1), 
+               nrow = dimensionality))
+
+Psi <- list(diag(dimensionality) * runif(dimensionality),
+            diag(dimensionality) * runif(dimensionality),
+            diag(dimensionality) * runif(dimensionality))
+
+# generate datasets
+simDataUUU <- mixMPLNFA::mplnFADataGenerator(numDatasets = numDatasets,
+                                  nObservations = nObservations,
+                                  dimensionality = dimensionality,
+                                  mixingProportions = mixingProportions,
+                                  trueClusters = trueClusters,
+                                  pfactors = pfactors,
+                                  modelName = "UUU",
+                                  mu = mu,
+                                  Lambda = Lambda,
+                                  Psi = Psi)
+
 ```
 <br>
 
 The generated dataset can be checked:
 
 ``` r
-nrow(sampleData$dataset) # 2000 observations
-ncol(sampleData$dataset) # 9 dimensions
-class(sampleData$dataset) # matrix 
-typeof(sampleData$dataset) # integer
-summary(sampleData$dataset) # summary of data
-dim(sampleData$dataset) # 2000 x 9
+nrow(simDataUUU$`dataset=1`$dataset) # 2000 observations
+ncol(simDataUUU$`dataset=1`$dataset) # 9 dimensions
+class(simDataUUU$`dataset=1`$dataset) # matrix 
+typeof(simDataUUU$`dataset=1`$dataset) # integer
+summary(simDataUUU$`dataset=1`$dataset) # summary of data
+dim(simDataUUU$`dataset=1`$dataset) # 2000 x 9
 ```
 
 <br>
@@ -110,22 +133,30 @@ dim(sampleData$dataset) # 2000 x 9
 <div style="text-align:left">
 Once the count data is available, clustering can be performed using the *mixMPLNFA::MPLNFAClust* function. See *?mixMPLNFA::MPLNFAClust* for more information, including examples and references. Here, clustering will be performed using the above generated dataset. 
 
-Below, clustering of *sampleData$dataset* is performed for g = 1:3 with latent factors from p = 1:3 with model tested including CCU and UUU. 
+Below, clustering of *simDataUUU$`dataset=1`$dataset* is performed for g = 1:3 with latent factors from p = 1:3 with model tested including CCU and UUU. 
 
 ``` r
-set.seed(1234) # for reproducibility, setting seed
-MPLNFAResults <- mixMPLNFA::MPLNFAClust(
-                      dataset = sampleData$dataset,
-                      membership = sampleData$trueMembership,
-                      gmin = 1,
-                      gmax = 4,
-                      pmin = 1,
-                      pmax = 1,
-                      modelNames = c("CCU", "UUU"),
-                      normalize = "Yes")
-                      
+# Clustering
+MPLNFAEx <- mixMPLNFA::MPLNFAClust(
+                     dataset = simDataUUU$`dataset=1`$dataset,
+                     membership = simDataUUU$`dataset=1`$trueMembership,
+                     gmin = 1,
+                     gmax = 2,
+                     pmin = 1,
+                     pmax = 3,
+                     modelNames = c("UUU", "UUC", "UCU", "UCC",
+                     "CUU", "CUC", "CCU", "CCC"),
+                     normalize = "No")
+
+names(MPLNFAEx) # see all names of outputs
+
+# To see BIC results
+MPLNFAEx$BICresults
+MPLNFAEx$BICresults$BICmodelselected
+
+
 # To see output saved                      
-names(MPLNFAResults) 
+names(MPLNFAEx) 
 # [1] "dataset"              "dimensionality"       "normalizationFactors"
 # [4] "gmin"                 "gmax"                 "pmin"                
 # [7] "pmax"                 "modelNames"           "initalizationMethod" 
@@ -134,7 +165,7 @@ names(MPLNFAResults)
 # [16] "AICresults"           "AIC3results"          "totalTime"       
 
 # To see total time
-MPLNFAResults$totalTime
+MPLNFAEx$totalTime
 #    user  system elapsed 
 # 306.731   4.535 312.929 
                       
@@ -143,12 +174,13 @@ MPLNFAResults$totalTime
 The model selected by BIC for this dataset can be further analyzed.
 
 ``` r
-MPLNFAResults$BICresults$BICmodelselected
+MPLNFAEx$BICresults$BICmodelselected
 # G=3,p=1,model=UUU selected
 # A model with 3 components/clusters is selected
 
 # Cross tabulation of BIC selected model labels with true lables
-table(MPLNFAResults$BICresults$BICmodelSelectedLabels, sampleData$trueMembership)
+table(MPLNFAEx$BICresults$BICmodelSelectedLabels, 
+      sampleData$trueMembership)
 #     1    2    3
 #1    0    0 1000
 #2    0  594    0
@@ -163,8 +195,8 @@ Clustering results can be viewed as a barplot of probabilities. For this, select
 #  Visualizing probabilities for 2 components 
 par(mfrow = c(1, 3))                    
 MPLNLineColor <- mixMPLNFA::mplnFAVisLine(
-                    dataset = sampleData$dataset,
-                    clusterMembershipVector = MPLNFAResults$BICresults$BICmodelSelectedLabels,
+                    dataset = simDataUUU$`dataset=1`$dataset,
+                    clusterMembershipVector = MPLNFAEx$BICresults$BICmodelSelectedLabels,
                     fileName = 'multiColorPlot',
                     LinePlotColours = "multicolour",
                     printPlot = FALSE)
