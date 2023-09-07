@@ -96,6 +96,12 @@
 #'                                   Lambda = Lambda,
 #'                                   Psi = Psi)
 #'
+#' # length of results
+#' length(simDataCCC)
+#'
+#' # names of results
+#' names(simDataCCC)
+#'
 #' # access dataset 1
 #' simDataCCC$`dataset=1`$dataset
 #'
@@ -164,6 +170,50 @@
 #' # access input used to generate dataset 1
 #' simDataUCC$`dataset=1`$input
 #'
+#'
+#' # Example 3
+#' # Here, Lambda (loading matrix) is unconstrained and Psi
+#' (error variance and isotropic) are all unconstrained and
+#' hence UUU model is used
+#'
+#' set.seed(100)
+#' numDatasets <- 10 # total number of datasets to be generated
+#' pfactors <- 4 # number of true latent factors
+#' dimensionality <- 10 # dimensionality of observed data
+#' trueClusters <- 3 # number of groups/clusters
+#' mixingProportions <- c(0.23, 0.44, 0.33) # mixing proportions for 4 clusters
+#' nObservations <- 1000 # sample size or number of observations
+#'
+#' # set parameter values
+#' mu <- list(c(4, 6, 4, 2, 2, 4, 6, 4, 6, 2),
+#'            c(5, 5, 3, 3, 7, 5, 3, 3, 7, 7),
+#'            c(2, 4, 4, 7, 2, 4, 7, 2, 7, 4))
+#'
+#' Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+#'
+#' Psi <- list(diag(dimensionality) * runif(dimensionality),
+#'             diag(dimensionality) * runif(dimensionality),
+#'             diag(dimensionality) * runif(dimensionality))
+#'
+#' # generate datasets
+#' simDataUUU <- mplnFADataGenerator(numDatasets = numDatasets,
+#'                                   nObservations = nObservations,
+#'                                   dimensionality = dimensionality,
+#'                                   mixingProportions = mixingProportions,
+#'                                   trueClusters = trueClusters,
+#'                                   pfactors = pfactors,
+#'                                   modelName = "UUU",
+#'                                   mu = mu,
+#'                                   Lambda = Lambda,
+#'                                   Psi = Psi)
+#'
+#' # access dataset 1
+#' simDataUUU$`dataset=1`$dataset
+#'
+#' # access input used to generate dataset 1
+#' simDataUUU$`dataset=1`$input
 #'
 #' @references
 #' Aitchison, J. and C. H. Ho (1989). The multivariate Poisson-log normal distribution.
@@ -285,48 +335,21 @@ mplnFADataGenerator <- function(numDatasets = 10,
   for (run in 1:numDatasets) {
     set.seed(run) # ensure seed alters for each dataset
 
-    if(modelName == "CCC") {
-      Ymatrix <- Xmatrix <- matrix(0, ncol = dimensionality, nrow = nObservations)
-      Umatrix <- mvtnorm::rmvnorm(n = nObservations,
-                                  mean = rep(0, pfactors),
-                                  sigma = diag(pfactors))
-      zmatrix <- t(stats::rmultinom(n = nObservations, size = 1,
-                                    prob = mixingProportions))
+    Ymatrix <- Xmatrix <- matrix(0, ncol = dimensionality, nrow = nObservations)
+    Umatrix <- mvtnorm::rmvnorm(n = nObservations,
+                                mean = rep(0, pfactors),
+                                sigma = diag(pfactors))
+    zmatrix <- t(stats::rmultinom(n = nObservations, size = 1,
+                                  prob = mixingProportions))
 
-      for (i in 1:nObservations) {
-        grp <- which(zmatrix[i, ] == 1)
-        Xmatrix[i,] <- mvtnorm::rmvnorm(n = 1,
-                                        mean = mu[[grp]] + Lambda[[grp]] %*% Umatrix[i, ],
-                                        sigma = Psi[[grp]])
-        for (j in 1:dimensionality) {
-          Ymatrix[i, j] <- stats::rpois(n = 1, lambda = exp(Xmatrix[i, j]))
-        }
+    for (i in 1:nObservations) {
+      grp <- which(zmatrix[i, ] == 1)
+      Xmatrix[i,] <- mvtnorm::rmvnorm(n = 1,
+                                      mean = mu[[grp]] + Lambda[[grp]] %*% Umatrix[i, ],
+                                      sigma = Psi[[grp]])
+      for (j in 1:dimensionality) {
+        Ymatrix[i, j] <- stats::rpois(n = 1, lambda = exp(Xmatrix[i, j]))
       }
-
-    }
-
-    if(modelName == "UCC") {
-
-      Ymatrix <- Xmatrix <- matrix(0, ncol = dimensionality, nrow = nObservations)
-      Umatrix <- mvtnorm::rmvnorm(n = nObservations,
-                                  mean = rep(0, pfactors),
-                                  sigma = diag(pfactors))
-      zmatrix <- t(stats::rmultinom(n = nObservations, size = 1,
-                                    prob = mixingProportions))
-
-      for (i in 1:nObservations) {
-        grp <- which(zmatrix[i, ] == 1)
-        Xmatrix[i, ] <- mvtnorm::rmvnorm(n = 1,
-                                         mean = mu[[grp]] + Lambda[[grp]] %*% Umatrix[i, ],
-                                         sigma = Psi[[grp]])
-        for (j in 1:d) {
-          Ymatrix[i, j] <- stats::rpois(n = 1, lambda = exp(Xmatrix[i, j]))
-        }
-      }
-    }
-
-    if(modelName == "UUU") {
-
     }
 
 
