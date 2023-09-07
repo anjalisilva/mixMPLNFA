@@ -35,8 +35,21 @@ of total components or clusters. Default value is 2.}
 \item{pfactors}{A positive integer indicating the number
 of total latent factors. Default value is 3.}
 
-\item{mu}{A matrix of size (dimensionality x number of components), indicating
-the mean for each component. See example.}
+\item{mu}{A list of length equal to the value provided to 'trueClusters' argument
+and each element should have length equal to the value provided to
+'dimensionality' argument. See example or default value.}
+
+\item{Lambda}{A list of length 'trueClusters' with each list element having
+a matrix with rows equal to value provided to 'dimensionality' argument
+and columns equal to value provided to 'pfactors' argument. The values
+should be provided as per the model used in modelNames argument. See example
+or default values.}
+
+\item{Psi}{Psi should be a list of length 'trueClusters' with each list
+element having a matrix with rows equal to value provided to
+'dimensionality' argument and columns equal to value provided to
+'dimensionality' argument. The values should be provided as per the
+model used in modelNames argument. See example or default values.}
 
 \item{modelNames}{A character string indicating the model name to generate
 covariance matrix, Sigma. Since the largest contribution of free parameters
@@ -46,20 +59,8 @@ and Psi (error variance and isotropic) which are used to generate Sigma.
 The 'C' stands for constrained and 'U' stands for unconstrained. The order
 goes as loading matrix (Lambda), error variance (Psi) and isotropic (Psi),
 respectively. Example, if the loading matrix (Lambda), error variance (Psi)
-and isotropic are all constrained, then select 'CCC'. Options are "CCC",
+and isotropic are all constrained, then select 'CCC'. Options are one of "CCC",
 "UUU", or "UCC".}
-
-\item{sigma}{A matrix of size ((dimensionality * number of components) x
-dimensionality), indicating the covariance matrix for each component.
-See example.}
-
-\item{produceImage}{A character string indicating whether or not to
-produce an image. Options "Yes" or "No". Image will be produced as
-'Pairs plot of log-transformed data.png" in the current working
-directory.}
-
-\item{ImageName}{A character string indicating name for image, if
-produceImage is set to "Yes". Default is "TwoComponents".}
 }
 \value{
 Returns an S3 object of class mplnDataGenerator with results.
@@ -89,12 +90,16 @@ largest contribution of free parameters is through the covariance
 matrices, it is the focus for introduction of parsimony.
 }
 \examples{
+
+# Example 1: Generate 10 datasets from CCC model
+# Here, Lambda (loading matrix) and Psi (error variance and
+# isotropic) are all constrained and hence CCC
 set.seed(100)
 numDatasets <- 10 # total number of datasets to be generated
 pfactors <- 3 # number of true latent factors
 dimensionality <- 10 # dimensionality of observed data
 G <- 2 # number of groups/clusters
-mixingProportions = c(0.32, 0.68)
+mixingProportions <- c(0.32, 0.68)
 nObservations <- 1000 ### sample size or number of observations
 
 mu <- list(c(6, 3, 3, 6, 3, 6, 3, 3, 6 ,3),
@@ -106,23 +111,36 @@ Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensiona
 Psi <- list(diag(dimensionality) * runif(1),
             diag(dimensionality) * runif(1))
 
+simDataCCC <- mplnFADataGenerator(numDatasets = numDatasets,
+                                  nObservations = nObservations,
+                                  dimensionality = dimensionality,
+                                  mixingProportions = mixingProportions,
+                                  trueClusters = trueClusters,
+                                  pfactors = pfactors,
+                                  modelName = "CCC",
+                                  mu = mu,
+                                  Lambda = Lambda,
+                                  Psi = Psi)
 
-testing <- mplnFADataGenerator(nObservations = nObservations,
-                               dimensionality = dimensionality,
-                               mixingProportions = c(0.32, 0.68),
-                               mu = mu,
-                               Lambda = Lambda,
-                               Psi = Psi,
-                               trueClusters = 2,
-                               pfactors = 3,
-                               numDatasets = 10,
-                               modelName = "CCC")
+# Access dataset 1
+simDataCCC$`dataset=1`$dataset
 
-# To generate Sigma values if need
-for (gvalue in 1:length(Lambda)) {
- sigma_1 <- lambda_1\%*\%t(lambda_1)+psi_1
- sigma_2 <- lambda_2\%*\%t(lambda_2)+psi_2
+# Access input used to generate dataset 1
+simDataCCC$`dataset=1`$input
+
+# To generate Sigma values if need for dataset 1
+Sigma <- list()
+for (gvalue in 1:simDataCCC$`dataset=1`$input$trueClusters) {
+ Lambda <- simDataCCC$`dataset=1`$input$Lambda[[gvalue]]
+ Psi <- simDataCCC$`dataset=1`$input$Psi[[gvalue]]
+ Sigma[[gvalue]] <- Lambda \%*\% t(Lambda) + Psi
 }
+
+Sigma[[1]] # Sigma for C1
+Sigma[[2]] # Sigma for C2
+
+# Access dataset 2
+simDataCCC$`dataset=2`$dataset
 
 
 }
