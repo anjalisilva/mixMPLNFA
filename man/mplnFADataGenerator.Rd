@@ -74,6 +74,8 @@ dimensionality.
 dimensionality.
 \item zmatrix - The matrix of membership indicator variables indicating which
 cluster/component each observation belongs to.
+\item trueMembership - A vector of length nObservations giving the true
+membership of all observations.
 \item Umatrix - The matrix containing latent factors for each observation. This
 has dimensions nObservations x pfactors.
 }
@@ -112,7 +114,7 @@ Psi <- list(diag(dimensionality) * runif(1),
             diag(dimensionality) * runif(1))
 
 # generate datasets
-simDataCCC <- mplnFADataGenerator(numDatasets = numDatasets,
+simDataCCC <- mixMPLNFA::mplnFADataGenerator(numDatasets = numDatasets,
                                   nObservations = nObservations,
                                   dimensionality = dimensionality,
                                   mixingProportions = mixingProportions,
@@ -180,7 +182,7 @@ Psi <- list(diag(dimensionality) * runif(1),
             diag(dimensionality) * runif(1))
 
 # generate datasets
-simDataUCC <- mplnFADataGenerator(numDatasets = numDatasets,
+simDataUCC <- mixMPLNFA::mplnFADataGenerator(numDatasets = numDatasets,
                                   nObservations = nObservations,
                                   dimensionality = dimensionality,
                                   mixingProportions = mixingProportions,
@@ -225,7 +227,7 @@ Psi <- list(diag(dimensionality) * runif(dimensionality),
             diag(dimensionality) * runif(dimensionality))
 
 # generate datasets
-simDataUUU <- mplnFADataGenerator(numDatasets = numDatasets,
+simDataUUU <- mixMPLNFA::mplnFADataGenerator(numDatasets = numDatasets,
                                   nObservations = nObservations,
                                   dimensionality = dimensionality,
                                   mixingProportions = mixingProportions,

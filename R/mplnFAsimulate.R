@@ -56,6 +56,8 @@
 #'      dimensionality.
 #'   \item zmatrix - The matrix of membership indicator variables indicating which
 #'      cluster/component each observation belongs to.
+#'   \item trueMembership - A vector of length nObservations giving the true
+#'      membership of all observations.
 #'   \item Umatrix - The matrix containing latent factors for each observation. This
 #'      has dimensions nObservations x pfactors.
 #'}
@@ -85,7 +87,7 @@
 #'             diag(dimensionality) * runif(1))
 #'
 #' # generate datasets
-#' simDataCCC <- mplnFADataGenerator(numDatasets = numDatasets,
+#' simDataCCC <- mixMPLNFA::mplnFADataGenerator(numDatasets = numDatasets,
 #'                                   nObservations = nObservations,
 #'                                   dimensionality = dimensionality,
 #'                                   mixingProportions = mixingProportions,
@@ -153,7 +155,7 @@
 #'             diag(dimensionality) * runif(1))
 #'
 #' # generate datasets
-#' simDataUCC <- mplnFADataGenerator(numDatasets = numDatasets,
+#' simDataUCC <- mixMPLNFA::mplnFADataGenerator(numDatasets = numDatasets,
 #'                                   nObservations = nObservations,
 #'                                   dimensionality = dimensionality,
 #'                                   mixingProportions = mixingProportions,
@@ -198,7 +200,7 @@
 #'             diag(dimensionality) * runif(dimensionality))
 #'
 #' # generate datasets
-#' simDataUUU <- mplnFADataGenerator(numDatasets = numDatasets,
+#' simDataUUU <- mixMPLNFA::mplnFADataGenerator(numDatasets = numDatasets,
 #'                                   nObservations = nObservations,
 #'                                   dimensionality = dimensionality,
 #'                                   mixingProportions = mixingProportions,
@@ -365,8 +367,9 @@ mplnFADataGenerator <- function(numDatasets = 10,
     dat[[run]][[2]] <- Ymatrix
     dat[[run]][[3]] <- Xmatrix
     dat[[run]][[4]] <- zmatrix
-    dat[[run]][[5]] <- Umatrix
-    names(dat[[run]]) <- c("input", "dataset", "Xmatrix", "zmatrix", "Umatrix")
+    dat[[run]][[5]] <- mclust::map(zmatrix)
+    dat[[run]][[6]] <- Umatrix
+    names(dat[[run]]) <- c("input", "dataset", "Xmatrix", "zmatrix", "trueMembership", "Umatrix")
   }
   names(dat) <- paste0(rep("dataset=", length(seq(1, numDatasets, 1))), seq(1, numDatasets, 1))
 
