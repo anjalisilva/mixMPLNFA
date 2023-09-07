@@ -76,7 +76,7 @@ set.seed(1234) # for reproducibility, setting seed
 (error variance and isotropic) are all unconstrained and
 hence UUU model is used
 
-numDatasets <- 10 # total number of datasets to be generated
+numDatasets <- 1 # total number of datasets to be generated
 pfactors <- 4 # number of true latent factors
 dimensionality <- 10 # dimensionality of observed data
 trueClusters <- 3 # number of groups/clusters
@@ -99,7 +99,7 @@ Psi <- list(diag(dimensionality) * runif(dimensionality),
             diag(dimensionality) * runif(dimensionality),
             diag(dimensionality) * runif(dimensionality))
 
-# generate datasets
+# generate a UUU dataset
 simDataUUU <- mixMPLNFA::mplnFADataGenerator(numDatasets = numDatasets,
                                   nObservations = nObservations,
                                   dimensionality = dimensionality,
@@ -117,12 +117,11 @@ simDataUUU <- mixMPLNFA::mplnFADataGenerator(numDatasets = numDatasets,
 The generated dataset can be checked:
 
 ``` r
-nrow(simDataUUU$`dataset=1`$dataset) # 2000 observations
-ncol(simDataUUU$`dataset=1`$dataset) # 9 dimensions
+nrow(simDataUUU$`dataset=1`$dataset) # 1000 observations
+ncol(simDataUUU$`dataset=1`$dataset) # 10 dimensions
 class(simDataUUU$`dataset=1`$dataset) # matrix 
-typeof(simDataUUU$`dataset=1`$dataset) # integer
 summary(simDataUUU$`dataset=1`$dataset) # summary of data
-dim(simDataUUU$`dataset=1`$dataset) # 2000 x 9
+dim(simDataUUU$`dataset=1`$dataset) # 1000 x 10
 ```
 
 <br>
@@ -152,7 +151,7 @@ names(MPLNFAEx) # see all names of outputs
 
 # To see BIC results
 MPLNFAEx$BICresults
-MPLNFAEx$BICresults$BICmodelselected
+MPLNFAEx$BICresults$BICmodelselected # "G=3, p=4, UUU"
 
 
 # To see output saved                      
@@ -180,7 +179,7 @@ MPLNFAEx$BICresults$BICmodelselected
 
 # Cross tabulation of BIC selected model labels with true lables
 table(MPLNFAEx$BICresults$BICmodelSelectedLabels, 
-      sampleData$trueMembership)
+      simDataUUU$`dataset=1`$trueMembership)
 #     1    2    3
 #1    0    0 1000
 #2    0  594    0
