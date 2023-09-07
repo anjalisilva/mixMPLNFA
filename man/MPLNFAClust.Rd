@@ -109,8 +109,71 @@ Starting values (argument: initMethod) play an
 important role in the successful operation of this algorithm.
 }
 \examples{
-# Example 1: Cluster a datset
+# Example 1: Cluster a UCC datset
+# Here, Lambda (loading matrix) is unconstrained and Psi
+# (error variance and isotropic) are all constrained and
+# hence UCC model is used
 
+set.seed(100)
+pfactors <- 2 # number of true latent factors
+dimensionality <- 8 # dimensionality of observed data
+trueClusters <- 4 # number of groups/clusters
+mixingProportions <- c(0.11, 0.43, 0.24, 0.22) # mixing proportions for 4 clusters
+nObservations <- 1000 # sample size or number of observations
+
+# set parameter values
+mu <- list(c(6, 3, 3, 6, 3, 6, 3, 3),
+           c(5, 3, 5, 3, 5, 3, 3, 5),
+           c(4, 2, 6, 4, 2, 6, 4, 4),
+           c(1, 3, 5, 1, 3, 5, 3, 5))
+
+Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+
+Psi <- list(diag(dimensionality) * runif(1),
+            diag(dimensionality) * runif(1),
+            diag(dimensionality) * runif(1),
+            diag(dimensionality) * runif(1))
+
+# generate datasets
+simDataUCC <- mixMPLNFA::mplnFADataGenerator(numDatasets = 1,
+                                             nObservations = nObservations,
+                                             dimensionality = dimensionality,
+                                             mixingProportions = mixingProportions,
+                                             trueClusters = trueClusters,
+                                             pfactors = pfactors,
+                                             modelName = "UCC",
+                                             mu = mu,
+                                             Lambda = Lambda,
+                                             Psi = Psi)
+
+# Clustering
+MPLNFAEx1 <- mixMPLNFA::MPLNFAClust(
+  dataset = simDataUCC$`dataset=1`$dataset,
+  membership = simDataUCC$`dataset=1`$trueMembership,
+  gmin = 1,
+  gmax = 4,
+  pmin = 1,
+  pmax = 3,
+  modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
+  normalize = "Yes")
+
+# To see BIC results
+MPLNFAEx1$BICresults
+MPLNFAEx1$BICresults$BICmodelselected
+
+# Compare with true labels
+table(MPLNFAEx1$BICresults$BICmodelSelectedLabels,
+      simDataUCC$`dataset=1`$trueMembership)
+
+# Access all results for g = 4, p = 2, model = "UCC"
+# UCC is mentioned in fourth place for input string of modelNames argument
+MPLNFAEx1$allResults[[4]][[2]][[4]]
+
+
+# Example 2
 # First generate a dataset from CCC model
 # Here, Lambda (loading matrix) and Psi (error variance and
 # isotropic) are all constrained and hence CCC
@@ -147,30 +210,83 @@ simDataCCC <- mixMPLNFA::mplnFADataGenerator(numDatasets = 1,
 dim(simDataCCC$`dataset=1`$dataset) # a dataset of size 1000 by 10
 
 # Clustering
-MPLNFAEx1 <- mixMPLNFA::MPLNFAClust(
+MPLNFAEx2 <- mixMPLNFA::MPLNFAClust(
                      dataset = simDataCCC$`dataset=1`$dataset,
                      membership = simDataCCC$`dataset=1`$trueMembership,
-                     gmin = 2,
-                     gmax = 3,
-                     pmin = 2,
+                     gmin = 1,
+                     gmax = 2,
+                     pmin = 1,
                      pmax = 3,
                      modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
-                     normalize = "Yes")
+                     normalize = "No")
 
-names(MPLNFAEx1) # see all names of outputs
+names(MPLNFAEx2) # see all names of outputs
 
 # To see BIC results
-MPLNFAResults$BICresults
-MPLNFAResults$BICresults$BICmodelselected
+MPLNFAEx2$BICresults
+MPLNFAEx2$BICresults$BICmodelselected
 
 # Compare with true labels
-table(MPLNFAResults$BICresults$BICmodelSelectedLabels,
-      sampleData$trueMembership)
+table(MPLNFAEx2$BICresults$BICmodelSelectedLabels,
+      simDataCCC$`dataset=1`$trueMembership)
 
-# Access all results for g = 2, p = 1, model = "UUU"
-# UUU is mentioned in second placed for input string c("CCU", "UUU")
-MPLNFAResults$allResults[[2]][[1]][[2]]
+# Access all results for g = 2, p = 2, model = "CCC"
+# CCC is mentioned in last place (8th) for input string of modelNames argument
 
+
+# Example 3
+# Here, Lambda (loading matrix) is unconstrained and Psi
+(error variance and isotropic) are all unconstrained and
+hence UUU model is used
+
+set.seed(100)
+pfactors <- 4 # number of true latent factors
+dimensionality <- 10 # dimensionality of observed data
+trueClusters <- 3 # number of groups/clusters
+mixingProportions <- c(0.23, 0.44, 0.33) # mixing proportions for 4 clusters
+nObservations <- 1000 # sample size or number of observations
+
+# set parameter values
+mu <- list(c(4, 6, 4, 2, 2, 4, 6, 4, 6, 2),
+           c(5, 5, 3, 3, 7, 5, 3, 3, 7, 7),
+           c(2, 4, 4, 7, 2, 4, 7, 2, 7, 4))
+
+Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+
+Psi <- list(diag(dimensionality) * runif(dimensionality),
+            diag(dimensionality) * runif(dimensionality),
+            diag(dimensionality) * runif(dimensionality))
+
+# generate datasets
+simDataUUU <- mixMPLNFA::mplnFADataGenerator(numDatasets = 1,
+                                  nObservations = nObservations,
+                                  dimensionality = dimensionality,
+                                  mixingProportions = mixingProportions,
+                                  trueClusters = trueClusters,
+                                  pfactors = pfactors,
+                                  modelName = "UUU",
+                                  mu = mu,
+                                  Lambda = Lambda,
+                                  Psi = Psi)
+
+# Clustering
+MPLNFAEx3 <- mixMPLNFA::MPLNFAClust(
+                     dataset = simDataUUU$`dataset=1`$dataset,
+                     membership = simDataUUU$`dataset=1`$trueMembership,
+                     gmin = 1,
+                     gmax = 2,
+                     pmin = 1,
+                     pmax = 3,
+                     modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
+                     normalize = "No")
+
+names(MPLNFAEx3) # see all names of outputs
+
+# To see BIC results
+MPLNFAEx3$BICresults
+MPLNFAEx3$BICresults$BICmodelselected
 
 
 }
