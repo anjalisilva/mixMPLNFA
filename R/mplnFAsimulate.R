@@ -70,7 +70,7 @@
 #' numDatasets <- 10 # total number of datasets to be generated
 #' pfactors <- 3 # number of true latent factors
 #' dimensionality <- 10 # dimensionality of observed data
-#' G <- 2 # number of groups/clusters
+#' trueClusters <- 2 # number of groups/clusters
 #' mixingProportions <- c(0.32, 0.68) # mixing proportions for 2 clusters
 #' nObservations <- 1000 # sample size or number of observations
 #'
@@ -126,7 +126,7 @@
 #' numDatasets <- 10 # total number of datasets to be generated
 #' pfactors <- 2 # number of true latent factors
 #' dimensionality <- 8 # dimensionality of observed data
-#' G <- 4 # number of groups/clusters
+#' trueClusters <- 4 # number of groups/clusters
 #' mixingProportions <- c(0.11, 0.43, 0.24, 0.22) # mixing proportions for 4 clusters
 #' nObservations <- 1000 # sample size or number of observations
 #'
@@ -159,10 +159,10 @@
 #'                                   Psi = Psi)
 #'
 #' # access dataset 1
-#' simDataCCC$`dataset=1`$dataset
+#' simDataUCC$`dataset=1`$dataset
 #'
 #' # access input used to generate dataset 1
-#' simDataCCC$`dataset=1`$input
+#' simDataUCC$`dataset=1`$input
 #'
 #'
 #' @references
@@ -228,7 +228,7 @@ mplnFADataGenerator <- function(numDatasets = 10,
     stop("modelName should be a vector of class character.")
   }
 
-  if(length(modelNames) != 1L){
+  if(length(modelName) != 1L){
     stop("Only one model name can be used for modelNames argument.")
   }
 
