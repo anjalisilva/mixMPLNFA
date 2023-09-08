@@ -135,7 +135,7 @@
 #'
 #' # To see BIC results
 #' MPLNFAEx1$BICresults
-#' MPLNFAEx1$BICresults$BICmodelselected
+#' MPLNFAEx1$BICresults$BICmodelselected # "G=4,p=2,model=UCC"
 #'
 #' # Compare with true labels
 #' table(MPLNFAEx1$BICresults$BICmodelSelectedLabels,
@@ -187,9 +187,9 @@
 #'                      dataset = simDataCCC$`dataset=1`$dataset,
 #'                      membership = simDataCCC$`dataset=1`$trueMembership,
 #'                      gmin = 1,
-#'                      gmax = 2,
-#'                      pmin = 1,
-#'                      pmax = 3,
+#'                      gmax = 3,
+#'                      pmin = 2,
+#'                      pmax = 4,
 #'                      modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
 #'                      normalize = "No")
 #'
@@ -259,7 +259,7 @@
 #'
 #' # To see BIC results
 #' MPLNFAEx3$BICresults
-#' MPLNFAEx3$BICresults$BICmodelselected
+#' MPLNFAEx3$BICresults$BICmodelselected # "G=3,p=4,model=UUU"
 #'
 #'
 #' @author {Anjali Silva, \email{anjali@alumni.uoguelph.ca}, Andrea Payne, \email{andreapayne@cmail.carleton.ca},
