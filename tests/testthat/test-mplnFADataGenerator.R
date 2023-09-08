@@ -114,14 +114,17 @@ test_that("Data clustering error upon invalid user input", {
                                                         Lambda = Lambda,
                                                         Psi = Psi))
 
-  # Incorrect g as gmax cannot be larger than d
-  testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = sampleData$dataset,
-                                                gmin = 1,
-                                                gmax = nrow(sampleData$dataset) + 1,
-                                                pmin = 1,
-                                                pmax = 2,
-                                                modelName = "UUU",
-                                                normalize = "Yes"))
+  # Incorrect trueClusters as trueClusters cannot be larger than nObservations
+  testthat::expect_error(mixMPLNFA::mplnFADataGenerator(numDatasets = numDatasets,
+                                                        nObservations = nObservations,
+                                                        dimensionality = dimensionality,
+                                                        mixingProportions = mixingProportions,
+                                                        trueClusters = trueClusters,
+                                                        pfactors = pfactors,
+                                                        modelName = "UUU",
+                                                        mu = mu,
+                                                        Lambda = Lambda,
+                                                        Psi = Psi))
 
 
   # Incorrect input type for gmin
