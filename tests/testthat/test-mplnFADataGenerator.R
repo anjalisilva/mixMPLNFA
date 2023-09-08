@@ -116,10 +116,10 @@ test_that("Data clustering error upon invalid user input", {
 
   # Incorrect trueClusters as trueClusters cannot be larger than nObservations
   testthat::expect_error(mixMPLNFA::mplnFADataGenerator(numDatasets = numDatasets,
-                                                        nObservations = nObservations,
+                                                        nObservations = 100,
                                                         dimensionality = dimensionality,
                                                         mixingProportions = mixingProportions,
-                                                        trueClusters = trueClusters,
+                                                        trueClusters = 200,
                                                         pfactors = pfactors,
                                                         modelName = "UUU",
                                                         mu = mu,
@@ -127,61 +127,18 @@ test_that("Data clustering error upon invalid user input", {
                                                         Psi = Psi))
 
 
-  # Incorrect input type for gmin
-  testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = sampleData$dataset,
-                                                gmin = "1",
-                                                gmax = 3,
-                                                pmin = 1,
-                                                pmax = 2,
-                                                modelName = "UUU",
-                                                normalize = "Yes"))
+  # Incorrect modelName
+  testthat::expect_error(mixMPLNFA::mplnFADataGenerator(numDatasets = numDatasets,
+                                                        nObservations = nObservations,
+                                                        dimensionality = dimensionality,
+                                                        mixingProportions = mixingProportions,
+                                                        trueClusters = trueClusters,
+                                                        pfactors = pfactors,
+                                                        modelName = "AAA",
+                                                        mu = mu,
+                                                        Lambda = Lambda,
+                                                        Psi = Psi))
 
 
-  # Incorrect input for gmin and gmax
-  testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = sampleData$dataset,
-                                                gmin = 5,
-                                                gmax = 2,
-                                                pmin = 1,
-                                                pmax = 2,
-                                                modelName = "UUU",
-                                                normalize = "Yes"))
-
-  # Incorrect input for pmin and pmax
-  testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = sampleData$dataset,
-                                                gmin = 1,
-                                                gmax = 2,
-                                                pmin = 3,
-                                                pmax = 1,
-                                                modelName = "UUU",
-                                                normalize = "Yes"))
-
-  # Incorrect input type for normalize
-  testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = sampleData$dataset,
-                                                gmin = 1,
-                                                gmax = 2,
-                                                pmin = 3,
-                                                pmax = 1,
-                                                modelName = "UUU",
-                                                normalize = NA))
-
-
-  # Incorrect input type for modelName
-  testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = sampleData$dataset,
-                                                gmin = 1,
-                                                gmax = 2,
-                                                pmin = 3,
-                                                pmax = 1,
-                                                modelName = "UUU",
-                                                normalize = NA))
-
-  # Incorrect input type for membership
-  testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = sampleData$dataset,
-                                                membership = "",
-                                                gmin = 1,
-                                                gmax = 2,
-                                                pmin = 1,
-                                                pmax = 2,
-                                                modelName = "UUU",
-                                                normalize = NA))
 })
 # [END]
