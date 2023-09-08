@@ -29,8 +29,8 @@
 #'     The 'C' stands for constrained and 'U' stands for unconstrained. The order
 #'     goes as loading matrix (Lambda), error variance (Psi) and isotropic (Psi),
 #'     respectively. Example, if the loading matrix (Lambda), error variance (Psi)
-#'     and isotropic are all constrained, then select 'CCC'. Options are one of "CCC",
-#'     "UUU", or "UCC".
+#'     and isotropic are all constrained, then select 'CCC'. Options are one of
+#'     "UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC".
 #' @param mu A list of length equal to the value provided to 'trueClusters' argument
 #'     and each element should have length equal to the value provided to
 #'     'dimensionality' argument. See example or default value.
@@ -293,6 +293,10 @@ mplnFADataGenerator <- function(numDatasets = 10,
 
   if(length(modelName) != 1L){
     stop("Only one model name can be used for modelNames argument.")
+  }
+
+  if(! modelName %in% c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC")) {
+    stop("Model name can only be one of UUU, UUC, UCU, UCC, CUU, CUC, CCU, or CCC")
   }
 
   if (length(mu[[1]]) != dimensionality) {

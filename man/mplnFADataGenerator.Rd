@@ -59,8 +59,8 @@ and Psi (error variance and isotropic) which are used to generate Sigma.
 The 'C' stands for constrained and 'U' stands for unconstrained. The order
 goes as loading matrix (Lambda), error variance (Psi) and isotropic (Psi),
 respectively. Example, if the loading matrix (Lambda), error variance (Psi)
-and isotropic are all constrained, then select 'CCC'. Options are one of "CCC",
-"UUU", or "UCC".}
+and isotropic are all constrained, then select 'CCC'. Options are one of
+"UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC".}
 }
 \value{
 Returns an S3 object of class mplnFADataGenerator with results that
