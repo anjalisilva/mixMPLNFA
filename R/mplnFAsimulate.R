@@ -266,6 +266,11 @@ mplnFADataGenerator <- function(numDatasets = 10,
     stop("trueClusters should be of class numeric.")
   }
 
+  if(trueClusters > nObservations) {
+    stop("trueClusters argument value cannot be greater than the
+         number of observations.")
+  }
+
   if(is.numeric(numDatasets) != TRUE) {
     stop("numDatasets should be of class numeric.")
   }
