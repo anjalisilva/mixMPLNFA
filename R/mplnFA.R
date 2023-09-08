@@ -248,10 +248,10 @@
 #' MPLNFAEx3 <- mixMPLNFA::MPLNFAClust(
 #'                      dataset = simDataUUU$`dataset=1`$dataset,
 #'                      membership = simDataUUU$`dataset=1`$trueMembership,
-#'                      gmin = 1,
-#'                      gmax = 2,
-#'                      pmin = 1,
-#'                      pmax = 3,
+#'                      gmin = 2,
+#'                      gmax = 4,
+#'                      pmin = 3,
+#'                      pmax = 5,
 #'                      modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
 #'                      normalize = "No")
 #'
@@ -377,6 +377,10 @@ MPLNFAClust <- function(dataset,
 
   if (gmax > nObservations) {
     stop("gmax cannot be larger than nrow(dataset).")
+  }
+
+  if(! all(modelName %in% c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"))) {
+    stop("Model name can only be of UUU, UUC, UCU, UCC, CUU, CUC, CCU, or CCC")
   }
 
   # To add:
