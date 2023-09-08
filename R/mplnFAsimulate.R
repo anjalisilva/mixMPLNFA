@@ -31,6 +31,9 @@
 #'     respectively. Example, if the loading matrix (Lambda), error variance (Psi)
 #'     and isotropic are all constrained, then select 'CCC'. Options are one of
 #'     "UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC".
+#' @param mixingProportions A numeric vector of length trueClusters indicating the proportion
+#'     of observations in each cluster/component. Should sum to 1. See example
+#'     or default value.
 #' @param mu A list of length equal to the value provided to 'trueClusters' argument
 #'     and each element should have length equal to the value provided to
 #'     'dimensionality' argument. See example or default value.

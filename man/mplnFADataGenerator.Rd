@@ -29,6 +29,10 @@ value is 1000.}
 \item{dimensionality}{A positive integer indicating the
 dimensionality for the dataset. Default value is 10.}
 
+\item{mixingProportions}{A numeric vector of length trueClusters indicating the proportion
+of observations in each cluster/component. Should sum to 1. See example
+or default value.}
+
 \item{trueClusters}{A positive integer indicating the number
 of total components or clusters. Default value is 2.}
 
