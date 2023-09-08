@@ -37,20 +37,16 @@ test_that("Checking data generation results", {
                                                Psi = Psi)
 
   expect_type(simDataUUU, "list")
-  expect_length(simDataUUU, 18)
+  expect_length(simDataUUU, 10)
   expect_s3_class(simDataUUU, "mplnFADataGenerator")
-  expect_identical(simDataUUU$gmin, 1)
-  expect_identical(simDataUUU$gmax, 3)
-  expect_identical(simDataUUU$pmin, 1)
-  expect_identical(simDataUUU$pmax, 2)
-  expect_named(simDataUUU, c("dataset", "dimensionality", "normalizationFactors",
-                                 "gmin",  "gmax", "pmin",
-                                 "pmax", "modelNames", "initalizationMethod", "allResults",
-                                 "logLikelihood", "numbParameters", "trueLabels",
-                                 "ICLresults", "BICresults", "AICresults",
-                                 "AIC3results", "totalTime"))
-  expect_output(str(simDataUUU), "List of 17")
-  expect_identical(simDataUUU$BICresults$BICmodelselected, "G=2,p=1,model=UUU")
+  expect_identical(simDataUUU$`dataset=1`$input$trueClusters, 3)
+  expect_identical(simDataUUU$`dataset=1`$input$pfactors, 4)
+  expect_identical(simDataUUU$`dataset=1`$input$nObservations, 1000)
+  expect_identical(simDataUUU$`dataset=1`$input$dimensionality, 10)
+  expect_named(simDataUUU$`dataset=1`$input, c("mu", "Lambda", "Psi", "trueClusters",
+                                               "pfactors", "nObservations", "dimensionality",
+                                               "mixingProportions"))
+  expect_output(str(simDataUUU), "List of 10")
 })
 
 # "Checking for invalid user input"
