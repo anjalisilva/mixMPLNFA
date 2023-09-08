@@ -389,7 +389,7 @@ MPLNFAClust <- function(dataset,
     stop("gmax cannot be larger than nrow(dataset).")
   }
 
-  if(! all(modelName %in% c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"))) {
+  if(! all(modelNames %in% c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"))) {
     stop("Model name can only be of UUU, UUC, UCU, UCC, CUU, CUC, CCU, or CCC")
   }
 
