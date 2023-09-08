@@ -256,6 +256,12 @@ mplnFADataGenerator <- function(numDatasets = 10,
     stop("pfactors should be of class numeric.")
   }
 
+  if(dimensionality <= pfactors ) {
+    stop("Dimensionality cannot be less than or equal to latent factors.
+         Latent factors should be less than dimensionality.")
+  }
+
+
   if(is.numeric(trueClusters) != TRUE) {
     stop("trueClusters should be of class numeric.")
   }
