@@ -32,7 +32,7 @@ set.seed(1) # for exact reproducibility
 
 ## Introduction
 
-[**mixMPLNFA**](https://github.com/anjalisilva/mixMPLNFA) is an R package for model-based clustering based on parsimonious mixtures of multivariate Poisson-log normal factor analyzers family (MPLNFA) via variational Gaussian approximations. It is applicable for clustering of count data. The [**mixMPLNFA**](https://github.com/anjalisilva/mixMPLNFA) package provides functions for parameter estimation via variational Gaussian approximations (VGA). Here we will explore this method. 
+[**mixMPLNFA**](https://github.com/anjalisilva/mixMPLNFA) is an R package for model-based clustering based on parsimonious mixtures of multivariate Poisson-log normal factor analyzers family (MPLNFA) via variational Gaussian approximations. The model is applicable for clustering of count data and by considering a factor analyzer structure, it reduces the number of free covariance structure parameters to be calculated. The [**mixMPLNFA**](https://github.com/anjalisilva/mixMPLNFA) package provides functions for parameter estimation via variational Gaussian approximations (VGA). Here we will explore this method. 
 
 ### Family of Models ###
 
