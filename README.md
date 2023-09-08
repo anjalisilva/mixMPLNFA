@@ -54,13 +54,16 @@ To list all functions available in the package:
 ls("package:mixMPLNFA")
 ```
 
-`MPLNClust` contains 3 functions.
+`MPLNClust` contains 4 functions.
 
 1.  ***MPLNFAClust*** for carrying out clustering of count data using
     parsimonious mixtures of multivariate Poisson-log normal factor
     analyzers
-2.  ***mplnFAVisLine*** for visualizing clustering results as line plots
-3.  ***runMixMPLNFA*** is the shiny implementation of *MPLNFAClust*
+2.  ***mplnFADataGenerator*** for generating simulated data with known
+    number of latent factors and clusters/components via mixtures of
+    multivariate Poisson-log normal factor analyzers
+3.  ***mplnFAVisLine*** for visualizing clustering results as line plots
+4.  ***runMixMPLNFA*** is the shiny implementation of *MPLNFAClust*
     (under construction)
 
 For more information, see details section below. An overview of the
