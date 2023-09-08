@@ -35,23 +35,7 @@ of total components or clusters. Default value is 2.}
 \item{pfactors}{A positive integer indicating the number
 of total latent factors. Default value is 3.}
 
-\item{mu}{A list of length equal to the value provided to 'trueClusters' argument
-and each element should have length equal to the value provided to
-'dimensionality' argument. See example or default value.}
-
-\item{Lambda}{A list of length 'trueClusters' with each list element having
-a matrix with rows equal to value provided to 'dimensionality' argument
-and columns equal to value provided to 'pfactors' argument. The values
-should be provided as per the model used in modelNames argument. See example
-or default values.}
-
-\item{Psi}{Psi should be a list of length 'trueClusters' with each list
-element having a matrix with rows equal to value provided to
-'dimensionality' argument and columns equal to value provided to
-'dimensionality' argument. The values should be provided as per the
-model used in modelNames argument. See example or default values.}
-
-\item{modelNames}{A character string indicating the model name to generate
+\item{modelName}{A character string indicating the model name to generate
 covariance matrix, Sigma. Since the largest contribution of free parameters
 is through the covariance matrices, it is the focus for introduction
 of parsimony. The constraints can be imposed on Lambda (loading matrix)
@@ -61,6 +45,22 @@ goes as loading matrix (Lambda), error variance (Psi) and isotropic (Psi),
 respectively. Example, if the loading matrix (Lambda), error variance (Psi)
 and isotropic are all constrained, then select 'CCC'. Options are one of
 "UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC".}
+
+\item{mu}{A list of length equal to the value provided to 'trueClusters' argument
+and each element should have length equal to the value provided to
+'dimensionality' argument. See example or default value.}
+
+\item{Lambda}{A list of length 'trueClusters' with each list element having
+a matrix with rows equal to value provided to 'dimensionality' argument
+and columns equal to value provided to 'pfactors' argument. The values
+should be provided as per the model used in modelName argument. See example
+or default values.}
+
+\item{Psi}{Psi should be a list of length 'trueClusters' with each list
+element having a matrix with rows equal to value provided to
+'dimensionality' argument and columns equal to value provided to
+'dimensionality' argument. The values should be provided as per the
+model used in modelName argument. See example or default values.}
 }
 \value{
 Returns an S3 object of class mplnFADataGenerator with results that

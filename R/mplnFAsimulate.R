@@ -21,7 +21,7 @@
 #'    of total components or clusters. Default value is 2.
 #' @param pfactors A positive integer indicating the number
 #'    of total latent factors. Default value is 3.
-#' @param modelNames A character string indicating the model name to generate
+#' @param modelName A character string indicating the model name to generate
 #'     covariance matrix, Sigma. Since the largest contribution of free parameters
 #'     is through the covariance matrices, it is the focus for introduction
 #'     of parsimony. The constraints can be imposed on Lambda (loading matrix)
@@ -37,13 +37,13 @@
 #' @param Lambda A list of length 'trueClusters' with each list element having
 #'     a matrix with rows equal to value provided to 'dimensionality' argument
 #'     and columns equal to value provided to 'pfactors' argument. The values
-#'     should be provided as per the model used in modelNames argument. See example
+#'     should be provided as per the model used in modelName argument. See example
 #'     or default values.
 #' @param Psi Psi should be a list of length 'trueClusters' with each list
 #'     element having a matrix with rows equal to value provided to
 #'     'dimensionality' argument and columns equal to value provided to
 #'     'dimensionality' argument. The values should be provided as per the
-#'     model used in modelNames argument. See example or default values.
+#'     model used in modelName argument. See example or default values.
 #'
 #' @return Returns an S3 object of class mplnFADataGenerator with results that
 #'    equal the length of numDatasets argument. For each dataset generated, the
@@ -292,7 +292,7 @@ mplnFADataGenerator <- function(numDatasets = 10,
   }
 
   if(length(modelName) != 1L){
-    stop("Only one model name can be used for modelNames argument.")
+    stop("Only one model name can be used for modelName argument.")
   }
 
   if(! modelName %in% c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC")) {

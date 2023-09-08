@@ -153,8 +153,8 @@ simDataUCC <- mixMPLNFA::mplnFADataGenerator(numDatasets = 1,
 MPLNFAEx1 <- mixMPLNFA::MPLNFAClust(
   dataset = simDataUCC$`dataset=1`$dataset,
   membership = simDataUCC$`dataset=1`$trueMembership,
-  gmin = 1,
-  gmax = 4,
+  gmin = 3,
+  gmax = 5,
   pmin = 1,
   pmax = 3,
   modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
@@ -162,15 +162,21 @@ MPLNFAEx1 <- mixMPLNFA::MPLNFAClust(
 
 # To see BIC results
 MPLNFAEx1$BICresults
-MPLNFAEx1$BICresults$BICmodelselected
+MPLNFAEx1$BICresults$BICmodelselected # "G=4,p=2,model=UCC"
 
 # Compare with true labels
 table(MPLNFAEx1$BICresults$BICmodelSelectedLabels,
       simDataUCC$`dataset=1`$trueMembership)
+ #     1   2   3   4
+ # 1   0   0   1 197
+ # 2   0   0 222   0
+ # 3   0 466   0   0
+ # 4 114   0   0   0
+
 
 # Access all results for g = 4, p = 2, model = "UCC"
 # UCC is mentioned in fourth place for input string of modelNames argument
-MPLNFAEx1$allResults[[4]][[2]][[4]]
+MPLNFAEx1$allResults[[2]][[2]][[4]]
 
 
 # Example 2
@@ -196,7 +202,7 @@ Psi <- list(diag(dimensionality) * runif(1),
             diag(dimensionality) * runif(1))
 
 # generate  a dataset
-simDataCCC <- mixMPLNFA::mplnFADataGenerator(numDatasets = 1,
+simDataCCC <- mixMPLNFA::mplnFADataGenerator(numDatasets = 2,
                                   nObservations = nObservations,
                                   dimensionality = dimensionality,
                                   mixingProportions = mixingProportions,
@@ -207,16 +213,16 @@ simDataCCC <- mixMPLNFA::mplnFADataGenerator(numDatasets = 1,
                                   Lambda = Lambda,
                                   Psi = Psi)
 
-dim(simDataCCC$`dataset=1`$dataset) # a dataset of size 1000 by 10
+dim(simDataCCC$`dataset=2`$dataset) # a dataset of size 1000 by 10
 
 # Clustering
 MPLNFAEx2 <- mixMPLNFA::MPLNFAClust(
                      dataset = simDataCCC$`dataset=1`$dataset,
                      membership = simDataCCC$`dataset=1`$trueMembership,
                      gmin = 1,
-                     gmax = 2,
-                     pmin = 1,
-                     pmax = 3,
+                     gmax = 3,
+                     pmin = 2,
+                     pmax = 4,
                      modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
                      normalize = "No")
 
@@ -224,14 +230,18 @@ names(MPLNFAEx2) # see all names of outputs
 
 # To see BIC results
 MPLNFAEx2$BICresults
-MPLNFAEx2$BICresults$BICmodelselected
+MPLNFAEx2$BICresults$BICmodelselected # "G=2,p=3,model=UUC"
 
 # Compare with true labels
 table(MPLNFAEx2$BICresults$BICmodelSelectedLabels,
       simDataCCC$`dataset=1`$trueMembership)
+#     1   2
+# 1   0 659
+# 2 341   0
 
 # Access all results for g = 2, p = 2, model = "CCC"
 # CCC is mentioned in last place (8th) for input string of modelNames argument
+MPLNFAEx2$allResults[[2]][[1]][[8]]
 
 
 # Example 3
@@ -286,7 +296,7 @@ names(MPLNFAEx3) # see all names of outputs
 
 # To see BIC results
 MPLNFAEx3$BICresults
-MPLNFAEx3$BICresults$BICmodelselected
+MPLNFAEx3$BICresults$BICmodelselected # "G=3,p=4,model=UUU"
 
 
 }
