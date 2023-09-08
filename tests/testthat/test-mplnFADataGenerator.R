@@ -54,7 +54,7 @@ test_that("Checking data generation results", {
 })
 
 # "Checking for invalid user input"
-test_that("Data clustering error upon invalid user input", {
+test_that("Data generation error upon invalid user input", {
 
   set.seed(100)
   numDatasets <- 10 # total number of datasets to be generated
