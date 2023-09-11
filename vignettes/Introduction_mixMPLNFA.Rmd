@@ -109,16 +109,17 @@ Psi <- list(diag(dimensionality) * runif(1),
             diag(dimensionality) * runif(1))
 
 # generate dataset
-simDataUCC <- mixMPLNFA::mplnFADataGenerator(numDatasets = 1,
-                                             nObservations = nObservations,
-                                             dimensionality = dimensionality,
-                                             mixingProportions = mixingProportions,
-                                             trueClusters = trueClusters,
-                                             pfactors = pfactors,
-                                             modelName = "UCC",
-                                             mu = mu,
-                                             Lambda = Lambda,
-                                             Psi = Psi)
+simDataUCC <- mixMPLNFA::mplnFADataGenerator(
+                         numDatasets = 1,
+                         nObservations = nObservations,
+                         dimensionality = dimensionality,
+                         mixingProportions = mixingProportions,
+                         trueClusters = trueClusters,
+                         pfactors = pfactors,
+                         modelName = "UCC",
+                         mu = mu,
+                         Lambda = Lambda,
+                         Psi = Psi)
 
 
 ```
@@ -223,10 +224,10 @@ The above plot illustrates, for each cluster, its expression pattern with counts
 
 Log-likelihood and information criteria value at each run can be plotted as follows.
 ``` r
-# install.packages("ggplot2")
-# library("ggplot2")
-# library("tidyverse")
-# library("reshape")
+# install.packages(c("ggplot2", "tidyverse", "reshape"))
+library("ggplot2")
+library("tidyverse")
+library("reshape")
 
 # Log-likelihood
 MPLNFAEx1$logLikelihood %>%
@@ -294,32 +295,40 @@ MPLNFAEx1$logLikelihood %>%
 <br>
 
 <div style="text-align:left">
+<br>
+<br>
 
-Let's explore the benefit of using factor analysis model. The proposed models of MPLNFA are well-suited to high-dimensional applications as the number of scale parameters is linear in data dimensionality for all eight models, as opposed to in traditional MPLN model, where the parameters grow quadratically. 
+Let's explore the benefit of using factor analysis model. The proposed models of MPLNFA are well-suited to high-dimensional applications as the number of free parameters is linear in data dimensionality for all eight models, as opposed to in traditional mixtures of MPLN model, where the parameters grow quadratically. 
 
 ``` r
+library(RColorBrewer)
+
 paraTable <- data.frame(
-  paras = MPLNFAEx1$numbParameters,
-  model = names(MPLNFAEx1$numbParameters),
-  regularParas = MPLNFAEx1$allResults$    )
+  MPLNFactorAnalyser = MPLNFAEx1$numbParameters,
+  RegularMPLN = MPLNFAEx1$nParametersRegular)
 
 
- MPLNFAEx1$numbParameters %>%
+paraTable %>%
    tibble::rownames_to_column('models') %>%   
-   dplyr::select("models", "BIC") %>%
    reshape::melt() %>%
    ggplot2::ggplot(mapping = aes(x = models, y = value, col=variable)) +
-   geom_line(linetype = "dashed") +
-   geom_point() +
-   ggtitle("Information criterion value vs model") +
-   ylab("Information criterion value") +
-   theme_minimal() +
-   theme(legend.position = "top",
-         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
-         panel.border = element_rect(colour = "black", fill = NA, linewidth = 1)) +
-         facet_grid(cols = vars(variable))
+   ggplot2::geom_point() +
+   ggplot2::ggtitle("Parameters of Regular Mixtures of MPLN vs PMPLNFA Models") +
+   ggplot2::ylab("Number of Free Parameters") +
+   ggplot2::theme_minimal() +
+   ggplot2::theme(legend.position = "top",
+         axis.text.x = 
+         element_text(angle = 90, vjust = 0.5, hjust = 1),
+         panel.border = 
+         element_rect(colour = "black", fill = NA, linewidth = 1))
 
 ```
+<img src="Benefit.png" alt="Benefit" width="450"/>
+<br>
+
+<div style="text-align:left">
+
+This figure illustrates the number of free parameters that would need be calculated if a regular mixtures of MPLN model was to be used, represented in turquoise color. For the same model, the number of free parameters in the factor analyzer framework is also shown in orange color. Note the difference in the number of parameters for the same 'G' or cluster size/component. 
 
 ## References
 
