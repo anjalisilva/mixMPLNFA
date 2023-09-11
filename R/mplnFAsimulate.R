@@ -1,12 +1,16 @@
 #' Generating Data Using Mixture of MPLN Factor Analyzers
 #'
 #' This function simulates data from a mixture of multivariate
-#' Poisson-log normal factor analyzers family (PMPLNFA). In the
-#' PMPLNFA framework restrictions are introduced to the model
-#' parameters with the aim of obtaining parsimonious models, which
-#' are sufficiently flexible for clustering purposes. Since the
-#' largest contribution of free parameters is through the covariance
-#' matrices, it is the focus for introduction of parsimony.
+#' Poisson-log normal factor analyzers family (PMPLNFA). In the PMPLNFA framework
+#' restrictions are introduced to the model parameters with the
+#' aim of obtaining parsimonious models, which are sufficiently
+#' flexible for clustering purposes. Since the largest contribution
+#' of free parameters is through the covariance matrices, it is
+#' the focus for introduction of parsimony here. The constraints can
+#' be imposed on Lambda (loading matrix) and Psi (error variance and
+#' isotropic) which are used to generate Sigma as per the factor
+#' analysis model by Spearman, 1904 and mixture of factor analyzers
+#' model by Ghahramani et al., 1996.
 #'
 #' @param numDatasets A positive integer indicating the number
 #'    of datasets to be generated. Default value is 10.
