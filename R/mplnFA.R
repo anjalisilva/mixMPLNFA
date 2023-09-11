@@ -11,7 +11,9 @@
 #' of free parameters is through the covariance matrices, it is
 #' the focus for introduction of parsimony here. The constraints can
 #' be imposed on Lambda (loading matrix) and Psi (error variance and
-#' isotropic) which are used to generate Sigma. This function
+#' isotropic) which are used to generate Sigma as per the factor
+#' analysis model by Spearman, 1904 and mixture of factor analyzers
+#' model  by Ghahramani et al., 1996. This function
 #' simultaneously performs factor analysis and cluster analysis, by
 #' assuming that the discrete observed data (counts) have been generated
 #' by a factor analyzer model with continuous latent variables.
@@ -283,9 +285,6 @@
 #' principle. In \emph{Second International Symposium on Information Theory}, New York, NY,
 #' USA, pp. 267–281. Springer Verlag.
 #'
-#' Arlot, S., Brault, V., Baudry, J., Maugis, C., and Michel, B. (2016).
-#' capushe: CAlibrating Penalities Using Slope HEuristics. R package version 1.1.1.
-#'
 #' Biernacki, C., G. Celeux, and G. Govaert (2000). Assessing a mixture model for
 #' clustering with the integrated classification likelihood. \emph{IEEE Transactions
 #' on Pattern Analysis and Machine Intelligence} 22.
@@ -304,6 +303,15 @@
 #' Silva, A. et al. (2019). A multivariate Poisson-log normal mixture model
 #' for clustering transcriptome sequencing data. \emph{BMC Bioinformatics} 20.
 #' \href{https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2916-0}{Link}
+#'
+#' Silva, A., Qin, X., S. J. Rothstein, P. D. McNicholas, and S. Subedi (2023).
+#' Finite mixtures of matrix variate Poisson-log normal distributions
+#' for three-way count data, \emph{Bioinformatics} 39(5).
+#' \href{https://doi.org/10.1093/bioinformatics/btad167}{Link}
+#'
+#' Subedi, S., R.P. Browne (2020). A family of parsimonious mixtures of
+#' multivariate Poisson-lognormal distributions for clustering multivariate
+#'  count data. \emph{Stat} 9:e310. \href{https://doi.org/10.1002/sta4.310}{Link}
 #'
 #' @export
 #' @importFrom edgeR calcNormFactors
