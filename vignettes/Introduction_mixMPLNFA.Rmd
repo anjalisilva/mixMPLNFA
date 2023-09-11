@@ -254,10 +254,11 @@ MPLNFAEx1$logLikelihood %>%
                ICL = MPLNFAEx1$ICLresults$allICLvalues,
                AIC = MPLNFAEx1$AICresults$allAICvalues,
                AIC3 = MPLNFAEx1$AIC3results$allAIC3values)
-              
+
+# Plot BIC              
  ICvalues %>%
    tibble::rownames_to_column('models') %>%   
-   dplyr::select("models", "BIC") %>%
+   dplyr::select("models", "BIC") %>% # select for BIC
    reshape::melt() %>%
    ggplot2::ggplot(mapping = aes(x = models, y = value, col=variable)) +
    geom_line(linetype = "dashed") +
@@ -273,7 +274,7 @@ MPLNFAEx1$logLikelihood %>%
 # ICL
  ICvalues %>%
    tibble::rownames_to_column('models') %>%   
-   dplyr::select("models", "ICL") %>%
+   dplyr::select("models", "ICL") %>% # select for ICL
    reshape::melt() %>%
    ggplot2::ggplot(mapping = aes(x = models, y = value, col=variable)) +
    geom_line(linetype = "dashed") +
@@ -293,6 +294,32 @@ MPLNFAEx1$logLikelihood %>%
 <br>
 
 <div style="text-align:left">
+
+Let's explore the benefit of using factor analysis model. The proposed models of MPLNFA are well-suited to high-dimensional applications as the number of scale parameters is linear in data dimensionality for all eight models, as opposed to in traditional MPLN model, where the parameters grow quadratically. 
+
+``` r
+paraTable <- data.frame(
+  paras = MPLNFAEx1$numbParameters,
+  model = names(MPLNFAEx1$numbParameters),
+  regularParas = MPLNFAEx1$allResults$    )
+
+
+ MPLNFAEx1$numbParameters %>%
+   tibble::rownames_to_column('models') %>%   
+   dplyr::select("models", "BIC") %>%
+   reshape::melt() %>%
+   ggplot2::ggplot(mapping = aes(x = models, y = value, col=variable)) +
+   geom_line(linetype = "dashed") +
+   geom_point() +
+   ggtitle("Information criterion value vs model") +
+   ylab("Information criterion value") +
+   theme_minimal() +
+   theme(legend.position = "top",
+         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+         panel.border = element_rect(colour = "black", fill = NA, linewidth = 1)) +
+         facet_grid(cols = vars(variable))
+
+```
 
 ## References
 
