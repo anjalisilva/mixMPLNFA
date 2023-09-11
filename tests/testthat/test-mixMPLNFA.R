@@ -29,7 +29,7 @@ test_that("Checking clustering results", {
                                   normalize = "Yes")
 
   expect_type(clusResultsUUU, "list")
-  expect_length(clusResultsUUU, 18)
+  expect_length(clusResultsUUU, 19)
   expect_s3_class(clusResultsUUU, "PMPLNFA")
   expect_identical(clusResultsUUU$gmin, 1)
   expect_identical(clusResultsUUU$gmax, 3)
@@ -38,10 +38,10 @@ test_that("Checking clustering results", {
   expect_named(clusResultsUUU, c("dataset", "dimensionality", "normalizationFactors",
                                  "gmin",  "gmax", "pmin",
                                  "pmax", "modelNames", "initalizationMethod", "allResults",
-                                 "logLikelihood", "numbParameters", "trueLabels",
-                                 "ICLresults", "BICresults", "AICresults",
+                                 "logLikelihood", "numbParameters", "nParametersRegular",
+                                 "trueLabels", "ICLresults", "BICresults", "AICresults",
                                  "AIC3results", "totalTime"))
-  expect_output(str(clusResultsUUU), "List of 17")
+  expect_output(str(clusResultsUUU), "List of 18")
   expect_identical(clusResultsUUU$BICresults$BICmodelselected, "G=2,p=1,model=UUU")
 })
 
