@@ -27,10 +27,13 @@ count data, with clustering of RNA sequencing data as a motivation.
 However, the clustering method may be applied to other types of count
 data. This model considers a factor analyzer structure and this reduces
 the number of free covariance structure parameters to be calculated.
-This package provides functions for data simulation and clustering with
-parameter estimation via a variational Gaussian approximation with
-Expectation-Maximization (EM) algorithm. Information criteria (AIC, BIC,
-AIC3 and ICL) are offered for model selection.
+With the introduction of the factor analysis structure, the number of
+covariance parameters to be calculated is linear in data dimensionality,
+thus making this family well suited for analysis of high-dimensional
+discrete data. This package provides functions for data simulation and
+clustering with parameter estimation via a variational Gaussian
+approximation with Expectation-Maximization (EM) algorithm. Information
+criteria (AIC, BIC, AIC3 and ICL) are offered for model selection.
 
 ## Installation
 
