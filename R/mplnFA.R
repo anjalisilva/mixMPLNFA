@@ -518,7 +518,7 @@ MPLNFAClust <- function(dataset,
 
   names(logLikelihood) <- names(nParameters) <- names(BIC) <-
     names(ICL) <- names(AIC) <- names(AIC3) <-
-    names(cluslabels) <- nameVector
+    names(cluslabels) <- names(nParaRegularTotal) <- nameVector
 
   # select best model
   BICbestmodel <- names(BIC)[grep(max(BIC, na.rm = TRUE), BIC)]
@@ -834,7 +834,7 @@ PMPLNFAind <- function(dataset,
     # paras from covariance only has the covariance parameters so now we need
     # to add the parameters for the mean and pi
     kTotal <- paras + (clustersize - 1) + (clustersize * dimensionality)
-    kRegularTotal <- (0.5 * dimensionality * (dimensionality + 1)) +
+    kRegularTotal <- (clustersize * (0.5 * dimensionality * (dimensionality + 1))) +
       (clustersize - 1) + (clustersize * dimensionality)
 
     # Inf criteria

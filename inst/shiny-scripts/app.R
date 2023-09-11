@@ -5,9 +5,9 @@ library(shinyalert)
 ui <- fluidPage(
 
   # App title ----
-  titlePanel(tags$h1(tags$b("mixMVPLN:"),"Mixtures of Matrix Variate
-                     Poisson-log Normal With Variational-EM Framework
-                     for Clustering Three-way Count Data")),
+  titlePanel(tags$h1(tags$b("mixMPLNFA:"),"Mixtures of Multivariate
+                     Poisson-Log Normal Factor Analyzers for
+                     Clustering Count Data")),
 
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
@@ -15,26 +15,29 @@ ui <- fluidPage(
     # Sidebar panel for inputs ----
     sidebarPanel(
 
-      tags$p("Description: This is a Shiny App that is part of the mixMVPLN R package
-             (Silva et al., 2022). Most of the functions available via the package are made
-             available with Shiny App. The mixMVPLN is an R package for performing
-             clustering using mixtures of matrix variate Poisson-log normal (mixMVPLN)
-             distribution provided a three-way count dataset. The observations of the
-             dataset will be clustered into subgroups. The app permits to model select
+      tags$p("Description: This is a Shiny App that is part of the mixMPLNFA R package
+             (Payne et al., 2023). Most of the functions available via the package are made
+             available with Shiny App. The mixMPLNFA is an R package for performing
+             clustering using mixtures of multivariate Poisson-log normal factor analyzers
+             (PMPLNFA) provided a count dataset. In the PMPLNFA framework restrictions
+             are introduced to the model parameters with the aim of obtaining parsimonious
+             models, which are sufficiently flexible for clustering purposes. Since the
+             largest contribution of free parameters is through the covariance matrices, it is
+             the focus for introduction of parsimony here. The constraints can be imposed
+             on Lambda (loading matrix) and Psi (error variance and isotropic) which are
+             used to generate Sigma as per the factor analysis model by Spearman, 1904 and
+             mixture of factor analyzers model by Ghahramani et al., 1996. The observations
+             of the dataset will be clustered into subgroups. The app permits to model select
              using Bayesian information criterion (BIC), Integrated Complete Likelihood (ICL)
-             criterion, and Akaike Information Criterion (AIC) values. Results will
-             be available as dotted line plots of information criteria value versus
-             cluster size, heatmaps of input datset with cluster membership information,
-             alluvial plot of observations by cluster, and barplot of posterior
-             probabilities."),
+             criterion, and Akaike Information Criterion (AIC) values."),
 
       # br() element to introduce extra vertical spacing ----
       br(),
       br(),
 
       # input
-      tags$b("Instructions: Below, upload a three-way count dataset
-              in rds format, and enter or select values to perform
+      tags$b("Instructions: Below, upload a count dataset in csv format,
+              and enter or select values to perform
               cluster analysis. Default values are shown. Then press
               'Run'. Navigate through the different tabs to the right
               to explore the results."),
@@ -49,17 +52,26 @@ ui <- fluidPage(
       actionButton(inputId = "data1",
                    label = "Dataset 1 Details"),
       fileInput(inputId = "file1",
-                label = "Dataset: Select a three-way count dataset to analyze.
-                File should be in single R object (.rds) format containing
-                three-way data of units (n), defined by occasions/layers (r) and
-                the variables/responses (p) save as a list in R. You may
-                download an example dataset above and explore first.",
-                accept = c(".rds")),
+                label = "Dataset: Select a count dataset to analyze.
+                File should be in comma seperated value or csv (.csv)
+                format containing count (discrete) data with observations along
+                rows and variables along columns. The observations will be
+                clustered. You may download an example dataset above and
+                explore first.",
+                accept = c(".csv")),
       textInput(inputId = "ngmin",
                 label = "ngmin: Enter the minimum value of components or clusters
                 for clustering. This should be a positive integer.", "1"),
       textInput(inputId = "ngmax",
                 label = "ngmax: Enter the maximum value of components or clusters.
+                for clustering. This should be a positive integer, bigger
+                than ngmin and less than or equal to number of total units (n)
+                in the dataset.", "2"),
+      textInput(inputId = "npmin",
+                label = "ngmin: Enter the minimum value of latent factors
+                for clustering. This should be a positive integer.", "1"),
+      textInput(inputId = "npmax",
+                label = "ngmax: Enter the maximum value of latenet factors
                 for clustering. This should be a positive integer, bigger
                 than ngmin and less than or equal to number of total units (n)
                 in the dataset.", "2"),
@@ -70,9 +82,25 @@ ui <- fluidPage(
                               "medoids",
                               "clara",
                               "fanny")),
-      textInput(inputId = "nInitIterations",
-                label = "nInitIterations: Enter the number of initial iterations.
-                This should be a positive integer.", "1"),
+      selectInput(inputId = "modelNames",
+                label = "modelNames: Select the model names to test for
+                covariance matrix, Sigma. Since the largest contribution of
+                free parameters is through the covariance matrices, it is the
+                focus for introduction of parsimony. The constraints can be imposed
+                on Lambda (loading matrix) and Psi (error variance and isotropic)
+                which are used to generate Sigma. The 'C' stands for constrained and
+                'U' stands for unconstrained. The order goes as loading matrix (Lambda),
+                error variance (Psi) and isotropic (Psi), respectively. Example, if the
+                loading matrix (Lambda), error variance (Psi) and isotropic are all
+                constrained, then select 'CCC'.",
+                choices = c("'UUU' ",
+                            "'UUC' ",
+                            "'UCU' ",
+                            "'UCC' ",
+                            "'CUU' ",
+                            "'CUC' ",
+                            "'CCU' ",
+                            "'CCC' "),
       selectInput(inputId = 'typenormalize',
                   label = 'Normalization: Select whether to perform normalization
                   or not. Currently, normalization is performed by
@@ -170,14 +198,16 @@ server <- function(input, output) {
     withProgress(message = 'Clustering', value = 0, {
       # Number of times we'll go through the loop
 
-      mixMVPLN::mvplnVGAclus(
+      mixMPLNFA::MPLNFAClust(
         dataset = matrixInput(),
         membership = "none",
         gmin = as.numeric(input$ngmin),
         gmax = as.numeric(input$ngmax),
+        gmin = as.numeric(input$npmin),
+        gmax = as.numeric(input$npmax),
         initMethod = as.character(input$typeinitMethod),
-        nInitIterations = as.numeric(input$nInitIterations),
-        normalize = "Yes")
+        modelNames = as.character(input$modelNames),
+        normalize = as.character(input$typenormalize))
     })
   })
 
@@ -185,11 +215,9 @@ server <- function(input, output) {
   output$textOut <- renderText({
     if (! is.null(startclustering))
 
-      a1 <- paste("Number of occasions/layers (r):", nrow(startclustering()$dataset[[1]]), "\n")
+      a1 <- paste("Number of observations:", nrow(startclustering()$dataset[[1]]), "\n")
 
-      a2 <- paste("Number of variables/responses (p):", ncol(startclustering()$dataset[[1]]), "\n")
-
-      a3 <- paste("Number of units (n):", length(startclustering()$dataset), "\n")
+      a2 <- paste("Number of variables:", ncol(startclustering()$dataset[[1]]), "\n")
 
       paste(a1, a2, a3, sep = "\n")
  })
