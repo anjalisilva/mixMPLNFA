@@ -137,7 +137,7 @@
 #'
 #' # To see BIC results
 #' MPLNFAEx1$BICresults
-#' MPLNFAEx1$BICresults$BICmodelselected # "G=4,p=2,model=UCC"
+#' MPLNFAEx1$BICresults$BICmodelselected # "G=4,p=2,model=UUC"
 #'
 #' # Compare with true labels
 #' table(MPLNFAEx1$BICresults$BICmodelSelectedLabels,
@@ -294,11 +294,22 @@
 #' Conference on the Frontiers of Statistical Modeling: An Informational Approach:
 #' Volume 2 Multivariate Statistical Modeling}, pp. 69–113. Dordrecht: Springer Netherlands.
 #'
+#' Ghahramani, Z., G. E. Hinton, et al. (1996). The EM algorithm for mixtures of
+#' factor analyzers. Technical report, Technical Report CRG-TR-96-1, University
+#' of Toronto.
+#'
+#' Ghahramani, Z. and Beal, M. (1999). Variational inference for bayesian
+#' mixtures of factor analysers. \emph{Advances in neural information processing
+#' systems} 12.
+#'
 #' Robinson, M.D., and Oshlack, A. (2010). A scaling normalization method for differential
 #' expression analysis of RNA-seq data. \emph{Genome Biology} 11, R25.
 #'
 #' Schwarz, G. (1978). Estimating the dimension of a model. \emph{The Annals of Statistics}
 #' 6.
+#'
+#' Spearman, C. (1904). The proof and measurement of association between two things.
+#' \emph{The American Journal of Psychology}, 15(1).
 #'
 #' Silva, A. et al. (2019). A multivariate Poisson-log normal mixture model
 #' for clustering transcriptome sequencing data. \emph{BMC Bioinformatics} 20.
@@ -311,7 +322,7 @@
 #'
 #' Subedi, S., R.P. Browne (2020). A family of parsimonious mixtures of
 #' multivariate Poisson-lognormal distributions for clustering multivariate
-#'  count data. \emph{Stat} 9:e310. \href{https://doi.org/10.1002/sta4.310}{Link}
+#' count data. \emph{Stat} 9:e310. \href{https://doi.org/10.1002/sta4.310}{Link}
 #'
 #' @export
 #' @importFrom edgeR calcNormFactors

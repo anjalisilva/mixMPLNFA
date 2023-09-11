@@ -113,6 +113,53 @@
 #'
 #' @author Anjali Silva, \email{anjali@alumni.uoguelph.ca}
 #'
+#' @references
+#' Aitchison, J. and C. H. Ho (1989). The multivariate Poisson-log normal distribution.
+#' \emph{Biometrika} 76.
+#'
+#' Akaike, H. (1973). Information theory and an extension of the maximum likelihood
+#' principle. In \emph{Second International Symposium on Information Theory}, New York, NY,
+#' USA, pp. 267–281. Springer Verlag.
+#'
+#' Biernacki, C., G. Celeux, and G. Govaert (2000). Assessing a mixture model for
+#' clustering with the integrated classification likelihood. \emph{IEEE Transactions
+#' on Pattern Analysis and Machine Intelligence} 22.
+#'
+#' Bozdogan, H. (1994). Mixture-model cluster analysis using model selection criteria
+#' and a new informational measure of complexity. In \emph{Proceedings of the First US/Japan
+#' Conference on the Frontiers of Statistical Modeling: An Informational Approach:
+#' Volume 2 Multivariate Statistical Modeling}, pp. 69–113. Dordrecht: Springer Netherlands.
+#'
+#' Ghahramani, Z., G. E. Hinton, et al. (1996). The EM algorithm for mixtures of
+#' factor analyzers. Technical report, Technical Report CRG-TR-96-1, University
+#' of Toronto.
+#'
+#' Ghahramani, Z. and Beal, M. (1999). Variational inference for bayesian
+#' mixtures of factor analysers. \emph{Advances in neural information processing
+#' systems} 12.
+#'
+#' Robinson, M.D., and Oshlack, A. (2010). A scaling normalization method for differential
+#' expression analysis of RNA-seq data. \emph{Genome Biology} 11, R25.
+#'
+#' Schwarz, G. (1978). Estimating the dimension of a model. \emph{The Annals of Statistics}
+#' 6.
+#'
+#' Spearman, C. (1904). The proof and measurement of association between two things.
+#' \emph{The American Journal of Psychology}, 15(1).
+#'
+#' Silva, A. et al. (2019). A multivariate Poisson-log normal mixture model
+#' for clustering transcriptome sequencing data. \emph{BMC Bioinformatics} 20.
+#' \href{https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2916-0}{Link}
+#'
+#' Silva, A., Qin, X., S. J. Rothstein, P. D. McNicholas, and S. Subedi (2023).
+#' Finite mixtures of matrix variate Poisson-log normal distributions
+#' for three-way count data, \emph{Bioinformatics} 39(5).
+#' \href{https://doi.org/10.1093/bioinformatics/btad167}{Link}
+#'
+#' Subedi, S., R.P. Browne (2020). A family of parsimonious mixtures of
+#' multivariate Poisson-lognormal distributions for clustering multivariate
+#' count data. \emph{Stat} 9:e310. \href{https://doi.org/10.1002/sta4.310}{Link}
+#'
 #' @export
 #' @import graphics
 #' @importFrom grDevices png
