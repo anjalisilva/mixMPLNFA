@@ -26,89 +26,71 @@
 #'
 #' @examples
 #' # Example 1
-#' trueMu1 <- c(6.5, 6, 6, 6, 6, 6, 6, 6, 6)
-#' trueMu2 <- c(2, 2.5, 2, 2, 2, 2, 2, 2, 2)
-#' trueMu3 <- c(1, 1, 1, 1, 1, 1, 1, 1, 1)
+#' # Here, Lambda (loading matrix) is unconstrained and Psi
+#' # (error variance and isotropic) are all unconstrained and
+#' # hence UUU model is used
 #'
-#' trueSigma1 <- diag(length(trueMu1)) * 2
-#' trueSigma2 <- diag(length(trueMu1)) * 0.05
-#' trueSigma3 <- diag(length(trueMu1)) * 0.01
+#' set.seed(100)
+#' pfactors <- 4 # number of true latent factors
+#' dimensionality <- 10 # dimensionality of observed data
+#' trueClusters <- 3 # number of groups/clusters
+#' mixingProportions <- c(0.23, 0.44, 0.33) # mixing proportions for 4 clusters
+#' nObservations <- 1000 # sample size or number of observations
 #'
-#' # Generating simulated data with 3 clusters
-#' sampleData <- MPLNClust::mplnDataGenerator(nObservations = 2000,
-#'                      dimensionality = length(trueMu1),
-#'                      mixingProportions = c(0.2, 0.3, 0.5),
-#'                      mu = rbind(trueMu1, trueMu2, trueMu3),
-#'                      sigma = rbind(trueSigma1, trueSigma2, trueSigma3),
-#'                      produceImage = "No")
+#' # set parameter values
+#' mu <- list(c(4, 6, 4, 2, 2, 4, 6, 4, 6, 2),
+#'            c(5, 5, 3, 3, 7, 5, 3, 3, 7, 7),
+#'            c(2, 4, 4, 7, 2, 4, 7, 2, 7, 4))
 #'
-#'  dim(sampleData$dataset) # a dataset of size 2000 by 9
+#' Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+#'
+#' Psi <- list(diag(dimensionality) * runif(dimensionality),
+#'             diag(dimensionality) * runif(dimensionality),
+#'             diag(dimensionality) * runif(dimensionality))
+#'
+#' # generate datasets
+#' simDataUUU <- mixMPLNFA::mplnFADataGenerator(numDatasets = 1,
+#'                                   nObservations = nObservations,
+#'                                   dimensionality = dimensionality,
+#'                                   mixingProportions = mixingProportions,
+#'                                   trueClusters = trueClusters,
+#'                                   pfactors = pfactors,
+#'                                   modelName = "UUU",
+#'                                   mu = mu,
+#'                                   Lambda = Lambda,
+#'                                   Psi = Psi)
 #'
 #' # Clustering
-#' MPLNFAResults <- mixMPLNFA::MPLNFAClust(
-#'                      dataset = sampleData$dataset,
-#'                      membership = sampleData$trueMembership,
-#'                      gmin = 1,
+#' MPLNFAEx1 <- mixMPLNFA::MPLNFAClust(
+#'                      dataset = simDataUUU$`dataset=1`$dataset,
+#'                      membership = simDataUUU$`dataset=1`$trueMembership,
+#'                      gmin = 2,
 #'                      gmax = 4,
-#'                      pmin = 1,
-#'                      pmax = 1,
-#'                      modelNames = c("CCU", "UUU"),
-#'                      normalize = "Yes")
+#'                      pmin = 3,
+#'                      pmax = 5,
+#'                      modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
+#'                      normalize = "No")
 #'
 #'  # Visualize data using line plot
 #'  # Use navigation buttons to see previous plots
-#'  MPLNFABlack <- mixMPLNFA::mplnFAVisLine(dataset = sampleData$dataset,
+#'  MPLNFABlack <- mixMPLNFA::mplnFAVisLine(dataset = simDataUUU$dataset,
 #'                                          clusterMembershipVector =
-#'                                          MPLNFAResults$BICresults$BICmodelSelectedLabels,
+#'                                          MPLNFAEx1$BICresults$BICmodelSelectedLabels,
 #'                                          fileName = 'Example1',
 #'                                          printPlot = FALSE)
 #'
 #'
 #'  # Visualize data using line plot with multicolours
 #'  # Use navigation buttons to see previous plots
-#'  MPLNLineColor <- mixMPLNFA::mplnFAVisLine(dataset = sampleData$dataset,
+#'  MPLNLineColor <- mixMPLNFA::mplnFAVisLine(dataset = simDataUUU$dataset,
 #'                                          clusterMembershipVector =
-#'                                          MPLNFAResults$BICresults$BICmodelSelectedLabels,
+#'                                          MPLNFAEx1$BICresults$BICmodelSelectedLabels,
 #'                                          fileName = 'Example1MultiColor',
 #'                                          LinePlotColours = "multicolour",
 #'                                          printPlot = FALSE)
 #'
-#'  # Example 2
-#' trueMu1 <- c(6.5, 6, 6, 6, 6, 6, 6, 6, 6)
-#' trueMu2 <- c(1, 2.5, 2, 2, 2, 2, 1, 1, 1)
-#'
-#' trueSigma1 <- diag(length(trueMu1)) * 2.5
-#' trueSigma2 <- diag(length(trueMu1)) * 0.5
-#'
-#' # Generating simulated data with 2 clusters
-#' sampleData2 <- MPLNClust::mplnDataGenerator(nObservations = 2000,
-#'                      dimensionality = length(trueMu1),
-#'                      mixingProportions = c(0.6, 0.4),
-#'                      mu = rbind(trueMu1, trueMu2),
-#'                      sigma = rbind(trueSigma1, trueSigma2),
-#'                      produceImage = "No")
-#'
-#'  dim(sampleData2$dataset) # a dataset of size 2000 by 9
-#'
-#' # Clustering
-#' MPLNFAResults2 <- mixMPLNFA::MPLNFAClust(
-#'                      dataset = sampleData2$dataset,
-#'                      membership = sampleData2$trueMembership,
-#'                      gmin = 1,
-#'                      gmax = 3,
-#'                      pmin = 1,
-#'                      pmax = 2,
-#'                      modelNames = c("CCU"),
-#'                      normalize = "Yes")
-#'
-#'  # Visualize data using line plot with multicolours
-#'  # Use navigation buttons to see previous plots
-#'  MPLNLineColor <- mixMPLNFA::mplnFAVisLine(dataset = sampleData2$dataset,
-#'                                          clusterMembershipVector =
-#'                                          MPLNFAResults2$BICresults$BICmodelSelectedLabels,
-#'                                          fileName = 'TwoClusterModel',
-#'                                          LinePlotColours = "multicolour",
-#'                                          printPlot = FALSE)
 #'
 #'
 #' @author Anjali Silva, \email{anjali@alumni.uoguelph.ca}

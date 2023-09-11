@@ -224,8 +224,8 @@
 #'
 #' # Example 3
 #' # Here, Lambda (loading matrix) is unconstrained and Psi
-#' (error variance and isotropic) are all unconstrained and
-#' hence UUU model is used
+#' # (error variance and isotropic) are all unconstrained and
+#' # hence UUU model is used
 #'
 #' set.seed(100)
 #' pfactors <- 4 # number of true latent factors

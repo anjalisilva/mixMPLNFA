@@ -134,8 +134,8 @@
 #'
 #' # Example 2
 #' # Here, Lambda (loading matrix) is unconstrained and Psi
-#' (error variance and isotropic) are all constrained and
-#' hence UCC model is used
+#' # (error variance and isotropic) are all constrained and
+#' # hence UCC model is used
 #'
 #' set.seed(100)
 #' numDatasets <- 10 # total number of datasets to be generated
@@ -182,8 +182,8 @@
 #'
 #' # Example 3
 #' # Here, Lambda (loading matrix) is unconstrained and Psi
-#' (error variance and isotropic) are all unconstrained and
-#' hence UUU model is used
+#' # (error variance and isotropic) are all unconstrained and
+#' # hence UUU model is used
 #'
 #' set.seed(100)
 #' numDatasets <- 10 # total number of datasets to be generated
