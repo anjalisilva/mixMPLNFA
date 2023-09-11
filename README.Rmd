@@ -56,7 +56,7 @@ ls("package:mixMPLNFA")
 
 1. __*mplnFADataGenerator*__ for generating simulated data with known
 number of latent factors, a known covariance structure model and a known number of clusters/components via mixtures of multivariate Poisson-log normal factor analyzers
-2. __*MPLNFAClust*__ for carrying out clustering of count data using parsimonious mixtures of multivariate Poisson-log normal factor analyzers. Can input user provided count dataset or a dataset generated via the mplnFADataGenerator() function.
+2. __*MPLNFAClust*__ for carrying out clustering of count data using parsimonious mixtures of multivariate Poisson-log normal factor analyzers. Can input user provided count dataset or a dataset generated via the mplnFADataGenerator() function
 3. __*mplnFAVisLine*__ for visualizing clustering results as line plots
 4. __*runMixMPLNFA*__ is the shiny implementation of *MPLNFAClust* (under construction)
 

@@ -65,7 +65,7 @@ ls("package:mixMPLNFA")
 2.  ***MPLNFAClust*** for carrying out clustering of count data using
     parsimonious mixtures of multivariate Poisson-log normal factor
     analyzers. Can input user provided count dataset or a dataset
-    generated via the mplnFADataGenerator() function.
+    generated via the mplnFADataGenerator() function
 3.  ***mplnFAVisLine*** for visualizing clustering results as line plots
 4.  ***runMixMPLNFA*** is the shiny implementation of *MPLNFAClust*
     (under construction)
