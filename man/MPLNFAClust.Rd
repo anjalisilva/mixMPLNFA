@@ -77,8 +77,11 @@ run.
 of 'g, p, model', respectively. See examples.
 \item logLikelihood - A vector with value of final log-likelihoods for
 each component/cluster size.
-\item numbParameters - A vector with number of parameters for each
-component/cluster size.
+\item numbParameters - A vector with total number of parameters (pi, mu
+and sigma) for each component/cluster size for the factor analysis model.
+\item nParametersRegular - A vector with total number of parameters for
+(pi, mu and sigma) each component/clustersize if the factor analysis
+model was not considered.
 \item trueLabels - The vector of true labels, if provided by user.
 \item ICLresults - A list with all ICL model selection results.
 \item BICresults - A list with all BIC model selection results.
@@ -164,7 +167,7 @@ MPLNFAEx1 <- mixMPLNFA::MPLNFAClust(
 
 # To see BIC results
 MPLNFAEx1$BICresults
-MPLNFAEx1$BICresults$BICmodelselected # "G=4,p=2,model=UCC"
+MPLNFAEx1$BICresults$BICmodelselected # "G=4,p=2,model=UUC"
 
 # Compare with true labels
 table(MPLNFAEx1$BICresults$BICmodelSelectedLabels,
@@ -319,11 +322,22 @@ and a new informational measure of complexity. In \emph{Proceedings of the First
 Conference on the Frontiers of Statistical Modeling: An Informational Approach:
 Volume 2 Multivariate Statistical Modeling}, pp. 69–113. Dordrecht: Springer Netherlands.
 
+Ghahramani, Z., G. E. Hinton, et al. (1996). The EM algorithm for mixtures of
+factor analyzers. Technical report, Technical Report CRG-TR-96-1, University
+of Toronto.
+
+Ghahramani, Z. and Beal, M. (1999). Variational inference for bayesian
+mixtures of factor analysers. \emph{Advances in neural information processing
+systems} 12.
+
 Robinson, M.D., and Oshlack, A. (2010). A scaling normalization method for differential
 expression analysis of RNA-seq data. \emph{Genome Biology} 11, R25.
 
 Schwarz, G. (1978). Estimating the dimension of a model. \emph{The Annals of Statistics}
 6.
+
+Spearman, C. (1904). The proof and measurement of association between two things.
+\emph{The American Journal of Psychology}, 15(1).
 
 Silva, A. et al. (2019). A multivariate Poisson-log normal mixture model
 for clustering transcriptome sequencing data. \emph{BMC Bioinformatics} 20.

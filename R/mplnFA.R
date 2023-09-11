@@ -72,8 +72,11 @@
 #'      of 'g, p, model', respectively. See examples.
 #'   \item logLikelihood - A vector with value of final log-likelihoods for
 #'      each component/cluster size.
-#'   \item numbParameters - A vector with number of parameters for each
-#'      component/cluster size.
+#'   \item numbParameters - A vector with total number of parameters (pi, mu
+#'      and sigma) for each component/cluster size for the factor analysis model.
+#'   \item nParametersRegular - A vector with total number of parameters for
+#'      (pi, mu and sigma) each component/clustersize if the factor analysis
+#'      model was not considered.
 #'   \item trueLabels - The vector of true labels, if provided by user.
 #'   \item ICLresults - A list with all ICL model selection results.
 #'   \item BICresults - A list with all BIC model selection results.
@@ -442,7 +445,7 @@ MPLNFAClust <- function(dataset,
   # to save cluster output
   clusterResults <- cluslabels <- list()
   BIC <- ICL <- AIC <- AIC3 <-
-    nParameters <- logLikelihood <- nameVector <- vector()
+    nParameters <- nParaRegularTotal <- logLikelihood <- nameVector <- vector()
 
   # for saving model selection values
   numberVec <- (1:((gmax - gmin + 1) * (pmax - pmin + 1) * length(modelNames)))
@@ -497,6 +500,7 @@ MPLNFAClust <- function(dataset,
         logLikelihood[inserNum] <- unlist(tail(
           clusterResults[[gmodel]][[pmodel]][[famodel]]$loglik, n = 1))
         nParameters[inserNum] <- clusterResults[[gmodel]][[pmodel]][[famodel]]$kTotal
+        nParaRegularTotal[inserNum] <- clusterResults[[gmodel]][[pmodel]][[famodel]]$kRegularTotal
         nameVector[inserNum] <- paste0("G=", clustersize,",p=", pSize, ",model=", modelNames[famodel])
       }
 
@@ -551,6 +555,7 @@ MPLNFAClust <- function(dataset,
                   allResults = clusterResults,
                   logLikelihood = logLikelihood,
                   numbParameters = nParameters,
+                  nParametersRegular = nParaRegularTotal,
                   trueLabels = membership,
                   ICLresults = ICLmodel,
                   BICresults = BICmodel,
@@ -829,6 +834,8 @@ PMPLNFAind <- function(dataset,
     # paras from covariance only has the covariance parameters so now we need
     # to add the parameters for the mean and pi
     kTotal <- paras + (clustersize - 1) + (clustersize * dimensionality)
+    kRegularTotal <- (0.5 * dimensionality * (dimensionality + 1)) +
+      (clustersize - 1) + (clustersize * dimensionality)
 
     # Inf criteria
     AIC <- 2 * loglik[it - 1] - (2 * kTotal)
@@ -867,6 +874,7 @@ PMPLNFAind <- function(dataset,
       clustersize = clustersize,
       pSize = pSize,
       kTotal = kTotal,
+      kRegularTotal = kRegularTotal,
       clusterlabels = mclust::map(z))
 
     class(modelList) <- "mixMPLNFA"
