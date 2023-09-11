@@ -113,8 +113,8 @@ measurements by [Silva et al.,
 2019](https://pubmed.ncbi.nlm.nih.gov/31311497/). In current work, a
 family of mixtures of MPLN factor analyzers that is analogous to the
 PGMM family is developed, by considering the general mixture of factor
-analyzers model (\$\_g = \_g \_g^{} + \_g \$) and by allowing the
-constraints $\mathbf{\Lambda}_g = \mathbf{\Lambda}$,
+analyzers model (\$\_g) and by allowing the constraints
+$\mathbf{\Lambda}_g = \mathbf{\Lambda}$,
 $\mathbf{\Psi}_g = \mathbf{\Psi}$, and the isotropic constraint
 $\mathbf{\Psi}_g = \psi_{g}\mathbf{I}_d$. This new family is referred to
 as the parsimonious mixtures of MPLN factor analyzers family (MPLNFA).
