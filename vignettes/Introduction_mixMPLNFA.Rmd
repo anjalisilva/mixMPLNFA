@@ -86,7 +86,7 @@ To simulate a dataset from MPLNFA with 1000 observations, 8 dimensions, with fou
 # hence UCC model is used
 
 set.seed(1234) # for reproducibility, setting seed
-pfactors <- 2 # number of true latent factors
+kfactors <- 2 # number of true latent factors
 dimensionality <- 8 # dimensionality of observed data
 trueClusters <- 4 # number of groups/clusters
 mixingProportions <- c(0.11, 0.43, 0.24, 0.22) # mixing proportions for 4 clusters
@@ -98,10 +98,10 @@ mu <- list(c(6, 3, 3, 6, 3, 6, 3, 3),
            c(4, 2, 6, 4, 2, 6, 4, 4),
            c(1, 3, 5, 1, 3, 5, 3, 5))
 
-Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 
 Psi <- list(diag(dimensionality) * runif(1),
             diag(dimensionality) * runif(1),
@@ -115,7 +115,7 @@ simDataUCC <- mixMPLNFA::mplnFADataGenerator(
                          dimensionality = dimensionality,
                          mixingProportions = mixingProportions,
                          trueClusters = trueClusters,
-                         pfactors = pfactors,
+                         kfactors = kfactors,
                          modelName = "UCC",
                          mu = mu,
                          Lambda = Lambda,
@@ -156,16 +156,17 @@ MPLNFAEx1 <- mixMPLNFA::MPLNFAClust(
   membership = simDataUCC$`dataset=1`$trueMembership,
   gmin = 3,
   gmax = 5,
-  pmin = 1,
-  pmax = 3,
-  modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
+  kmin = 1,
+  kmax = 3,
+  modelNames = c("UUU", "UUC", "UCU", "UCC",
+                 "CUU", "CUC", "CCU", "CCC"),
   normalize = "Yes")
   
 # To see output saved                      
 names(MPLNFAEx1) 
 # [1] "dataset"              "dimensionality"       "normalizationFactors"
-# [4] "gmin"                 "gmax"                 "pmin"                
-# [7] "pmax"                 "modelNames"           "initalizationMethod" 
+# [4] "gmin"                 "gmax"                 "kmin"                
+# [7] "kmax"                 "modelNames"           "initalizationMethod" 
 # [10] "allResults"           "logLikelihood"        "numbParameters"      
 # [13] "trueLabels"           "ICLresults"           "BICresults"          
 # [16] "AICresults"           "AIC3results"          "totalTime"          
