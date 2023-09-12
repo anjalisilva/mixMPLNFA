@@ -393,7 +393,7 @@ mplnFADataGenerator <- function(numDatasets = 10,
                             nObservations = nObservations,
                             dimensionality= dimensionality,
                             mixingProportions = mixingProportions)
-    dat[[run]][[2]] <- Ymatrix
+    dat[[run]][[2]] <- as.integer(Ymatrix)
     dat[[run]][[3]] <- Xmatrix
     dat[[run]][[4]] <- zmatrix
     dat[[run]][[5]] <- mclust::map(zmatrix)
