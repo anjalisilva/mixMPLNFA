@@ -96,7 +96,7 @@ MPLNFAEx1 <- mixMPLNFA::MPLNFAClust(
 
  # Visualize data using line plot
  # Use navigation buttons to see previous plots
- MPLNFABlack <- mixMPLNFA::mplnFAVisLine(dataset = simDataUUU$dataset,
+ MPLNFABlack <- mixMPLNFA::mplnFAVisLine(dataset = simDataUUU$`dataset=1`$dataset,
                                          clusterMembershipVector =
                                          MPLNFAEx1$BICresults$BICmodelSelectedLabels,
                                          fileName = 'Example1',
@@ -105,7 +105,7 @@ MPLNFAEx1 <- mixMPLNFA::MPLNFAClust(
 
  # Visualize data using line plot with multicolours
  # Use navigation buttons to see previous plots
- MPLNLineColor <- mixMPLNFA::mplnFAVisLine(dataset = simDataUUU$dataset,
+ MPLNLineColor <- mixMPLNFA::mplnFAVisLine(dataset = simDataUUU$`dataset=1`$dataset,
                                          clusterMembershipVector =
                                          MPLNFAEx1$BICresults$BICmodelSelectedLabels,
                                          fileName = 'Example1MultiColor',
