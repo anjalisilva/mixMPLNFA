@@ -34,9 +34,9 @@
 #'    to be considered in the clustering run. Default is 1.
 #' @param gmax A positive integer, >= gmin, specifying the maximum number of
 #'    components to be considered in the clustering run. Default is 3.
-#' @param pmin A positive integer specifying the minimum number of latent
+#' @param kmin A positive integer specifying the minimum number of latent
 #'    factors to be considered in the clustering run. Default is 1.
-#' @param pmax A positive integer, >= pmin, specifying the maximum number of
+#' @param kmax A positive integer, >= kmin, specifying the maximum number of
 #'    latent factors to be considered in the clustering run. Default is 2.
 #' @param initMethod A character vector indicating the initialization method
 #'    to be used. Default is "kmeans". Options are currently "kmeans" only.
@@ -64,9 +64,9 @@
 #'      run.
 #'   \item gmax - Maximum number of components/clusters considered in the clustering
 #'      run.
-#'   \item pmin - Minimum number of latent factors (p) considered in the clustering
+#'   \item kmin - Minimum number of latent factors (p) considered in the clustering
 #'      run.
-#'   \item pmax - Maximum number of latent factors (p) considered in the clustering
+#'   \item kmax - Maximum number of latent factors (p) considered in the clustering
 #'      run.
 #'   \item allResults - A list with all results. To access results use the format
 #'      of 'g, p, model', respectively. See examples.
@@ -93,7 +93,7 @@
 #' # hence UCC model is used
 #'
 #' set.seed(100)
-#' pfactors <- 2 # number of true latent factors
+#' kfactors <- 2 # number of true latent factors
 #' dimensionality <- 8 # dimensionality of observed data
 #' trueClusters <- 4 # number of groups/clusters
 #' mixingProportions <- c(0.11, 0.43, 0.24, 0.22) # mixing proportions for 4 clusters
@@ -105,10 +105,10 @@
 #'            c(4, 2, 6, 4, 2, 6, 4, 4),
 #'            c(1, 3, 5, 1, 3, 5, 3, 5))
 #'
-#' Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+#' Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 #'
 #' Psi <- list(diag(dimensionality) * runif(1),
 #'             diag(dimensionality) * runif(1),
@@ -121,7 +121,7 @@
 #'                                              dimensionality = dimensionality,
 #'                                              mixingProportions = mixingProportions,
 #'                                              trueClusters = trueClusters,
-#'                                              pfactors = pfactors,
+#'                                              kfactors = kfactors,
 #'                                              modelName = "UCC",
 #'                                              mu = mu,
 #'                                              Lambda = Lambda,
@@ -133,8 +133,8 @@
 #'   membership = simDataUCC$`dataset=1`$trueMembership,
 #'   gmin = 3,
 #'   gmax = 5,
-#'   pmin = 1,
-#'   pmax = 3,
+#'   kmin = 1,
+#'   kmax = 3,
 #'   modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
 #'   normalize = "Yes")
 #'
@@ -163,7 +163,7 @@
 #' # isotropic) are all constrained and hence CCC
 #'
 #' set.seed(100)
-#' pfactors <- 3 # number of true latent factors
+#' kfactors <- 3 # number of true latent factors
 #' dimensionality <- 10 # dimensionality of observed data
 #' trueClusters <- 2 # number of groups/clusters
 #' mixingProportions <- c(0.32, 0.68) # mixing proportions for 2 clusters
@@ -173,8 +173,8 @@
 #' mu <- list(c(6, 3, 3, 6, 3, 6, 3, 3, 6 ,3),
 #'            c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5))
 #'
-#' Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+#' Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 #'
 #' Psi <- list(diag(dimensionality) * runif(1),
 #'             diag(dimensionality) * runif(1))
@@ -185,7 +185,7 @@
 #'                                   dimensionality = dimensionality,
 #'                                   mixingProportions = mixingProportions,
 #'                                   trueClusters = trueClusters,
-#'                                   pfactors = pfactors,
+#'                                   kfactors = kfactors,
 #'                                   modelName = "CCC",
 #'                                   mu = mu,
 #'                                   Lambda = Lambda,
@@ -199,8 +199,8 @@
 #'                      membership = simDataCCC$`dataset=1`$trueMembership,
 #'                      gmin = 1,
 #'                      gmax = 3,
-#'                      pmin = 2,
-#'                      pmax = 4,
+#'                      kmin = 2,
+#'                      kmax = 4,
 #'                      modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
 #'                      normalize = "No")
 #'
@@ -228,7 +228,7 @@
 #' # hence UUU model is used
 #'
 #' set.seed(100)
-#' pfactors <- 4 # number of true latent factors
+#' kfactors <- 4 # number of true latent factors
 #' dimensionality <- 10 # dimensionality of observed data
 #' trueClusters <- 3 # number of groups/clusters
 #' mixingProportions <- c(0.23, 0.44, 0.33) # mixing proportions for 4 clusters
@@ -239,9 +239,9 @@
 #'            c(5, 5, 3, 3, 7, 5, 3, 3, 7, 7),
 #'            c(2, 4, 4, 7, 2, 4, 7, 2, 7, 4))
 #'
-#' Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+#' Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 #'
 #' Psi <- list(diag(dimensionality) * runif(dimensionality),
 #'             diag(dimensionality) * runif(dimensionality),
@@ -253,7 +253,7 @@
 #'                                   dimensionality = dimensionality,
 #'                                   mixingProportions = mixingProportions,
 #'                                   trueClusters = trueClusters,
-#'                                   pfactors = pfactors,
+#'                                   kfactors = kfactors,
 #'                                   modelName = "UUU",
 #'                                   mu = mu,
 #'                                   Lambda = Lambda,
@@ -265,8 +265,8 @@
 #'                      membership = simDataUUU$`dataset=1`$trueMembership,
 #'                      gmin = 2,
 #'                      gmax = 4,
-#'                      pmin = 3,
-#'                      pmax = 5,
+#'                      kmin = 3,
+#'                      kmax = 5,
 #'                      modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
 #'                      normalize = "No")
 #'
@@ -338,8 +338,8 @@ MPLNFAClust <- function(dataset,
                     membership = "none",
                     gmin = 1,
                     gmax = 3,
-                    pmin = 1,
-                    pmax = 2,
+                    kmin = 1,
+                    kmax = 2,
                     initMethod = "kmeans",
                     modelNames = "CCC",
                     normalize = "Yes") {
@@ -387,20 +387,20 @@ MPLNFAClust <- function(dataset,
     stop("Class of gmin and gmin should be numeric.")
   }
 
-  if(is.numeric(pmin) != TRUE || is.numeric(pmax) != TRUE) {
-    stop("Class of pmin and pmin should be numeric.")
+  if(is.numeric(kmin) != TRUE || is.numeric(kmax) != TRUE) {
+    stop("Class of kmin and kmin should be numeric.")
   }
 
   if (gmax < gmin) {
     stop("gmax cannot be less than gmin.")
   }
 
-  if (pmax < pmin) {
-    stop("pmax cannot be less than pmin.")
+  if (kmax < kmin) {
+    stop("kmax cannot be less than kmin.")
   }
 
-  if (pmax >= dimensionality) {
-    stop("pmax has to be less than d (dimensionality)")
+  if (kmax >= dimensionality) {
+    stop("kmax has to be less than d (dimensionality)")
   }
 
   if (gmax > nObservations) {
@@ -448,17 +448,17 @@ MPLNFAClust <- function(dataset,
     nParameters <- nParaRegularTotal <- logLikelihood <- nameVector <- vector()
 
   # for saving model selection values
-  numberVec <- (1:((gmax - gmin + 1) * (pmax - pmin + 1) * length(modelNames)))
+  numberVec <- (1:((gmax - gmin + 1) * (kmax - kmin + 1) * length(modelNames)))
   numberArray <- array(numberVec,
-                  dim = c((gmax - gmin + 1), (pmax - pmin + 1), length(modelNames)))
+                  dim = c((gmax - gmin + 1), (kmax - kmin + 1), length(modelNames)))
   rownames(numberArray) <- paste0(rep("G=", length(seq(gmin, gmax, 1))), seq(gmin, gmax, 1))
-  colnames(numberArray) <- paste0(rep("p=", length(seq(pmin, pmax, 1))), seq(pmin, pmax, 1))
+  colnames(numberArray) <- paste0(rep("k=", length(seq(kmin, kmax, 1))), seq(kmin, kmax, 1))
 
   for (gmodel in 1:(gmax - gmin + 1)) {
     # iterating through p
-    clusterResults[[gmodel]] <- vector("list", length = (pmax - pmin + 1))
+    clusterResults[[gmodel]] <- vector("list", length = (kmax - kmin + 1))
 
-    for (pmodel in 1:(pmax - pmin + 1)) {
+    for (pmodel in 1:(kmax - kmin + 1)) {
 
       for (famodel in seq_along(modelNames)) {
 
@@ -473,14 +473,14 @@ MPLNFAClust <- function(dataset,
         }
 
 
-        if(length(1:(pmax - pmin + 1)) == pmax) {
+        if(length(1:(kmax - kmin + 1)) == kmax) {
           pSize <- pmodel
-        } else if(length(1:(pmax - pmin + 1)) < pmax) {
-          pSize <- seq(pmin, pmax, 1)[pmodel]
+        } else if(length(1:(kmax - kmin + 1)) < kmax) {
+          pSize <- seq(kmin, kmax, 1)[pmodel]
         }
 
         # print statement to user
-        cat("\n Running for g =", clustersize, "q =",
+        cat("\n Running for g =", clustersize, "k =",
             pSize, "and model =", modelNames[famodel])
 
         clusterResults[[gmodel]][[pmodel]][[famodel]] <-
@@ -501,13 +501,13 @@ MPLNFAClust <- function(dataset,
           clusterResults[[gmodel]][[pmodel]][[famodel]]$loglik, n = 1))
         nParameters[inserNum] <- clusterResults[[gmodel]][[pmodel]][[famodel]]$kTotal
         nParaRegularTotal[inserNum] <- clusterResults[[gmodel]][[pmodel]][[famodel]]$kRegularTotal
-        nameVector[inserNum] <- paste0("G=", clustersize,",p=", pSize, ",model=", modelNames[famodel])
+        nameVector[inserNum] <- paste0("G=", clustersize,",k=", pSize, ",model=", modelNames[famodel])
       }
 
       clusterResults[[gmodel]][[pmodel]][[famodel]]
     }
-    # names(clusterResults[[gmodel]]) <- paste0(rep("p=", length(seq(pmin, pmax, 1))),
-    #                                          seq(pmin, pmax, 1))
+    # names(clusterResults[[gmodel]]) <- paste0(rep("p=", length(seq(kmin, kmax, 1))),
+    #                                          seq(kmin, kmax, 1))
   }
 
 
@@ -548,8 +548,8 @@ MPLNFAClust <- function(dataset,
                   normalizationFactors = normFactors[1, ],
                   gmin = gmin,
                   gmax = gmax,
-                  pmin = pmin,
-                  pmax = pmax,
+                  kmin = kmin,
+                  kmax = kmax,
                   modelNames = modelNames,
                   initalizationMethod = "kmeans",
                   allResults = clusterResults,

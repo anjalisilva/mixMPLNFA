@@ -31,7 +31,7 @@
 #' # hence UUU model is used
 #'
 #' set.seed(100)
-#' pfactors <- 4 # number of true latent factors
+#' kfactors <- 4 # number of true latent factors
 #' dimensionality <- 10 # dimensionality of observed data
 #' trueClusters <- 3 # number of groups/clusters
 #' mixingProportions <- c(0.23, 0.44, 0.33) # mixing proportions for 4 clusters
@@ -42,9 +42,9 @@
 #'            c(5, 5, 3, 3, 7, 5, 3, 3, 7, 7),
 #'            c(2, 4, 4, 7, 2, 4, 7, 2, 7, 4))
 #'
-#' Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+#' Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 #'
 #' Psi <- list(diag(dimensionality) * runif(dimensionality),
 #'             diag(dimensionality) * runif(dimensionality),
@@ -56,7 +56,7 @@
 #'                                   dimensionality = dimensionality,
 #'                                   mixingProportions = mixingProportions,
 #'                                   trueClusters = trueClusters,
-#'                                   pfactors = pfactors,
+#'                                   kfactors = kfactors,
 #'                                   modelName = "UUU",
 #'                                   mu = mu,
 #'                                   Lambda = Lambda,
@@ -68,8 +68,8 @@
 #'                      membership = simDataUUU$`dataset=1`$trueMembership,
 #'                      gmin = 2,
 #'                      gmax = 4,
-#'                      pmin = 3,
-#'                      pmax = 5,
+#'                      kmin = 3,
+#'                      kmax = 5,
 #'                      modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
 #'                      normalize = "No")
 #'

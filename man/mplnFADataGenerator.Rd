@@ -10,7 +10,7 @@ mplnFADataGenerator(
   dimensionality = 10,
   mixingProportions = c(0.32, 0.68),
   trueClusters = 2,
-  pfactors = 3,
+  kfactors = 3,
   modelName = "CCC",
   mu = list(c(6, 3, 3, 6, 3, 6, 3, 3, 6, 3), c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5)),
   Lambda = list(matrix(runif(3 * 10, -1, 1), nrow = 10), matrix(runif(3 * 10, -1, 1),
@@ -36,7 +36,7 @@ or default value.}
 \item{trueClusters}{A positive integer indicating the number
 of total components or clusters. Default value is 2.}
 
-\item{pfactors}{A positive integer indicating the number
+\item{kfactors}{A positive integer indicating the number
 of total latent factors. Default value is 3.}
 
 \item{modelName}{A character string indicating the model name to generate
@@ -56,7 +56,7 @@ and each element should have length equal to the value provided to
 
 \item{Lambda}{A list of length 'trueClusters' with each list element having
 a matrix with rows equal to value provided to 'dimensionality' argument
-and columns equal to value provided to 'pfactors' argument. The values
+and columns equal to value provided to 'kfactors' argument. The values
 should be provided as per the model used in modelName argument. See example
 or default values.}
 
@@ -81,7 +81,7 @@ cluster/component each observation belongs to.
 \item trueMembership - A vector of length nObservations giving the true
 membership of all observations.
 \item Umatrix - The matrix containing latent factors for each observation. This
-has dimensions nObservations x pfactors.
+has dimensions nObservations x kfactors.
 }
 }
 \description{
@@ -105,7 +105,7 @@ model by Ghahramani et al., 1996.
 
 set.seed(100)
 numDatasets <- 10 # total number of datasets to be generated
-pfactors <- 3 # number of true latent factors
+kfactors <- 3 # number of true latent factors
 dimensionality <- 10 # dimensionality of observed data
 trueClusters <- 2 # number of groups/clusters
 mixingProportions <- c(0.32, 0.68) # mixing proportions for 2 clusters
@@ -115,8 +115,8 @@ nObservations <- 1000 # sample size or number of observations
 mu <- list(c(6, 3, 3, 6, 3, 6, 3, 3, 6 ,3),
            c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5))
 
-Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 
 Psi <- list(diag(dimensionality) * runif(1),
             diag(dimensionality) * runif(1))
@@ -127,7 +127,7 @@ simDataCCC <- mixMPLNFA::mplnFADataGenerator(numDatasets = numDatasets,
                                   dimensionality = dimensionality,
                                   mixingProportions = mixingProportions,
                                   trueClusters = trueClusters,
-                                  pfactors = pfactors,
+                                  kfactors = kfactors,
                                   modelName = "CCC",
                                   mu = mu,
                                   Lambda = Lambda,
@@ -167,7 +167,7 @@ simDataCCC$`dataset=2`$dataset
 
 set.seed(100)
 numDatasets <- 10 # total number of datasets to be generated
-pfactors <- 2 # number of true latent factors
+kfactors <- 2 # number of true latent factors
 dimensionality <- 8 # dimensionality of observed data
 trueClusters <- 4 # number of groups/clusters
 mixingProportions <- c(0.11, 0.43, 0.24, 0.22) # mixing proportions for 4 clusters
@@ -179,10 +179,10 @@ mu <- list(c(6, 3, 3, 6, 3, 6, 3, 3),
            c(4, 2, 6, 4, 2, 6, 4, 4),
            c(1, 3, 5, 1, 3, 5, 3, 5))
 
-Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 
 Psi <- list(diag(dimensionality) * runif(1),
             diag(dimensionality) * runif(1),
@@ -195,7 +195,7 @@ simDataUCC <- mixMPLNFA::mplnFADataGenerator(numDatasets = numDatasets,
                                   dimensionality = dimensionality,
                                   mixingProportions = mixingProportions,
                                   trueClusters = trueClusters,
-                                  pfactors = pfactors,
+                                  kfactors = kfactors,
                                   modelName = "UCC",
                                   mu = mu,
                                   Lambda = Lambda,
@@ -215,7 +215,7 @@ simDataUCC$`dataset=1`$input
 
 set.seed(100)
 numDatasets <- 10 # total number of datasets to be generated
-pfactors <- 4 # number of true latent factors
+kfactors <- 4 # number of true latent factors
 dimensionality <- 10 # dimensionality of observed data
 trueClusters <- 3 # number of groups/clusters
 mixingProportions <- c(0.23, 0.44, 0.33) # mixing proportions for 4 clusters
@@ -226,9 +226,9 @@ mu <- list(c(4, 6, 4, 2, 2, 4, 6, 4, 6, 2),
            c(5, 5, 3, 3, 7, 5, 3, 3, 7, 7),
            c(2, 4, 4, 7, 2, 4, 7, 2, 7, 4))
 
-Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 
 Psi <- list(diag(dimensionality) * runif(dimensionality),
             diag(dimensionality) * runif(dimensionality),
@@ -240,7 +240,7 @@ simDataUUU <- mixMPLNFA::mplnFADataGenerator(numDatasets = numDatasets,
                                   dimensionality = dimensionality,
                                   mixingProportions = mixingProportions,
                                   trueClusters = trueClusters,
-                                  pfactors = pfactors,
+                                  kfactors = kfactors,
                                   modelName = "UUU",
                                   mu = mu,
                                   Lambda = Lambda,

@@ -5,7 +5,7 @@ test_that("Checking data generation results", {
 
   set.seed(100)
   numDatasets <- 10 # total number of datasets to be generated
-  pfactors <- 4 # number of true latent factors
+  kfactors <- 4 # number of true latent factors
   dimensionality <- 10 # dimensionality of observed data
   trueClusters <- 3 # number of groups/clusters
   mixingProportions <- c(0.23, 0.44, 0.33) # mixing proportions for 4 clusters
@@ -16,9 +16,9 @@ test_that("Checking data generation results", {
              c(5, 5, 3, 3, 7, 5, 3, 3, 7, 7),
              c(2, 4, 4, 7, 2, 4, 7, 2, 7, 4))
 
-  Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-                 matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-                 matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+  Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+                 matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+                 matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 
   Psi <- list(diag(dimensionality) * runif(dimensionality),
               diag(dimensionality) * runif(dimensionality),
@@ -30,7 +30,7 @@ test_that("Checking data generation results", {
                                                dimensionality = dimensionality,
                                                mixingProportions = mixingProportions,
                                                trueClusters = trueClusters,
-                                               pfactors = pfactors,
+                                               kfactors = kfactors,
                                                modelName = "UUU",
                                                mu = mu,
                                                Lambda = Lambda,
@@ -40,11 +40,11 @@ test_that("Checking data generation results", {
   expect_length(simDataUUU, 10)
   expect_s3_class(simDataUUU, "mplnFADataGenerator")
   expect_identical(simDataUUU$`dataset=1`$input$trueClusters, 3)
-  expect_identical(simDataUUU$`dataset=1`$input$pfactors, 4)
+  expect_identical(simDataUUU$`dataset=1`$input$kfactors, 4)
   expect_identical(simDataUUU$`dataset=1`$input$nObservations, 1000)
   expect_identical(simDataUUU$`dataset=1`$input$dimensionality, 10)
   expect_named(simDataUUU$`dataset=1`$input, c("mu", "Lambda", "Psi", "trueClusters",
-                                               "pfactors", "nObservations", "dimensionality",
+                                               "kfactors", "nObservations", "dimensionality",
                                                "mixingProportions"))
   expect_output(str(simDataUUU), "List of 10")
 })
@@ -54,7 +54,7 @@ test_that("Data generation error upon invalid user input", {
 
   set.seed(100)
   numDatasets <- 10 # total number of datasets to be generated
-  pfactors <- 4 # number of true latent factors
+  kfactors <- 4 # number of true latent factors
   dimensionality <- 10 # dimensionality of observed data
   trueClusters <- 3 # number of groups/clusters
   mixingProportions <- c(0.23, 0.44, 0.33) # mixing proportions for 4 clusters
@@ -65,9 +65,9 @@ test_that("Data generation error upon invalid user input", {
              c(5, 5, 3, 3, 7, 5, 3, 3, 7, 7),
              c(2, 4, 4, 7, 2, 4, 7, 2, 7, 4))
 
-  Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-                 matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-                 matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+  Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+                 matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+                 matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 
   Psi <- list(diag(dimensionality) * runif(dimensionality),
               diag(dimensionality) * runif(dimensionality),
@@ -80,7 +80,7 @@ test_that("Data generation error upon invalid user input", {
                                                         dimensionality = dimensionality,
                                                         mixingProportions = mixingProportions,
                                                         trueClusters = trueClusters,
-                                                        pfactors = pfactors,
+                                                        kfactors = kfactors,
                                                         modelName = "UUU",
                                                         mu = mu,
                                                         Lambda = Lambda,
@@ -92,7 +92,7 @@ test_that("Data generation error upon invalid user input", {
                                                         dimensionality = dimensionality,
                                                         mixingProportions = mixingProportions,
                                                         trueClusters = trueClusters,
-                                                        pfactors = pfactors,
+                                                        kfactors = kfactors,
                                                         modelName = "UUU",
                                                         mu = mu,
                                                         Lambda = Lambda,
@@ -104,7 +104,7 @@ test_that("Data generation error upon invalid user input", {
                                                         dimensionality = 10,
                                                         mixingProportions = mixingProportions,
                                                         trueClusters = trueClusters,
-                                                        pfactors = 11,
+                                                        kfactors = 11,
                                                         modelName = "UUU",
                                                         mu = mu,
                                                         Lambda = Lambda,
@@ -116,7 +116,7 @@ test_that("Data generation error upon invalid user input", {
                                                         dimensionality = dimensionality,
                                                         mixingProportions = mixingProportions,
                                                         trueClusters = 200,
-                                                        pfactors = pfactors,
+                                                        kfactors = kfactors,
                                                         modelName = "UUU",
                                                         mu = mu,
                                                         Lambda = Lambda,
@@ -129,7 +129,7 @@ test_that("Data generation error upon invalid user input", {
                                                         dimensionality = dimensionality,
                                                         mixingProportions = mixingProportions,
                                                         trueClusters = trueClusters,
-                                                        pfactors = pfactors,
+                                                        kfactors = kfactors,
                                                         modelName = "AAA",
                                                         mu = mu,
                                                         Lambda = Lambda,

@@ -23,7 +23,7 @@
 #'    dimensionality for the dataset. Default value is 10.
 #' @param trueClusters A positive integer indicating the number
 #'    of total components or clusters. Default value is 2.
-#' @param pfactors A positive integer indicating the number
+#' @param kfactors A positive integer indicating the number
 #'    of total latent factors. Default value is 3.
 #' @param modelName A character string indicating the model name to generate
 #'     covariance matrix, Sigma. Since the largest contribution of free parameters
@@ -43,7 +43,7 @@
 #'     'dimensionality' argument. See example or default value.
 #' @param Lambda A list of length 'trueClusters' with each list element having
 #'     a matrix with rows equal to value provided to 'dimensionality' argument
-#'     and columns equal to value provided to 'pfactors' argument. The values
+#'     and columns equal to value provided to 'kfactors' argument. The values
 #'     should be provided as per the model used in modelName argument. See example
 #'     or default values.
 #' @param Psi Psi should be a list of length 'trueClusters' with each list
@@ -66,7 +66,7 @@
 #'   \item trueMembership - A vector of length nObservations giving the true
 #'      membership of all observations.
 #'   \item Umatrix - The matrix containing latent factors for each observation. This
-#'      has dimensions nObservations x pfactors.
+#'      has dimensions nObservations x kfactors.
 #'}
 #'
 #' @examples
@@ -77,7 +77,7 @@
 #'
 #' set.seed(100)
 #' numDatasets <- 10 # total number of datasets to be generated
-#' pfactors <- 3 # number of true latent factors
+#' kfactors <- 3 # number of true latent factors
 #' dimensionality <- 10 # dimensionality of observed data
 #' trueClusters <- 2 # number of groups/clusters
 #' mixingProportions <- c(0.32, 0.68) # mixing proportions for 2 clusters
@@ -87,8 +87,8 @@
 #' mu <- list(c(6, 3, 3, 6, 3, 6, 3, 3, 6 ,3),
 #'            c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5))
 #'
-#' Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+#' Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 #'
 #' Psi <- list(diag(dimensionality) * runif(1),
 #'             diag(dimensionality) * runif(1))
@@ -99,7 +99,7 @@
 #'                                   dimensionality = dimensionality,
 #'                                   mixingProportions = mixingProportions,
 #'                                   trueClusters = trueClusters,
-#'                                   pfactors = pfactors,
+#'                                   kfactors = kfactors,
 #'                                   modelName = "CCC",
 #'                                   mu = mu,
 #'                                   Lambda = Lambda,
@@ -139,7 +139,7 @@
 #'
 #' set.seed(100)
 #' numDatasets <- 10 # total number of datasets to be generated
-#' pfactors <- 2 # number of true latent factors
+#' kfactors <- 2 # number of true latent factors
 #' dimensionality <- 8 # dimensionality of observed data
 #' trueClusters <- 4 # number of groups/clusters
 #' mixingProportions <- c(0.11, 0.43, 0.24, 0.22) # mixing proportions for 4 clusters
@@ -151,10 +151,10 @@
 #'            c(4, 2, 6, 4, 2, 6, 4, 4),
 #'            c(1, 3, 5, 1, 3, 5, 3, 5))
 #'
-#' Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+#' Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 #'
 #' Psi <- list(diag(dimensionality) * runif(1),
 #'             diag(dimensionality) * runif(1),
@@ -167,7 +167,7 @@
 #'                                   dimensionality = dimensionality,
 #'                                   mixingProportions = mixingProportions,
 #'                                   trueClusters = trueClusters,
-#'                                   pfactors = pfactors,
+#'                                   kfactors = kfactors,
 #'                                   modelName = "UCC",
 #'                                   mu = mu,
 #'                                   Lambda = Lambda,
@@ -187,7 +187,7 @@
 #'
 #' set.seed(100)
 #' numDatasets <- 10 # total number of datasets to be generated
-#' pfactors <- 4 # number of true latent factors
+#' kfactors <- 4 # number of true latent factors
 #' dimensionality <- 10 # dimensionality of observed data
 #' trueClusters <- 3 # number of groups/clusters
 #' mixingProportions <- c(0.23, 0.44, 0.33) # mixing proportions for 4 clusters
@@ -198,9 +198,9 @@
 #'            c(5, 5, 3, 3, 7, 5, 3, 3, 7, 7),
 #'            c(2, 4, 4, 7, 2, 4, 7, 2, 7, 4))
 #'
-#' Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-#'                matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+#' Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+#'                matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 #'
 #' Psi <- list(diag(dimensionality) * runif(dimensionality),
 #'             diag(dimensionality) * runif(dimensionality),
@@ -212,7 +212,7 @@
 #'                                   dimensionality = dimensionality,
 #'                                   mixingProportions = mixingProportions,
 #'                                   trueClusters = trueClusters,
-#'                                   pfactors = pfactors,
+#'                                   kfactors = kfactors,
 #'                                   modelName = "UUU",
 #'                                   mu = mu,
 #'                                   Lambda = Lambda,
@@ -248,7 +248,7 @@ mplnFADataGenerator <- function(numDatasets = 10,
                                 dimensionality = 10,
                                 mixingProportions = c(0.32, 0.68),
                                 trueClusters = 2,
-                                pfactors = 3,
+                                kfactors = 3,
                                 modelName = "CCC",
                                 mu = list(c(6, 3, 3, 6, 3, 6, 3, 3, 6 ,3),
                                           c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5)),
@@ -266,11 +266,11 @@ mplnFADataGenerator <- function(numDatasets = 10,
     stop("dimensionality should be of class numeric.")
   }
 
-  if(is.numeric(pfactors) != TRUE) {
-    stop("pfactors should be of class numeric.")
+  if(is.numeric(kfactors) != TRUE) {
+    stop("kfactors should be of class numeric.")
   }
 
-  if(dimensionality <= pfactors ) {
+  if(dimensionality <= kfactors ) {
     stop("Dimensionality cannot be less than or equal to latent factors.
          Latent factors should be less than dimensionality.")
   }
@@ -324,18 +324,18 @@ mplnFADataGenerator <- function(numDatasets = 10,
          'trueClusters' argument.")
   }
 
-  if (ncol(Lambda[[1]]) != pfactors) {
+  if (ncol(Lambda[[1]]) != kfactors) {
     stop("Lambda should be a list of length 'trueClusters' with each
           list element having a matrix with rows equal to value provided to
           'dimensionality' argument and columns equal to value provided to
-          'pfactors' argument.")
+          'kfactors' argument.")
   }
 
   if (nrow(Lambda[[1]]) != dimensionality) {
     stop("Lambda should be a list of length 'trueClusters' with each
           list element having a matrix with rows equal to value provided to
           'dimensionality' argument and columns equal to value provided to
-          'pfactors' argument.")
+          'kfactors' argument.")
     }
 
   if (length(Lambda) != trueClusters) {
@@ -368,8 +368,8 @@ mplnFADataGenerator <- function(numDatasets = 10,
 
     Ymatrix <- Xmatrix <- matrix(0, ncol = dimensionality, nrow = nObservations)
     Umatrix <- mvtnorm::rmvnorm(n = nObservations,
-                                mean = rep(0, pfactors),
-                                sigma = diag(pfactors))
+                                mean = rep(0, kfactors),
+                                sigma = diag(kfactors))
     zmatrix <- t(stats::rmultinom(n = nObservations, size = 1,
                                   prob = mixingProportions))
 
@@ -389,7 +389,7 @@ mplnFADataGenerator <- function(numDatasets = 10,
                             Lambda = Lambda,
                             Psi = Psi,
                             trueClusters = trueClusters,
-                            pfactors = pfactors,
+                            kfactors = kfactors,
                             nObservations = nObservations,
                             dimensionality= dimensionality,
                             mixingProportions = mixingProportions)

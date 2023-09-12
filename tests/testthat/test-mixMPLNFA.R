@@ -23,8 +23,8 @@ test_that("Checking clustering results", {
   clusResultsUUU <- mixMPLNFA::MPLNFAClust(dataset = sampleData$dataset,
                                   gmin = 1,
                                   gmax = 3,
-                                  pmin = 1,
-                                  pmax = 2,
+                                  kmin = 1,
+                                  kmax = 2,
                                   modelName = "UUU",
                                   normalize = "Yes")
 
@@ -33,16 +33,16 @@ test_that("Checking clustering results", {
   expect_s3_class(clusResultsUUU, "PMPLNFA")
   expect_identical(clusResultsUUU$gmin, 1)
   expect_identical(clusResultsUUU$gmax, 3)
-  expect_identical(clusResultsUUU$pmin, 1)
-  expect_identical(clusResultsUUU$pmax, 2)
+  expect_identical(clusResultsUUU$kmin, 1)
+  expect_identical(clusResultsUUU$kmax, 2)
   expect_named(clusResultsUUU, c("dataset", "dimensionality", "normalizationFactors",
-                                 "gmin",  "gmax", "pmin",
-                                 "pmax", "modelNames", "initalizationMethod", "allResults",
+                                 "gmin",  "gmax", "kmin",
+                                 "kmax", "modelNames", "initalizationMethod", "allResults",
                                  "logLikelihood", "numbParameters", "nParametersRegular",
                                  "trueLabels", "ICLresults", "BICresults", "AICresults",
                                  "AIC3results", "totalTime"))
   expect_output(str(clusResultsUUU), "List of 18")
-  expect_identical(clusResultsUUU$BICresults$BICmodelselected, "G=2,p=1,model=UUU")
+  expect_identical(clusResultsUUU$BICresults$BICmodelselected, "G=2,k=1,model=UUU")
 })
 
 # "Checking for invalid user input"
@@ -52,8 +52,8 @@ test_that("Data clustering error upon invalid user input", {
   testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = "sampleData$dataset",
                                             gmin = 1,
                                             gmax = 3,
-                                            pmin = 1,
-                                            pmax = 2,
+                                            kmin = 1,
+                                            kmax = 2,
                                             modelName = "UUU",
                                             normalize = "Yes"))
 
@@ -61,8 +61,8 @@ test_that("Data clustering error upon invalid user input", {
   testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = FALSE,
                                             gmin = 1,
                                             gmax = 3,
-                                            pmin = 1,
-                                            pmax = 2,
+                                            kmin = 1,
+                                            kmax = 2,
                                             modelName = "UUU",
                                             normalize = "Yes"))
 
@@ -70,8 +70,8 @@ test_that("Data clustering error upon invalid user input", {
   testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = sampleData$dataset,
                                             gmin = 1,
                                             gmax = 3,
-                                            pmin = 1,
-                                            pmax = ncol(sampleData$dataset) + 1,
+                                            kmin = 1,
+                                            kmax = ncol(sampleData$dataset) + 1,
                                             modelName = "UUU",
                                             normalize = "Yes"))
 
@@ -79,8 +79,8 @@ test_that("Data clustering error upon invalid user input", {
   testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = sampleData$dataset,
                                             gmin = 1,
                                             gmax = nrow(sampleData$dataset) + 1,
-                                            pmin = 1,
-                                            pmax = 2,
+                                            kmin = 1,
+                                            kmax = 2,
                                             modelName = "UUU",
                                             normalize = "Yes"))
 
@@ -89,8 +89,8 @@ test_that("Data clustering error upon invalid user input", {
   testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = sampleData$dataset,
                                             gmin = "1",
                                             gmax = 3,
-                                            pmin = 1,
-                                            pmax = 2,
+                                            kmin = 1,
+                                            kmax = 2,
                                             modelName = "UUU",
                                             normalize = "Yes"))
 
@@ -99,17 +99,17 @@ test_that("Data clustering error upon invalid user input", {
   testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = sampleData$dataset,
                                             gmin = 5,
                                             gmax = 2,
-                                            pmin = 1,
-                                            pmax = 2,
+                                            kmin = 1,
+                                            kmax = 2,
                                             modelName = "UUU",
                                             normalize = "Yes"))
 
-  # Incorrect input for pmin and pmax
+  # Incorrect input for kmin and kmax
   testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = sampleData$dataset,
                                             gmin = 1,
                                             gmax = 2,
-                                            pmin = 3,
-                                            pmax = 1,
+                                            kmin = 3,
+                                            kmax = 1,
                                             modelName = "UUU",
                                             normalize = "Yes"))
 
@@ -117,8 +117,8 @@ test_that("Data clustering error upon invalid user input", {
   testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = sampleData$dataset,
                                             gmin = 1,
                                             gmax = 2,
-                                            pmin = 3,
-                                            pmax = 1,
+                                            kmin = 3,
+                                            kmax = 1,
                                             modelName = "UUU",
                                             normalize = NA))
 
@@ -127,8 +127,8 @@ test_that("Data clustering error upon invalid user input", {
   testthat::expect_error(mixMPLNFA::MPLNFAClust(dataset = sampleData$dataset,
                                             gmin = 1,
                                             gmax = 2,
-                                            pmin = 3,
-                                            pmax = 1,
+                                            kmin = 3,
+                                            kmax = 1,
                                             modelName = "UUU",
                                             normalize = NA))
 
@@ -137,8 +137,8 @@ test_that("Data clustering error upon invalid user input", {
                                             membership = "",
                                             gmin = 1,
                                             gmax = 2,
-                                            pmin = 1,
-                                            pmax = 2,
+                                            kmin = 1,
+                                            kmax = 2,
                                             modelName = "UUU",
                                             normalize = NA))
 })

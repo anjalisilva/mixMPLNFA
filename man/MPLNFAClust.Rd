@@ -9,8 +9,8 @@ MPLNFAClust(
   membership = "none",
   gmin = 1,
   gmax = 3,
-  pmin = 1,
-  pmax = 2,
+  kmin = 1,
+  kmax = 2,
   initMethod = "kmeans",
   modelNames = "CCC",
   normalize = "Yes"
@@ -34,10 +34,10 @@ to be considered in the clustering run. Default is 1.}
 \item{gmax}{A positive integer, >= gmin, specifying the maximum number of
 components to be considered in the clustering run. Default is 3.}
 
-\item{pmin}{A positive integer specifying the minimum number of latent
+\item{kmin}{A positive integer specifying the minimum number of latent
 factors to be considered in the clustering run. Default is 1.}
 
-\item{pmax}{A positive integer, >= pmin, specifying the maximum number of
+\item{kmax}{A positive integer, >= kmin, specifying the maximum number of
 latent factors to be considered in the clustering run. Default is 2.}
 
 \item{initMethod}{A character vector indicating the initialization method
@@ -69,9 +69,9 @@ for input dataset.
 run.
 \item gmax - Maximum number of components/clusters considered in the clustering
 run.
-\item pmin - Minimum number of latent factors (p) considered in the clustering
+\item kmin - Minimum number of latent factors (p) considered in the clustering
 run.
-\item pmax - Maximum number of latent factors (p) considered in the clustering
+\item kmax - Maximum number of latent factors (p) considered in the clustering
 run.
 \item allResults - A list with all results. To access results use the format
 of 'g, p, model', respectively. See examples.
@@ -120,7 +120,7 @@ important role in the successful operation of this algorithm.
 # hence UCC model is used
 
 set.seed(100)
-pfactors <- 2 # number of true latent factors
+kfactors <- 2 # number of true latent factors
 dimensionality <- 8 # dimensionality of observed data
 trueClusters <- 4 # number of groups/clusters
 mixingProportions <- c(0.11, 0.43, 0.24, 0.22) # mixing proportions for 4 clusters
@@ -132,10 +132,10 @@ mu <- list(c(6, 3, 3, 6, 3, 6, 3, 3),
            c(4, 2, 6, 4, 2, 6, 4, 4),
            c(1, 3, 5, 1, 3, 5, 3, 5))
 
-Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 
 Psi <- list(diag(dimensionality) * runif(1),
             diag(dimensionality) * runif(1),
@@ -148,7 +148,7 @@ simDataUCC <- mixMPLNFA::mplnFADataGenerator(numDatasets = 1,
                                              dimensionality = dimensionality,
                                              mixingProportions = mixingProportions,
                                              trueClusters = trueClusters,
-                                             pfactors = pfactors,
+                                             kfactors = kfactors,
                                              modelName = "UCC",
                                              mu = mu,
                                              Lambda = Lambda,
@@ -160,8 +160,8 @@ MPLNFAEx1 <- mixMPLNFA::MPLNFAClust(
   membership = simDataUCC$`dataset=1`$trueMembership,
   gmin = 3,
   gmax = 5,
-  pmin = 1,
-  pmax = 3,
+  kmin = 1,
+  kmax = 3,
   modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
   normalize = "Yes")
 
@@ -190,7 +190,7 @@ MPLNFAEx1$allResults[[2]][[2]][[4]]
 # isotropic) are all constrained and hence CCC
 
 set.seed(100)
-pfactors <- 3 # number of true latent factors
+kfactors <- 3 # number of true latent factors
 dimensionality <- 10 # dimensionality of observed data
 trueClusters <- 2 # number of groups/clusters
 mixingProportions <- c(0.32, 0.68) # mixing proportions for 2 clusters
@@ -200,8 +200,8 @@ nObservations <- 1000 # sample size or number of observations
 mu <- list(c(6, 3, 3, 6, 3, 6, 3, 3, 6 ,3),
            c(5, 3, 5, 3, 5, 5, 3, 5, 3, 5))
 
-Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 
 Psi <- list(diag(dimensionality) * runif(1),
             diag(dimensionality) * runif(1))
@@ -212,7 +212,7 @@ simDataCCC <- mixMPLNFA::mplnFADataGenerator(numDatasets = 2,
                                   dimensionality = dimensionality,
                                   mixingProportions = mixingProportions,
                                   trueClusters = trueClusters,
-                                  pfactors = pfactors,
+                                  kfactors = kfactors,
                                   modelName = "CCC",
                                   mu = mu,
                                   Lambda = Lambda,
@@ -226,8 +226,8 @@ MPLNFAEx2 <- mixMPLNFA::MPLNFAClust(
                      membership = simDataCCC$`dataset=1`$trueMembership,
                      gmin = 1,
                      gmax = 3,
-                     pmin = 2,
-                     pmax = 4,
+                     kmin = 2,
+                     kmax = 4,
                      modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
                      normalize = "No")
 
@@ -255,7 +255,7 @@ MPLNFAEx2$allResults[[2]][[1]][[8]]
 # hence UUU model is used
 
 set.seed(100)
-pfactors <- 4 # number of true latent factors
+kfactors <- 4 # number of true latent factors
 dimensionality <- 10 # dimensionality of observed data
 trueClusters <- 3 # number of groups/clusters
 mixingProportions <- c(0.23, 0.44, 0.33) # mixing proportions for 4 clusters
@@ -266,9 +266,9 @@ mu <- list(c(4, 6, 4, 2, 2, 4, 6, 4, 6, 2),
            c(5, 5, 3, 3, 7, 5, 3, 3, 7, 7),
            c(2, 4, 4, 7, 2, 4, 7, 2, 7, 4))
 
-Lambda <- list(matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality),
-               matrix(runif(pfactors * dimensionality, -1, 1), nrow = dimensionality))
+Lambda <- list(matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality),
+               matrix(runif(kfactors * dimensionality, -1, 1), nrow = dimensionality))
 
 Psi <- list(diag(dimensionality) * runif(dimensionality),
             diag(dimensionality) * runif(dimensionality),
@@ -280,7 +280,7 @@ simDataUUU <- mixMPLNFA::mplnFADataGenerator(numDatasets = 1,
                                   dimensionality = dimensionality,
                                   mixingProportions = mixingProportions,
                                   trueClusters = trueClusters,
-                                  pfactors = pfactors,
+                                  kfactors = kfactors,
                                   modelName = "UUU",
                                   mu = mu,
                                   Lambda = Lambda,
@@ -292,8 +292,8 @@ MPLNFAEx3 <- mixMPLNFA::MPLNFAClust(
                      membership = simDataUUU$`dataset=1`$trueMembership,
                      gmin = 2,
                      gmax = 4,
-                     pmin = 3,
-                     pmax = 5,
+                     kmin = 3,
+                     kmax = 5,
                      modelNames = c("UUU", "UUC", "UCU", "UCC", "CUU", "CUC", "CCU", "CCC"),
                      normalize = "No")
 
